@@ -11,6 +11,7 @@ import AiRiskAnalysis from "@/app/dashboard/AiRiskAnalysis";
 import RecentAlerts from "@/app/dashboard/RecentAlerts";
 import AnalyticsSection from "@/app/dashboard/AnalyticsSection";
 import QuickActions from "@/app/dashboard/QuickActions";
+import IncidentSignOff from "@/app/dashboard/IncidentSignOff";
 import type { SensorFrame } from "../../../shared/types/telemetry";
 
 export default function DashboardPage() {
@@ -56,6 +57,7 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <RecentAlerts />
             <QuickActions />
+            <IncidentSignOff />
           </div>
         </main>
       </div>

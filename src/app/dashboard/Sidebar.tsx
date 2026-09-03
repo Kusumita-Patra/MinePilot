@@ -37,11 +37,13 @@ export default function Sidebar() {
   const [time, setTime] = useState<string | null>(null);
 
   useEffect(() => {
-    setTime(new Date().toLocaleTimeString());
-    const interval = setInterval(() => {
-      setTime(new Date().toLocaleTimeString());
-    }, 1000);
-    return () => clearInterval(interval);
+    const tick = () => setTime(new Date().toLocaleTimeString());
+    const timer = setTimeout(tick, 0);
+    const interval = setInterval(tick, 1000);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, []);
 
   return (

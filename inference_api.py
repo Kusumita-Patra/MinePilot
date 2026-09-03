@@ -17,10 +17,12 @@ from typing import List, Optional
 import numpy as np
 import joblib
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from risk_scoring import calculate_risk_index, FEATURE_ORDER
 from data_generator import SENSORS as SENSOR_CONFIG, SECTORS
+import incidents
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 
@@ -28,6 +30,17 @@ app = FastAPI(
     title="Smart Mine Risk Inference API",
     description="Predictive hazard modeling for the Smart Mine Digital Twin platform",
     version="1.0.0",
+)
+
+# Allow the Next.js dev server to call the REST endpoints below. WebSocket
+# connections aren't subject to CORS, but fetch()-based POST/PATCH calls
+# from the dashboard/field pages need this.
+_frontend_origin = os.environ.get("FRONTEND_ORIGIN", "http://localhost:3000")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[_frontend_origin, "http://127.0.0.1:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -101,6 +114,33 @@ def health():
     return {"status": "ok"}
 
 
+# ---------------------------------------------------------------------------
+# Incident ticket lifecycle — REST endpoints consumed by the dashboard
+# (mine manager) and field-worker views.
+# ---------------------------------------------------------------------------
+
+@app.get("/api/v1/incidents", response_model=List[incidents.Incident])
+def get_incidents(status: Optional[str] = None):
+    return incidents.list_incidents(status)
+
+
+@app.patch("/api/v1/incidents/{ticket_id}", response_model=incidents.Incident)
+def patch_incident(ticket_id: str, patch: incidents.IncidentUpdate):
+    try:
+        return incidents.update_incident(ticket_id, patch)
+    except KeyError:
+        raise HTTPException(status_code=404, detail=f"No incident {ticket_id}")
+    except incidents.InvalidTransition as e:
+        raise HTTPException(status_code=409, detail=str(e))
+
+
+@app.post("/api/v1/incidents/reset")
+def reset_incidents():
+    """Demo/testing helper — clears all incidents."""
+    incidents.reset_all()
+    return {"status": "cleared"}
+
+
 @app.post("/api/v1/predict-risk", response_model=PredictRiskResponse)
 def predict_risk(req: PredictRiskRequest):
     if not req.telemetry:
@@ -110,6 +150,14 @@ def predict_risk(req: PredictRiskRequest):
     reading_dict = latest.dict()
 
     result = calculate_risk_index(reading_dict)
+
+    if result["risk_level"] != "NORMAL" and req.sensor_id and req.sector_id:
+        incidents.trigger_incident(
+            sensor_id=req.sensor_id,
+            sector_id=req.sector_id,
+            risk_score=result["risk_score"],
+            severity=result["risk_level"],
+        )
 
     forecast_out = None
     model, meta = _load_forecast_model()
@@ -220,6 +268,14 @@ async def ws_telemetry(websocket: WebSocket):
             state = _step_sensor(sector)
             telemetry = {k: round(v, 2) for k, v in state["values"].items()}
             risk = calculate_risk_index(telemetry)
+
+            if risk["risk_level"] != "NORMAL":
+                incidents.trigger_incident(
+                    sensor_id=state["sensor_id"],
+                    sector_id=sector,
+                    risk_score=risk["risk_score"],
+                    severity=risk["risk_level"],
+                )
 
             payload = {
                 "sensor_id": state["sensor_id"],
