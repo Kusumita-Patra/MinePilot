@@ -9,6 +9,7 @@ const POLL_MS = 4000;
 export function useIncidents() {
   const [incidents, setIncidents] = useState<Incident[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     try {
@@ -19,6 +20,8 @@ export function useIncidents() {
       // Backend not reachable — leave the last-known list in place rather
       // than clearing it, so a brief network blip doesn't flash the UI empty.
       setError(e instanceof Error ? e.message : "Failed to load incidents");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -31,5 +34,5 @@ export function useIncidents() {
     };
   }, [refresh]);
 
-  return { incidents, error, refresh };
+  return { incidents, error, loading, refresh };
 }

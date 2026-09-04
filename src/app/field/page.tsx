@@ -4,12 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { useIncidents } from "@/hooks/useIncidents";
 import { updateIncident } from "@/lib/api";
+import LoadingOverlay from "@/components/LoadingOverlay";
 import type { Incident } from "../../../shared/types/telemetry";
 
 const DEMO_WORKER_ID = "FW-DEMO-01";
 
 export default function FieldWorkerPage() {
-  const { incidents, error, refresh } = useIncidents();
+  const { incidents, error, loading, refresh } = useIncidents();
   const [remarksByTicket, setRemarksByTicket] = useState<Record<string, string>>({});
   const [busyTicket, setBusyTicket] = useState<string | null>(null);
 
@@ -29,7 +30,10 @@ export default function FieldWorkerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white p-4 max-w-md mx-auto">
+
+    <main className="min-h-screen bg-slate-950 text-white p-4 max-w-md mx-auto">
+      <LoadingOverlay active={loading} label="Loading assigned alerts..." />
+
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-xl font-bold">My Assigned Alerts</h1>
         <Link href="/dashboard" className="text-xs text-blue-400 hover:underline">

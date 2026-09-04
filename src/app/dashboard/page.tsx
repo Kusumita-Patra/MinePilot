@@ -12,10 +12,11 @@ import RecentAlerts from "@/app/dashboard/RecentAlerts";
 import AnalyticsSection from "@/app/dashboard/AnalyticsSection";
 import QuickActions from "@/app/dashboard/QuickActions";
 import IncidentSignOff from "@/app/dashboard/IncidentSignOff";
+import LoadingOverlay from "@/components/LoadingOverlay";
 import type { SensorFrame } from "../../../shared/types/telemetry";
 
 export default function DashboardPage() {
-  const { sensors } = useTelemetryWebSocket();
+  const { sensors, connected, usingMockData } = useTelemetryWebSocket();
   const [selected, setSelected] = useState<SensorFrame | null>(null);
 
   const sensorList = Object.values(sensors);
@@ -25,6 +26,7 @@ export default function DashboardPage() {
 
   return (
     <div className="h-screen flex flex-col bg-slate-950 text-white">
+      <LoadingOverlay active={!connected && !usingMockData} label="Connecting to mine network..." />
       <Header />
 
       <div className="flex flex-1 overflow-hidden">
