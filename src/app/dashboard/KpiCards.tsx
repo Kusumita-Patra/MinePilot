@@ -29,7 +29,7 @@ export default function KpiCards() {
       {KPIS.map(({ label, value, trend, icon: Icon, tone }) => (
         <div
           key={label}
-          className="bg-neutral-900 border border-white/10 rounded-xl p-4 flex items-start gap-3 hover:border-white/20 transition-colors"
+          className="bg-gray-900 border border-white/10 rounded-xl p-4 flex items-start gap-3 hover:border-white/20 transition-colors"
         >
           <div className={clsx("w-9 h-9 rounded-lg flex items-center justify-center shrink-0", TONE_STYLES[tone])}>
             <Icon size={16} />

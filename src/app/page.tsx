@@ -1,9 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="flex-1 flex flex-col items-center justify-center bg-neutral-950 text-white p-6 text-center">
-      <h1 className="text-3xl font-bold mb-2">MinePilot</h1>
+    <main className="flex-1 flex flex-col items-center justify-center bg-slate-950 text-white p-6 text-center">
+      <Image src="/Logo.png" alt="MinePilot" width={190} height={90} className="h-65 w-65" priority /> 
+      {/* <h1 className="text-3xl font-bold mb-2">MinePilot</h1> */}
       <p className="text-neutral-400 max-w-md mb-10">
         AI-based smart mine digital twin — live hazard telemetry, predictive
         risk scoring, and incident governance.

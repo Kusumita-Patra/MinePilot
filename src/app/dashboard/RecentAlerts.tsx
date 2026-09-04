@@ -26,7 +26,7 @@ export default function RecentAlerts() {
   const recent = incidents.slice(0, 6);
 
   return (
-    <div className="bg-neutral-900 border border-white/10 rounded-xl p-4">
+    <div className="bg-gray-900 border border-white/10 rounded-xl p-4">
       <div className="flex items-center justify-between mb-3">
         <p className="text-xs font-semibold text-neutral-300 tracking-wide">RECENT ALERTS</p>
         <span className="text-[11px] text-neutral-500">{incidents.length} total</span>

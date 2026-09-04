@@ -24,7 +24,7 @@ export default function AiRiskAnalysis({ riskScore = 70 }: { riskScore?: number 
   const ringColor = riskScore >= 75 ? "#ef4444" : riskScore >= 40 ? "#f59e0b" : "#10b981";
 
   return (
-    <div className="bg-neutral-900 border border-white/10 rounded-xl p-4 flex flex-col gap-4 w-full lg:w-80 shrink-0">
+    <div className="bg-gray-900 border border-white/10 rounded-xl p-4 flex flex-col gap-4 w-full lg:w-80 shrink-0">
       <p className="text-xs font-semibold text-neutral-300 tracking-wide">AI RISK ANALYSIS</p>
 
       <div className="flex flex-col items-center py-2">

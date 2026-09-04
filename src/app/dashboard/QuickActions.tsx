@@ -11,7 +11,7 @@ const ACTIONS = [
 
 export default function QuickActions() {
   return (
-    <div className="bg-neutral-900 border border-white/10 rounded-xl p-4">
+    <div className="bg-gray-900 border border-white/10 rounded-xl p-4">
       <p className="text-xs font-semibold text-neutral-300 tracking-wide mb-3">QUICK ACTIONS</p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {ACTIONS.map(({ label, icon: Icon, tone }) => (

@@ -1,14 +1,16 @@
+import Image from "next/image";
 import { Bell, Maximize2, ChevronDown } from "lucide-react";
 
 export default function Header() {
   return (
-    <header className="h-16 bg-neutral-950 border-b border-white/10 flex items-center justify-between px-6 shrink-0">
+    <header className="h-16 bg-slate-950 border-b border-white/10 flex items-center justify-between px-6 shrink-0">
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-md bg-blue-600 flex items-center justify-center text-sm font-bold">
+        {/* <div className="w-8 h-8 rounded-md bg-blue-600 flex items-center justify-center text-sm font-bold">
           SM
-        </div>
+        </div> */}
+        <Image src="/Logo.png" alt="MinePilot" width={190} height={90} className="h-15 w-15" priority /> 
         <div className="leading-tight">
-          <p className="font-bold text-sm tracking-wide">SMARTMINE</p>
+          <p className="font-bold text-sm tracking-wide">MINEPILOT</p>
           <p className="text-[10px] text-neutral-500 tracking-wide">COMMAND CENTER</p>
         </div>
       </div>

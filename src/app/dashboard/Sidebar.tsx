@@ -47,7 +47,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <aside className="hidden md:flex flex-col w-56 shrink-0 bg-neutral-950 border-r border-white/10 py-4">
+    <aside className="hidden md:flex flex-col w-56 shrink-0 bg-slate-950 border-r border-white/10 py-4">
       <nav className="flex-1 flex flex-col gap-1 px-3">
         {NAV_ITEMS.map(({ label, icon: Icon, badge }) => (
           <button

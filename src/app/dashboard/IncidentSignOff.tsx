@@ -21,7 +21,7 @@ export default function IncidentSignOff() {
   }
 
   return (
-    <div className="bg-neutral-900 border border-white/10 rounded-xl p-4">
+    <div className="bg-gray-900 border border-white/10 rounded-xl p-4">
       <p className="text-xs font-semibold text-neutral-300 tracking-wide mb-3">NEEDS SIGN-OFF</p>
       {pending.length === 0 ? (
         <p className="text-[11px] text-neutral-600 px-1 py-3">Nothing waiting on you right now.</p>

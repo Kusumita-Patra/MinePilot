@@ -24,7 +24,7 @@ export default function DashboardPage() {
     : 70;
 
   return (
-    <div className="h-screen flex flex-col bg-neutral-950 text-white">
+    <div className="h-screen flex flex-col bg-slate-950 text-white">
       <Header />
 
       <div className="flex flex-1 overflow-hidden">

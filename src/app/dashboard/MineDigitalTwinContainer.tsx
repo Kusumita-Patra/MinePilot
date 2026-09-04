@@ -17,7 +17,7 @@ export default function MineDigitalTwinContainer({ children }: { children: React
   const [level, setLevel] = useState("Level -3");
 
   return (
-    <div className="bg-neutral-900 border border-white/10 rounded-xl overflow-hidden flex flex-col">
+    <div className="bg-gray-900 border border-white/10 rounded-xl overflow-hidden flex flex-col">
       {/* Header bar */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
         <p className="text-xs font-semibold text-neutral-300 tracking-wide">

@@ -36,7 +36,7 @@ export default function AnalyticsSection() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       {/* Compliance Overview */}
-      <div className="bg-neutral-900 border border-white/10 rounded-xl p-4">
+      <div className="bg-gray-900 border border-white/10 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs font-semibold text-neutral-300 tracking-wide">COMPLIANCE OVERVIEW</p>
           <button className="text-[11px] text-blue-400 hover:underline">View All</button>
@@ -57,7 +57,7 @@ export default function AnalyticsSection() {
       </div>
 
       {/* Mine Risk Ranking */}
-      <div className="bg-neutral-900 border border-white/10 rounded-xl p-4">
+      <div className="bg-gray-900 border border-white/10 rounded-xl p-4">
         <p className="text-xs font-semibold text-neutral-300 tracking-wide mb-3">MINE RISK RANKING</p>
         <div className="space-y-3">
           {RANKING.map((r, i) => (
@@ -74,7 +74,7 @@ export default function AnalyticsSection() {
       </div>
 
       {/* Inspections Donut */}
-      <div className="bg-neutral-900 border border-white/10 rounded-xl p-4">
+      <div className="bg-gray-900 border border-white/10 rounded-xl p-4">
         <p className="text-xs font-semibold text-neutral-300 tracking-wide mb-3">INSPECTIONS (THIS MONTH)</p>
         <div className="flex items-center gap-4">
           <div className="w-28 h-28 relative shrink-0">
