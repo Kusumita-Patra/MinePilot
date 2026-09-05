@@ -1,0 +1,3269 @@
+{
+  "contractors": [
+    {
+      "contractorId": "contractor-001",
+      "companyName": "Bharat Mining Contractors Pvt Ltd",
+      "shortCode": "BMC",
+      "status": "ACTIVE",
+      "registrationNumber": "U45201JH2015PTC004112",
+      "gstin": "20AABCB1234C1Z5",
+      "pan": "AABCB1234C",
+      "clraLicenceNumber": "CLRA/JH/2023/1187",
+      "contractNumber": "CN-BMC-2020",
+      "scopeOfWork": "Overburden removal and haulage, Sector 1-2",
+      "contractValue": 5000000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2024-09-15",
+      "contractEndDate": "2027-05-03",
+      "daysUntilContractEnd": 240,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Rakesh Verma",
+          "designation": "Contracts Manager",
+          "email": "rakesh.verma@bharatmining.example",
+          "phone": "+91-9812345001",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-1",
+        "sector-2"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "EXPIRING_SOON",
+          "referenceNumber": "CLRA_LICENCE-REF-4692",
+          "validFrom": "2025-09-25",
+          "validTo": "2026-09-25",
+          "daysUntilExpiry": 20,
+          "documentId": "doc-022",
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-9672",
+          "validFrom": "2026-04-03",
+          "validTo": "2027-04-03",
+          "daysUntilExpiry": 210,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "PUBLIC_LIABILITY_INSURANCE-REF-7447",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "EPF_REGISTRATION-REF-3313",
+          "validFrom": "2026-10-10",
+          "validTo": "2027-10-10",
+          "daysUntilExpiry": 400,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "ESIC_REGISTRATION-REF-6655",
+          "validFrom": "2026-10-10",
+          "validTo": "2027-10-10",
+          "daysUntilExpiry": 400,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-4103",
+          "validFrom": "2027-01-18",
+          "validTo": "2028-01-18",
+          "daysUntilExpiry": 500,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_INDUCTION-REF-9766",
+          "validFrom": "2026-02-02",
+          "validTo": "2027-02-02",
+          "daysUntilExpiry": 150,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_AGREEMENT-REF-7051",
+          "validFrom": "2026-02-02",
+          "validTo": "2027-02-02",
+          "daysUntilExpiry": 150,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 100,
+      "overallComplianceState": "EXPIRING_SOON",
+      "totalWorkers": 8,
+      "workersOnSite": 6,
+      "workersBlocked": 2,
+      "safetyMetrics": {
+        "manHoursTotal": 148000,
+        "manHoursThisMonth": 8222,
+        "incidentCount": 1,
+        "nearMissCount": 4,
+        "firstAidCaseCount": 3,
+        "lostTimeInjuryCount": 1,
+        "fatalityCount": 0,
+        "ltifr": 6.76,
+        "safetyObservationsRaised": 24,
+        "safetyObservationsClosed": 19,
+        "violationCount": 1,
+        "safetyScore": 78,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 72
+          },
+          {
+            "month": "May 2026",
+            "score": 74
+          },
+          {
+            "month": "Jun 2026",
+            "score": 76
+          },
+          {
+            "month": "Jul 2026",
+            "score": 78
+          },
+          {
+            "month": "Aug 2026",
+            "score": 80
+          },
+          {
+            "month": "Sep 2026",
+            "score": 82
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [
+        "doc-022"
+      ],
+      "suspensionReason": null,
+      "suspendedAt": null,
+      "createdAt": "2024-09-15",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-002",
+      "companyName": "Shakti Earthmovers",
+      "shortCode": "SEM",
+      "status": "ACTIVE",
+      "registrationNumber": "U45202JH2017PTC005321",
+      "gstin": "20AABCS5678D1Z2",
+      "pan": "AABCS5678D",
+      "clraLicenceNumber": "CLRA/JH/2022/0934",
+      "contractNumber": "CN-SEM-2021",
+      "scopeOfWork": "Drilling support and material transport, Sector 2",
+      "contractValue": 6250000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2025-03-14",
+      "contractEndDate": "2026-11-04",
+      "daysUntilContractEnd": 60,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Meena Kujur",
+          "designation": "Site Coordinator",
+          "email": "meena.kujur@shaktiearthmovers.example",
+          "phone": "+91-9812345002",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-2"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "CLRA_LICENCE-REF-2239",
+          "validFrom": "2025-12-04",
+          "validTo": "2026-12-04",
+          "daysUntilExpiry": 90,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-3390",
+          "validFrom": "2025-07-01",
+          "validTo": "2026-07-01",
+          "daysUntilExpiry": -66,
+          "documentId": "doc-023",
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "PUBLIC_LIABILITY_INSURANCE-REF-9339",
+          "validFrom": "2025-10-20",
+          "validTo": "2026-10-20",
+          "daysUntilExpiry": 45,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "EPF_REGISTRATION-REF-6612",
+          "validFrom": "2026-03-24",
+          "validTo": "2027-03-24",
+          "daysUntilExpiry": 200,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-7178",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "SAFETY_INDUCTION-REF-1842",
+          "validFrom": "2025-08-26",
+          "validTo": "2026-08-26",
+          "daysUntilExpiry": -10,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_AGREEMENT-REF-9156",
+          "validFrom": "2025-12-14",
+          "validTo": "2026-12-14",
+          "daysUntilExpiry": 100,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 63,
+      "overallComplianceState": "EXPIRED",
+      "totalWorkers": 6,
+      "workersOnSite": 4,
+      "workersBlocked": 2,
+      "safetyMetrics": {
+        "manHoursTotal": 96000,
+        "manHoursThisMonth": 5333,
+        "incidentCount": 2,
+        "nearMissCount": 5,
+        "firstAidCaseCount": 4,
+        "lostTimeInjuryCount": 2,
+        "fatalityCount": 0,
+        "ltifr": 20.83,
+        "safetyObservationsRaised": 28,
+        "safetyObservationsClosed": 22,
+        "violationCount": 3,
+        "safetyScore": 61,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 55
+          },
+          {
+            "month": "May 2026",
+            "score": 57
+          },
+          {
+            "month": "Jun 2026",
+            "score": 59
+          },
+          {
+            "month": "Jul 2026",
+            "score": 61
+          },
+          {
+            "month": "Aug 2026",
+            "score": 63
+          },
+          {
+            "month": "Sep 2026",
+            "score": 65
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [
+        "doc-023"
+      ],
+      "suspensionReason": null,
+      "suspendedAt": null,
+      "createdAt": "2025-03-14",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-003",
+      "companyName": "Deccan Drilling & Blasting Co.",
+      "shortCode": "DDB",
+      "status": "ACTIVE",
+      "registrationNumber": "U74999JH2011PTC003210",
+      "gstin": "20AABCD9012E1Z8",
+      "pan": "AABCD9012E",
+      "clraLicenceNumber": "CLRA/JH/2020/0455",
+      "contractNumber": "CN-DDB-2022",
+      "scopeOfWork": "Drilling and blasting operations, Sector 3",
+      "contractValue": 7500000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2024-03-19",
+      "contractEndDate": "2027-10-10",
+      "daysUntilContractEnd": 400,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Farhan Ali",
+          "designation": "Blasting In-Charge",
+          "email": "farhan.ali@deccandrilling.example",
+          "phone": "+91-9812345003",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-3"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "CLRA_LICENCE-REF-5372",
+          "validFrom": "2027-01-18",
+          "validTo": "2028-01-18",
+          "daysUntilExpiry": 500,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-6062",
+          "validFrom": "2026-03-04",
+          "validTo": "2027-03-04",
+          "daysUntilExpiry": 180,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "PUBLIC_LIABILITY_INSURANCE-REF-3478",
+          "validFrom": "2026-03-04",
+          "validTo": "2027-03-04",
+          "daysUntilExpiry": 180,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "EPF_REGISTRATION-REF-7912",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "ESIC_REGISTRATION-REF-2312",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-4871",
+          "validFrom": "2026-10-10",
+          "validTo": "2027-10-10",
+          "daysUntilExpiry": 400,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_INDUCTION-REF-8952",
+          "validFrom": "2025-11-04",
+          "validTo": "2026-11-04",
+          "daysUntilExpiry": 60,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_AGREEMENT-REF-4083",
+          "validFrom": "2025-11-04",
+          "validTo": "2026-11-04",
+          "daysUntilExpiry": 60,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "EXPLOSIVE_LICENCE-REF-1679",
+          "validFrom": "2025-08-20",
+          "validTo": "2026-08-20",
+          "daysUntilExpiry": -16,
+          "documentId": "doc-002",
+          "notes": null
+        }
+      ],
+      "compliancePercentage": 89,
+      "overallComplianceState": "EXPIRED",
+      "totalWorkers": 5,
+      "workersOnSite": 5,
+      "workersBlocked": 0,
+      "safetyMetrics": {
+        "manHoursTotal": 72000,
+        "manHoursThisMonth": 4000,
+        "incidentCount": 0,
+        "nearMissCount": 2,
+        "firstAidCaseCount": 1,
+        "lostTimeInjuryCount": 0,
+        "fatalityCount": 0,
+        "ltifr": 0,
+        "safetyObservationsRaised": 20,
+        "safetyObservationsClosed": 16,
+        "violationCount": 1,
+        "safetyScore": 84,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 78
+          },
+          {
+            "month": "May 2026",
+            "score": 80
+          },
+          {
+            "month": "Jun 2026",
+            "score": 82
+          },
+          {
+            "month": "Jul 2026",
+            "score": 84
+          },
+          {
+            "month": "Aug 2026",
+            "score": 86
+          },
+          {
+            "month": "Sep 2026",
+            "score": 88
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [
+        "doc-002"
+      ],
+      "suspensionReason": null,
+      "suspendedAt": null,
+      "createdAt": "2024-03-19",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-004",
+      "companyName": "Himalaya Electricals & Instrumentation",
+      "shortCode": "HEI",
+      "status": "ACTIVE",
+      "registrationNumber": "U31900JH2018PTC006789",
+      "gstin": "20AABCH3456F1Z3",
+      "pan": "AABCH3456F",
+      "clraLicenceNumber": "CLRA/JH/2023/0221",
+      "contractNumber": "CN-HEI-2023",
+      "scopeOfWork": "Electrical installation and maintenance, all sectors",
+      "contractValue": 8750000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2025-08-01",
+      "contractEndDate": "2027-07-02",
+      "daysUntilContractEnd": 300,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Neha Kapoor",
+          "designation": "Electrical Lead",
+          "email": "neha.kapoor@himalayaei.example",
+          "phone": "+91-9812345004",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-1",
+        "sector-4"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "CLRA_LICENCE-REF-1290",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-8319",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "PUBLIC_LIABILITY_INSURANCE-REF-9124",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "EPF_REGISTRATION-REF-3927",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "ESIC_REGISTRATION-REF-2722",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-8995",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_INDUCTION-REF-4749",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_AGREEMENT-REF-6421",
+          "validFrom": "2026-05-13",
+          "validTo": "2027-05-13",
+          "daysUntilExpiry": 250,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 100,
+      "overallComplianceState": "VALID",
+      "totalWorkers": 4,
+      "workersOnSite": 4,
+      "workersBlocked": 0,
+      "safetyMetrics": {
+        "manHoursTotal": 54000,
+        "manHoursThisMonth": 3000,
+        "incidentCount": 0,
+        "nearMissCount": 1,
+        "firstAidCaseCount": 0,
+        "lostTimeInjuryCount": 0,
+        "fatalityCount": 0,
+        "ltifr": 0,
+        "safetyObservationsRaised": 20,
+        "safetyObservationsClosed": 16,
+        "violationCount": 1,
+        "safetyScore": 90,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 84
+          },
+          {
+            "month": "May 2026",
+            "score": 86
+          },
+          {
+            "month": "Jun 2026",
+            "score": 88
+          },
+          {
+            "month": "Jul 2026",
+            "score": 90
+          },
+          {
+            "month": "Aug 2026",
+            "score": 92
+          },
+          {
+            "month": "Sep 2026",
+            "score": 94
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [],
+      "suspensionReason": null,
+      "suspendedAt": null,
+      "createdAt": "2025-08-01",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-005",
+      "companyName": "Rajdhani Security Services",
+      "shortCode": "RSS",
+      "status": "ACTIVE",
+      "registrationNumber": "U74920JH2016PTC004987",
+      "gstin": "20AABCR7890G1Z9",
+      "pan": "AABCR7890G",
+      "clraLicenceNumber": "CLRA/JH/2024/0110",
+      "contractNumber": "CN-RSS-2024",
+      "scopeOfWork": "Site security and access control, all gates",
+      "contractValue": 10000000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2025-11-09",
+      "contractEndDate": "2026-09-25",
+      "daysUntilContractEnd": 20,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Vikram Thakur",
+          "designation": "Security Head",
+          "email": "vikram.thakur@rajdhanisecurity.example",
+          "phone": "+91-9812345005",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-1",
+        "sector-2",
+        "sector-3",
+        "sector-4"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "EXPIRING_SOON",
+          "referenceNumber": "CLRA_LICENCE-REF-1621",
+          "validFrom": "2025-09-20",
+          "validTo": "2026-09-20",
+          "daysUntilExpiry": 15,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "EXPIRING_SOON",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-1672",
+          "validFrom": "2025-09-20",
+          "validTo": "2026-09-20",
+          "daysUntilExpiry": 15,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "EXPIRING_SOON",
+          "referenceNumber": "PUBLIC_LIABILITY_INSURANCE-REF-9441",
+          "validFrom": "2025-09-20",
+          "validTo": "2026-09-20",
+          "daysUntilExpiry": 15,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "EPF_REGISTRATION-REF-8015",
+          "validFrom": "2025-11-04",
+          "validTo": "2026-11-04",
+          "daysUntilExpiry": 60,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "ESIC_REGISTRATION-REF-8399",
+          "validFrom": "2025-11-04",
+          "validTo": "2026-11-04",
+          "daysUntilExpiry": 60,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-9180",
+          "validFrom": "2025-12-14",
+          "validTo": "2026-12-14",
+          "daysUntilExpiry": 100,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "EXPIRING_SOON",
+          "referenceNumber": "SAFETY_INDUCTION-REF-1332",
+          "validFrom": "2025-10-05",
+          "validTo": "2026-10-05",
+          "daysUntilExpiry": 30,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "EXPIRING_SOON",
+          "referenceNumber": "SAFETY_AGREEMENT-REF-7673",
+          "validFrom": "2025-10-05",
+          "validTo": "2026-10-05",
+          "daysUntilExpiry": 30,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 100,
+      "overallComplianceState": "EXPIRING_SOON",
+      "totalWorkers": 6,
+      "workersOnSite": 5,
+      "workersBlocked": 1,
+      "safetyMetrics": {
+        "manHoursTotal": 60000,
+        "manHoursThisMonth": 3333,
+        "incidentCount": 0,
+        "nearMissCount": 2,
+        "firstAidCaseCount": 1,
+        "lostTimeInjuryCount": 0,
+        "fatalityCount": 0,
+        "ltifr": 0,
+        "safetyObservationsRaised": 20,
+        "safetyObservationsClosed": 16,
+        "violationCount": 1,
+        "safetyScore": 70,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 64
+          },
+          {
+            "month": "May 2026",
+            "score": 66
+          },
+          {
+            "month": "Jun 2026",
+            "score": 68
+          },
+          {
+            "month": "Jul 2026",
+            "score": 70
+          },
+          {
+            "month": "Aug 2026",
+            "score": 72
+          },
+          {
+            "month": "Sep 2026",
+            "score": 74
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [],
+      "suspensionReason": null,
+      "suspendedAt": null,
+      "createdAt": "2025-11-09",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-006",
+      "companyName": "Vindhya Transport & Logistics",
+      "shortCode": "VTL",
+      "status": "SUSPENDED",
+      "registrationNumber": "U60200JH2013PTC002765",
+      "gstin": "20AABCV2345H1Z1",
+      "pan": "AABCV2345H",
+      "clraLicenceNumber": "CLRA/JH/2019/0087",
+      "contractNumber": "CN-VTL-2020",
+      "scopeOfWork": "External haulage and logistics",
+      "contractValue": 11250000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2025-01-13",
+      "contractEndDate": "2026-12-14",
+      "daysUntilContractEnd": 100,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Rohit Sinha",
+          "designation": "Operations Manager",
+          "email": "rohit.sinha@vindhyatransport.example",
+          "phone": "+91-9812345006",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-2"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "CLRA_LICENCE-REF-1895",
+          "validFrom": "2025-06-17",
+          "validTo": "2026-06-17",
+          "daysUntilExpiry": -80,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-6722",
+          "validFrom": "2025-07-17",
+          "validTo": "2026-07-17",
+          "daysUntilExpiry": -50,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "PUBLIC_LIABILITY_INSURANCE-REF-3543",
+          "validFrom": "2025-12-04",
+          "validTo": "2026-12-04",
+          "daysUntilExpiry": 90,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "ESIC_REGISTRATION-REF-7540",
+          "validFrom": "2025-07-27",
+          "validTo": "2026-07-27",
+          "daysUntilExpiry": -40,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-8639",
+          "validFrom": "2026-01-03",
+          "validTo": "2027-01-03",
+          "daysUntilExpiry": 120,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "SAFETY_INDUCTION-REF-6864",
+          "validFrom": "2025-05-28",
+          "validTo": "2026-05-28",
+          "daysUntilExpiry": -100,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "SAFETY_AGREEMENT-REF-4549",
+          "validFrom": "2025-10-25",
+          "validTo": "2026-10-25",
+          "daysUntilExpiry": 50,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 38,
+      "overallComplianceState": "EXPIRED",
+      "totalWorkers": 5,
+      "workersOnSite": 0,
+      "workersBlocked": 1,
+      "safetyMetrics": {
+        "manHoursTotal": 40000,
+        "manHoursThisMonth": 2222,
+        "incidentCount": 4,
+        "nearMissCount": 8,
+        "firstAidCaseCount": 6,
+        "lostTimeInjuryCount": 3,
+        "fatalityCount": 0,
+        "ltifr": 75,
+        "safetyObservationsRaised": 36,
+        "safetyObservationsClosed": 28,
+        "violationCount": 3,
+        "safetyScore": 42,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 40
+          },
+          {
+            "month": "May 2026",
+            "score": 40
+          },
+          {
+            "month": "Jun 2026",
+            "score": 40
+          },
+          {
+            "month": "Jul 2026",
+            "score": 42
+          },
+          {
+            "month": "Aug 2026",
+            "score": 44
+          },
+          {
+            "month": "Sep 2026",
+            "score": 46
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [],
+      "suspensionReason": "Repeated CLRA licence lapses and unresolved safety induction gaps flagged in the Q2 audit.",
+      "suspendedAt": "2026-08-11T11:00:00.000Z",
+      "createdAt": "2025-01-13",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-007",
+      "companyName": "Coalfield Heavy Equipment Pvt Ltd",
+      "shortCode": "CHE",
+      "status": "BLACKLISTED",
+      "registrationNumber": "U29100JH2009PTC001456",
+      "gstin": "20AABCC6789I1Z4",
+      "pan": "AABCC6789I",
+      "clraLicenceNumber": "CLRA/JH/2015/0033",
+      "contractNumber": "CN-CHE-2021",
+      "scopeOfWork": "Heavy equipment rental and operation",
+      "contractValue": 12500000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2023-12-10",
+      "contractEndDate": "2026-07-07",
+      "daysUntilContractEnd": -60,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Sameer Qureshi",
+          "designation": "Director",
+          "email": "sameer.qureshi@coalfieldhe.example",
+          "phone": "+91-9812345007",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-1"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "CLRA_LICENCE-REF-2055",
+          "validFrom": "2025-02-17",
+          "validTo": "2026-02-17",
+          "daysUntilExpiry": -200,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-7315",
+          "validFrom": "2025-02-17",
+          "validTo": "2026-02-17",
+          "daysUntilExpiry": -200,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "EPF_REGISTRATION-REF-8439",
+          "validFrom": "2025-04-08",
+          "validTo": "2026-04-08",
+          "daysUntilExpiry": -150,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "ESIC_REGISTRATION-REF-1794",
+          "validFrom": "2025-04-08",
+          "validTo": "2026-04-08",
+          "daysUntilExpiry": -150,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "GST_REGISTRATION-REF-7772",
+          "validFrom": "2025-04-08",
+          "validTo": "2026-04-08",
+          "daysUntilExpiry": -150,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "EXPIRED",
+          "referenceNumber": "SAFETY_INDUCTION-REF-1537",
+          "validFrom": "2024-11-09",
+          "validTo": "2025-11-09",
+          "daysUntilExpiry": -300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 0,
+      "overallComplianceState": "EXPIRED",
+      "totalWorkers": 4,
+      "workersOnSite": 0,
+      "workersBlocked": 1,
+      "safetyMetrics": {
+        "manHoursTotal": 30000,
+        "manHoursThisMonth": 1667,
+        "incidentCount": 6,
+        "nearMissCount": 10,
+        "firstAidCaseCount": 9,
+        "lostTimeInjuryCount": 5,
+        "fatalityCount": 1,
+        "ltifr": 166.67,
+        "safetyObservationsRaised": 44,
+        "safetyObservationsClosed": 34,
+        "violationCount": 3,
+        "safetyScore": 21,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 40
+          },
+          {
+            "month": "May 2026",
+            "score": 40
+          },
+          {
+            "month": "Jun 2026",
+            "score": 40
+          },
+          {
+            "month": "Jul 2026",
+            "score": 40
+          },
+          {
+            "month": "Aug 2026",
+            "score": 40
+          },
+          {
+            "month": "Sep 2026",
+            "score": 40
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [],
+      "suspensionReason": "Blacklisted following a fatal equipment-related accident and revocation of statutory licences.",
+      "suspendedAt": "2026-07-07T09:00:00.000Z",
+      "createdAt": "2023-12-10",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-008",
+      "companyName": "Sunrise Civil Works",
+      "shortCode": "SCW",
+      "status": "ONBOARDING",
+      "registrationNumber": "U45400JH2026PTC009988",
+      "gstin": "20AABCS1122J1Z6",
+      "pan": "AABCS1122J",
+      "clraLicenceNumber": null,
+      "contractNumber": "CN-SCW-2022",
+      "scopeOfWork": "Civil construction for new administrative block",
+      "contractValue": 13750000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2026-09-15",
+      "contractEndDate": "2027-09-10",
+      "daysUntilContractEnd": 370,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Priya Menon",
+          "designation": "Project Manager",
+          "email": "priya.menon@sunrisecivil.example",
+          "phone": "+91-9812345008",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-1"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "CLRA_LICENCE-REF-8817",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-5273",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "EPF_REGISTRATION-REF-2165",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-5952",
+          "validFrom": "2026-07-02",
+          "validTo": "2027-07-02",
+          "daysUntilExpiry": 300,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 50,
+      "overallComplianceState": "EXPIRED",
+      "totalWorkers": 3,
+      "workersOnSite": 0,
+      "workersBlocked": 0,
+      "safetyMetrics": {
+        "manHoursTotal": 0,
+        "manHoursThisMonth": 0,
+        "incidentCount": 0,
+        "nearMissCount": 0,
+        "firstAidCaseCount": 0,
+        "lostTimeInjuryCount": 0,
+        "fatalityCount": 0,
+        "ltifr": 0,
+        "safetyObservationsRaised": 20,
+        "safetyObservationsClosed": 16,
+        "violationCount": 1,
+        "safetyScore": 65,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 59
+          },
+          {
+            "month": "May 2026",
+            "score": 61
+          },
+          {
+            "month": "Jun 2026",
+            "score": 63
+          },
+          {
+            "month": "Jul 2026",
+            "score": 65
+          },
+          {
+            "month": "Aug 2026",
+            "score": 67
+          },
+          {
+            "month": "Sep 2026",
+            "score": 69
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [],
+      "suspensionReason": null,
+      "suspendedAt": null,
+      "createdAt": "2026-09-15",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    },
+    {
+      "contractorId": "contractor-009",
+      "companyName": "Dhanbad Facility Management",
+      "shortCode": "DFM",
+      "status": "ONBOARDING",
+      "registrationNumber": "U74999JH2026PTC010023",
+      "gstin": "20AABCD3344K1Z0",
+      "pan": "AABCD3344K",
+      "clraLicenceNumber": null,
+      "contractNumber": "CN-DFM-2023",
+      "scopeOfWork": "Housekeeping and canteen services",
+      "contractValue": 15000000,
+      "contractCurrency": "INR",
+      "contractStartDate": "2026-09-10",
+      "contractEndDate": "2027-09-10",
+      "daysUntilContractEnd": 370,
+      "address": "Dhanbad Industrial Area, Jharkhand, India",
+      "contacts": [
+        {
+          "name": "Alok Nath",
+          "designation": "Facility Manager",
+          "email": "alok.nath@dfm.example",
+          "phone": "+91-9812345009",
+          "isPrimary": true
+        }
+      ],
+      "assignedZoneIds": [
+        "sector-1"
+      ],
+      "complianceItems": [
+        {
+          "key": "CLRA_LICENCE",
+          "label": "CLRA Licence",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "CLRA_LICENCE-REF-7615",
+          "validFrom": "2026-08-21",
+          "validTo": "2027-08-21",
+          "daysUntilExpiry": 350,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "WORKMENS_COMPENSATION",
+          "label": "Workmen's Compensation Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "WORKMENS_COMPENSATION-REF-5818",
+          "validFrom": "2026-08-21",
+          "validTo": "2027-08-21",
+          "daysUntilExpiry": 350,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "PUBLIC_LIABILITY_INSURANCE",
+          "label": "Public Liability Insurance",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "PUBLIC_LIABILITY_INSURANCE-REF-3208",
+          "validFrom": "2026-08-21",
+          "validTo": "2027-08-21",
+          "daysUntilExpiry": 350,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "EPF_REGISTRATION",
+          "label": "EPF Registration",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "ESIC_REGISTRATION",
+          "label": "ESIC Registration",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "GST_REGISTRATION",
+          "label": "GST Registration",
+          "isApplicable": true,
+          "complianceState": "VALID",
+          "referenceNumber": "GST_REGISTRATION-REF-3778",
+          "validFrom": "2026-08-21",
+          "validTo": "2027-08-21",
+          "daysUntilExpiry": 350,
+          "documentId": null,
+          "notes": null
+        },
+        {
+          "key": "SAFETY_INDUCTION",
+          "label": "Safety Induction Completion",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "SAFETY_AGREEMENT",
+          "label": "Signed Safety Agreement / Indemnity",
+          "isApplicable": true,
+          "complianceState": "MISSING",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not yet submitted"
+        },
+        {
+          "key": "EXPLOSIVE_LICENCE",
+          "label": "Explosive Handling Licence",
+          "isApplicable": false,
+          "complianceState": "NOT_APPLICABLE",
+          "referenceNumber": null,
+          "validFrom": null,
+          "validTo": null,
+          "daysUntilExpiry": null,
+          "documentId": null,
+          "notes": "Not applicable to this contract scope"
+        }
+      ],
+      "compliancePercentage": 50,
+      "overallComplianceState": "EXPIRED",
+      "totalWorkers": 3,
+      "workersOnSite": 0,
+      "workersBlocked": 0,
+      "safetyMetrics": {
+        "manHoursTotal": 0,
+        "manHoursThisMonth": 0,
+        "incidentCount": 0,
+        "nearMissCount": 0,
+        "firstAidCaseCount": 0,
+        "lostTimeInjuryCount": 0,
+        "fatalityCount": 0,
+        "ltifr": 0,
+        "safetyObservationsRaised": 20,
+        "safetyObservationsClosed": 16,
+        "violationCount": 1,
+        "safetyScore": 60,
+        "scoreTrend": [
+          {
+            "month": "Apr 2026",
+            "score": 54
+          },
+          {
+            "month": "May 2026",
+            "score": 56
+          },
+          {
+            "month": "Jun 2026",
+            "score": 58
+          },
+          {
+            "month": "Jul 2026",
+            "score": 60
+          },
+          {
+            "month": "Aug 2026",
+            "score": 62
+          },
+          {
+            "month": "Sep 2026",
+            "score": 64
+          }
+        ],
+        "aiRiskScore": null,
+        "aiRiskBand": null,
+        "aiRiskFactors": []
+      },
+      "documentIds": [],
+      "suspensionReason": null,
+      "suspendedAt": null,
+      "createdAt": "2026-09-10",
+      "updatedAt": "2026-09-04T10:00:00.000Z"
+    }
+  ],
+  "workers": [
+    {
+      "workerId": "worker-001",
+      "contractorId": "contractor-001",
+      "fullName": "Suresh Yadav",
+      "designation": "Shift Supervisor",
+      "skillCategory": "SUPERVISORY",
+      "dateOfJoining": "2025-04-10",
+      "contactNumber": "+91-9700000002",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-03",
+      "vocationalTraining": {
+        "certificateId": "cert-001",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-001",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-04-01",
+        "expiryDate": "2027-04-01",
+        "daysUntilExpiry": 208,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-001",
+      "gatePassExpiryDate": "2026-12-15",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-002",
+      "contractorId": "contractor-001",
+      "fullName": "Prakash Mahato",
+      "designation": "Blaster",
+      "skillCategory": "STATUTORY_POST",
+      "dateOfJoining": "2024-10-22",
+      "contactNumber": "+91-9700000003",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-01-10",
+      "vocationalTraining": {
+        "certificateId": "cert-002",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-002",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-06-29",
+        "expiryDate": "2027-06-29",
+        "daysUntilExpiry": 297,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [
+        {
+          "certificateId": "cert-003",
+          "certificateType": "COMPETENCY_BLASTER",
+          "certificateNumber": "COMP/WORKER-002",
+          "issuedBy": "Directorate of Mines Safety",
+          "issueDate": "2025-04-23",
+          "expiryDate": "2027-09-05",
+          "daysUntilExpiry": 365,
+          "complianceState": "VALID",
+          "documentId": null
+        }
+      ],
+      "gatePassNumber": "GP-WORKER-002",
+      "gatePassExpiryDate": "2027-02-01",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-003",
+      "contractorId": "contractor-001",
+      "fullName": "Ramesh Singh",
+      "designation": "Fitter",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2025-05-05",
+      "contactNumber": "+91-9700000004",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-07-06",
+      "vocationalTraining": {
+        "certificateId": "cert-004",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-003",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-05-06",
+        "expiryDate": "2027-05-06",
+        "daysUntilExpiry": 243,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-003",
+      "gatePassExpiryDate": "2027-03-06",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-004",
+      "contractorId": "contractor-001",
+      "fullName": "Dilip Oraon",
+      "designation": "Fitter",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2024-09-15",
+      "contactNumber": "+91-9700000005",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-02-16",
+      "vocationalTraining": {
+        "certificateId": "cert-005",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-004",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-04-30",
+        "expiryDate": "2027-04-30",
+        "daysUntilExpiry": 237,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-004",
+      "gatePassExpiryDate": "2027-02-28",
+      "isOnSite": true,
+      "currentZoneId": "sector-2",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-005",
+      "contractorId": "contractor-001",
+      "fullName": "Anil Kumar",
+      "designation": "Drill Helper",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2024-10-18",
+      "contactNumber": "+91-9700000006",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-07-04",
+      "vocationalTraining": {
+        "certificateId": "cert-006",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-005",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-07-03",
+        "expiryDate": "2027-07-03",
+        "daysUntilExpiry": 301,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-005",
+      "gatePassExpiryDate": "2027-04-12",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-006",
+      "contractorId": "contractor-001",
+      "fullName": "Vijay Prasad",
+      "designation": "Dumper Helper",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2025-03-09",
+      "contactNumber": "+91-9700000007",
+      "pmeStatus": "UNFIT",
+      "pmeExpiryDate": "2026-08-22",
+      "vocationalTraining": {
+        "certificateId": "cert-007",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-006",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2025-08-06",
+        "expiryDate": "2026-08-06",
+        "daysUntilExpiry": -30,
+        "complianceState": "EXPIRED",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-006",
+      "gatePassExpiryDate": "2026-11-24",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": false,
+      "blockingReasons": [
+        "PME certificate expired",
+        "Vocational Training certificate expired"
+      ]
+    },
+    {
+      "workerId": "worker-007",
+      "contractorId": "contractor-001",
+      "fullName": "Sanjay Mahto",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-05-22",
+      "contactNumber": "+91-9700000008",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-01-29",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-007",
+      "gatePassExpiryDate": "2027-04-06",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-008",
+      "contractorId": "contractor-001",
+      "fullName": "Birendra Kumar",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-04-26",
+      "contactNumber": "+91-9700000009",
+      "pmeStatus": "UNFIT",
+      "pmeExpiryDate": "2026-08-22",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-008",
+      "gatePassExpiryDate": "2027-02-13",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": false,
+      "blockingReasons": [
+        "PME certificate expired"
+      ]
+    },
+    {
+      "workerId": "worker-009",
+      "contractorId": "contractor-002",
+      "fullName": "Mukesh Ravidas",
+      "designation": "Site Supervisor",
+      "skillCategory": "SUPERVISORY",
+      "dateOfJoining": "2024-11-13",
+      "contactNumber": "+91-9700000010",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-03-21",
+      "vocationalTraining": {
+        "certificateId": "cert-008",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-009",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-04-06",
+        "expiryDate": "2027-04-06",
+        "daysUntilExpiry": 213,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-009",
+      "gatePassExpiryDate": "2026-12-31",
+      "isOnSite": true,
+      "currentZoneId": "sector-2",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-010",
+      "contractorId": "contractor-002",
+      "fullName": "Ashok Manjhi",
+      "designation": "Welder",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2025-01-13",
+      "contactNumber": "+91-9700000011",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-04-13",
+      "vocationalTraining": {
+        "certificateId": "cert-009",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-010",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-07-04",
+        "expiryDate": "2027-07-04",
+        "daysUntilExpiry": 302,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-010",
+      "gatePassExpiryDate": "2026-12-17",
+      "isOnSite": true,
+      "currentZoneId": "sector-2",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-011",
+      "contractorId": "contractor-002",
+      "fullName": "Ranjit Turi",
+      "designation": "Dumper Helper",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2025-01-10",
+      "contactNumber": "+91-9700000012",
+      "pmeStatus": "UNFIT",
+      "pmeExpiryDate": "2026-08-22",
+      "vocationalTraining": {
+        "certificateId": "cert-010",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-011",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-07-24",
+        "expiryDate": "2027-07-24",
+        "daysUntilExpiry": 322,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-011",
+      "gatePassExpiryDate": "2026-09-02",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": false,
+      "blockingReasons": [
+        "PME certificate expired",
+        "Gate pass expired"
+      ]
+    },
+    {
+      "workerId": "worker-012",
+      "contractorId": "contractor-002",
+      "fullName": "Bimal Hansda",
+      "designation": "Drill Helper",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2025-02-27",
+      "contactNumber": "+91-9700000013",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-17",
+      "vocationalTraining": {
+        "certificateId": "cert-011",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-012",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-07-16",
+        "expiryDate": "2027-07-16",
+        "daysUntilExpiry": 314,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-012",
+      "gatePassExpiryDate": "2026-12-05",
+      "isOnSite": true,
+      "currentZoneId": "sector-2",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-013",
+      "contractorId": "contractor-002",
+      "fullName": "Naresh Kumar",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-01-11",
+      "contactNumber": "+91-9700000014",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-23",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-013",
+      "gatePassExpiryDate": "2027-01-27",
+      "isOnSite": true,
+      "currentZoneId": "sector-2",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-014",
+      "contractorId": "contractor-002",
+      "fullName": "Sunil Baraik",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-02-18",
+      "contactNumber": "+91-9700000015",
+      "pmeStatus": "UNFIT",
+      "pmeExpiryDate": "2026-08-22",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-014",
+      "gatePassExpiryDate": "2027-01-24",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": false,
+      "blockingReasons": [
+        "PME certificate expired"
+      ]
+    },
+    {
+      "workerId": "worker-015",
+      "contractorId": "contractor-003",
+      "fullName": "Rajesh Munda",
+      "designation": "Overman",
+      "skillCategory": "STATUTORY_POST",
+      "dateOfJoining": "2025-06-05",
+      "contactNumber": "+91-9700000016",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-01-26",
+      "vocationalTraining": {
+        "certificateId": "cert-012",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-015",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-07-05",
+        "expiryDate": "2027-07-05",
+        "daysUntilExpiry": 303,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [
+        {
+          "certificateId": "cert-013",
+          "certificateType": "COMPETENCY_OVERMAN",
+          "certificateNumber": "COMP/WORKER-015",
+          "issuedBy": "Directorate of Mines Safety",
+          "issueDate": "2025-04-23",
+          "expiryDate": "2027-09-05",
+          "daysUntilExpiry": 365,
+          "complianceState": "VALID",
+          "documentId": null
+        }
+      ],
+      "gatePassNumber": "GP-WORKER-015",
+      "gatePassExpiryDate": "2027-01-14",
+      "isOnSite": true,
+      "currentZoneId": "sector-3",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-016",
+      "contractorId": "contractor-003",
+      "fullName": "Manoj Tirkey",
+      "designation": "Blaster",
+      "skillCategory": "STATUTORY_POST",
+      "dateOfJoining": "2024-12-07",
+      "contactNumber": "+91-9700000017",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-06",
+      "vocationalTraining": {
+        "certificateId": "cert-014",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-016",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-04-22",
+        "expiryDate": "2027-04-22",
+        "daysUntilExpiry": 229,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [
+        {
+          "certificateId": "cert-015",
+          "certificateType": "COMPETENCY_BLASTER",
+          "certificateNumber": "COMP/WORKER-016",
+          "issuedBy": "Directorate of Mines Safety",
+          "issueDate": "2025-04-23",
+          "expiryDate": "2027-09-05",
+          "daysUntilExpiry": 365,
+          "complianceState": "VALID",
+          "documentId": null
+        }
+      ],
+      "gatePassNumber": "GP-WORKER-016",
+      "gatePassExpiryDate": "2026-12-06",
+      "isOnSite": true,
+      "currentZoneId": "sector-3",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-017",
+      "contractorId": "contractor-003",
+      "fullName": "Deepak Soren",
+      "designation": "Electrician",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2024-09-08",
+      "contactNumber": "+91-9700000018",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-04",
+      "vocationalTraining": {
+        "certificateId": "cert-016",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-017",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-07-10",
+        "expiryDate": "2027-07-10",
+        "daysUntilExpiry": 308,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-017",
+      "gatePassExpiryDate": "2027-04-29",
+      "isOnSite": true,
+      "currentZoneId": "sector-3",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-018",
+      "contractorId": "contractor-003",
+      "fullName": "Ajay Kisku",
+      "designation": "Rigger Assistant",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2025-05-03",
+      "contactNumber": "+91-9700000019",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-07",
+      "vocationalTraining": {
+        "certificateId": "cert-017",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-018",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-03-13",
+        "expiryDate": "2027-03-13",
+        "daysUntilExpiry": 189,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-018",
+      "gatePassExpiryDate": "2027-04-02",
+      "isOnSite": true,
+      "currentZoneId": "sector-3",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-019",
+      "contractorId": "contractor-003",
+      "fullName": "Santosh Kumar",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-04-07",
+      "contactNumber": "+91-9700000020",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-08",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-019",
+      "gatePassExpiryDate": "2027-01-11",
+      "isOnSite": true,
+      "currentZoneId": "sector-3",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-020",
+      "contractorId": "contractor-004",
+      "fullName": "Gopal Das",
+      "designation": "Site Supervisor",
+      "skillCategory": "SUPERVISORY",
+      "dateOfJoining": "2024-10-02",
+      "contactNumber": "+91-9700000021",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-04-19",
+      "vocationalTraining": {
+        "certificateId": "cert-018",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-020",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-07-25",
+        "expiryDate": "2027-07-25",
+        "daysUntilExpiry": 323,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-020",
+      "gatePassExpiryDate": "2027-05-12",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-021",
+      "contractorId": "contractor-004",
+      "fullName": "Kailash Mahli",
+      "designation": "Fitter",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2025-07-15",
+      "contactNumber": "+91-9700000022",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-03",
+      "vocationalTraining": {
+        "certificateId": "cert-019",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-021",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-05-25",
+        "expiryDate": "2027-05-25",
+        "daysUntilExpiry": 262,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-021",
+      "gatePassExpiryDate": "2026-12-12",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-022",
+      "contractorId": "contractor-004",
+      "fullName": "Bhola Nath",
+      "designation": "Electrician",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2025-02-23",
+      "contactNumber": "+91-9700000023",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-29",
+      "vocationalTraining": {
+        "certificateId": "cert-020",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-022",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-04-09",
+        "expiryDate": "2027-04-09",
+        "daysUntilExpiry": 216,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-022",
+      "gatePassExpiryDate": "2027-01-10",
+      "isOnSite": true,
+      "currentZoneId": "sector-4",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-023",
+      "contractorId": "contractor-004",
+      "fullName": "Chandan Kumar",
+      "designation": "Drill Helper",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2025-05-17",
+      "contactNumber": "+91-9700000024",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-27",
+      "vocationalTraining": {
+        "certificateId": "cert-021",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-023",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-06-11",
+        "expiryDate": "2027-06-11",
+        "daysUntilExpiry": 279,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-023",
+      "gatePassExpiryDate": "2027-02-07",
+      "isOnSite": true,
+      "currentZoneId": "sector-4",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-024",
+      "contractorId": "contractor-005",
+      "fullName": "Ravi Shankar",
+      "designation": "Shift Supervisor",
+      "skillCategory": "SUPERVISORY",
+      "dateOfJoining": "2024-12-05",
+      "contactNumber": "+91-9700000025",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-04-16",
+      "vocationalTraining": {
+        "certificateId": "cert-022",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-024",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-04-28",
+        "expiryDate": "2027-04-28",
+        "daysUntilExpiry": 235,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-024",
+      "gatePassExpiryDate": "2027-04-12",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-025",
+      "contractorId": "contractor-005",
+      "fullName": "Lakhan Lal",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2024-08-22",
+      "contactNumber": "+91-9700000026",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-17",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-025",
+      "gatePassExpiryDate": "2026-11-23",
+      "isOnSite": true,
+      "currentZoneId": "sector-1",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-026",
+      "contractorId": "contractor-005",
+      "fullName": "Om Prakash",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-07-14",
+      "contactNumber": "+91-9700000027",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-03-13",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-026",
+      "gatePassExpiryDate": "2027-02-20",
+      "isOnSite": true,
+      "currentZoneId": "sector-2",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-027",
+      "contractorId": "contractor-005",
+      "fullName": "Umesh Yadav",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2024-11-13",
+      "contactNumber": "+91-9700000028",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-04-05",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-027",
+      "gatePassExpiryDate": "2027-03-08",
+      "isOnSite": true,
+      "currentZoneId": "sector-3",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-028",
+      "contractorId": "contractor-005",
+      "fullName": "Dinesh Sao",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2024-11-27",
+      "contactNumber": "+91-9700000029",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-27",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-028",
+      "gatePassExpiryDate": "2027-05-16",
+      "isOnSite": true,
+      "currentZoneId": "sector-4",
+      "lastSeenAt": "2026-09-05T06:30:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-029",
+      "contractorId": "contractor-005",
+      "fullName": "Vinod Kumar",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-02-25",
+      "contactNumber": "+91-9700000030",
+      "pmeStatus": "UNFIT",
+      "pmeExpiryDate": "2026-08-22",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-029",
+      "gatePassExpiryDate": "2026-12-28",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": false,
+      "blockingReasons": [
+        "PME certificate expired"
+      ]
+    },
+    {
+      "workerId": "worker-030",
+      "contractorId": "contractor-006",
+      "fullName": "Jitendra Mahto",
+      "designation": "Electrician",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2025-02-18",
+      "contactNumber": "+91-9700000031",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-15",
+      "vocationalTraining": {
+        "certificateId": "cert-023",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-030",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-05-17",
+        "expiryDate": "2027-05-17",
+        "daysUntilExpiry": 254,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-030",
+      "gatePassExpiryDate": "2027-03-09",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-031",
+      "contractorId": "contractor-006",
+      "fullName": "Pankaj Kumar",
+      "designation": "Drill Helper",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2025-02-11",
+      "contactNumber": "+91-9700000032",
+      "pmeStatus": "UNFIT",
+      "pmeExpiryDate": "2026-08-22",
+      "vocationalTraining": {
+        "certificateId": "cert-024",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-031",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-05-31",
+        "expiryDate": "2027-05-31",
+        "daysUntilExpiry": 268,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-031",
+      "gatePassExpiryDate": "2027-02-20",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": false,
+      "blockingReasons": [
+        "PME certificate expired"
+      ]
+    },
+    {
+      "workerId": "worker-032",
+      "contractorId": "contractor-006",
+      "fullName": "Satish Chandra",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2024-12-05",
+      "contactNumber": "+91-9700000033",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-01-10",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-032",
+      "gatePassExpiryDate": "2027-04-03",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-033",
+      "contractorId": "contractor-006",
+      "fullName": "Kamlesh Yadav",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-04-13",
+      "contactNumber": "+91-9700000034",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-10",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-033",
+      "gatePassExpiryDate": "2026-12-20",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-034",
+      "contractorId": "contractor-006",
+      "fullName": "Ramesh Turi",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-07-07",
+      "contactNumber": "+91-9700000035",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-18",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-034",
+      "gatePassExpiryDate": "2027-03-16",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-035",
+      "contractorId": "contractor-007",
+      "fullName": "Hari Om",
+      "designation": "Fitter",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2024-09-22",
+      "contactNumber": "+91-9700000036",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-21",
+      "vocationalTraining": {
+        "certificateId": "cert-025",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-035",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-05-01",
+        "expiryDate": "2027-05-01",
+        "daysUntilExpiry": 238,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-035",
+      "gatePassExpiryDate": "2026-12-29",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-036",
+      "contractorId": "contractor-007",
+      "fullName": "Yogendra Prasad",
+      "designation": "Rigger Assistant",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2025-06-11",
+      "contactNumber": "+91-9700000037",
+      "pmeStatus": "UNFIT",
+      "pmeExpiryDate": "2026-08-22",
+      "vocationalTraining": {
+        "certificateId": "cert-026",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-036",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2025-08-06",
+        "expiryDate": "2026-08-06",
+        "daysUntilExpiry": -30,
+        "complianceState": "EXPIRED",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-036",
+      "gatePassExpiryDate": "2027-02-21",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": false,
+      "blockingReasons": [
+        "PME certificate expired",
+        "Vocational Training certificate expired"
+      ]
+    },
+    {
+      "workerId": "worker-037",
+      "contractorId": "contractor-007",
+      "fullName": "Mahesh Kumar",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2024-12-14",
+      "contactNumber": "+91-9700000038",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-03-14",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-037",
+      "gatePassExpiryDate": "2027-02-05",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-038",
+      "contractorId": "contractor-007",
+      "fullName": "Girish Sao",
+      "designation": "Loader",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-02-13",
+      "contactNumber": "+91-9700000039",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-05-07",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-038",
+      "gatePassExpiryDate": "2027-02-01",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-039",
+      "contractorId": "contractor-008",
+      "fullName": "Nandlal Rana",
+      "designation": "Welder",
+      "skillCategory": "SKILLED",
+      "dateOfJoining": "2025-07-10",
+      "contactNumber": "+91-9700000040",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-21",
+      "vocationalTraining": {
+        "certificateId": "cert-027",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-039",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-04-24",
+        "expiryDate": "2027-04-24",
+        "daysUntilExpiry": 231,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-039",
+      "gatePassExpiryDate": "2027-04-11",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-040",
+      "contractorId": "contractor-008",
+      "fullName": "Bijay Karmakar",
+      "designation": "Dumper Helper",
+      "skillCategory": "SEMI_SKILLED",
+      "dateOfJoining": "2024-06-28",
+      "contactNumber": "+91-9700000041",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-03-07",
+      "vocationalTraining": {
+        "certificateId": "cert-028",
+        "certificateType": "VOCATIONAL_TRAINING",
+        "certificateNumber": "VT/WORKER-040",
+        "issuedBy": "Vocational Training Institute, Dhanbad",
+        "issueDate": "2026-06-30",
+        "expiryDate": "2027-06-30",
+        "daysUntilExpiry": 298,
+        "complianceState": "VALID",
+        "documentId": null
+      },
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-040",
+      "gatePassExpiryDate": "2027-05-11",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-041",
+      "contractorId": "contractor-008",
+      "fullName": "Shyam Sundar",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-07-10",
+      "contactNumber": "+91-9700000042",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-03-25",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-041",
+      "gatePassExpiryDate": "2026-11-17",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-042",
+      "contractorId": "contractor-009",
+      "fullName": "Manohar Lal",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2024-12-18",
+      "contactNumber": "+91-9700000043",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-21",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-042",
+      "gatePassExpiryDate": "2026-11-22",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-043",
+      "contractorId": "contractor-009",
+      "fullName": "Rakesh Mandal",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2025-04-25",
+      "contactNumber": "+91-9700000044",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-06-07",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-043",
+      "gatePassExpiryDate": "2026-12-18",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    },
+    {
+      "workerId": "worker-044",
+      "contractorId": "contractor-009",
+      "fullName": "Tapan Ghosh",
+      "designation": "General Labourer",
+      "skillCategory": "UNSKILLED",
+      "dateOfJoining": "2024-10-19",
+      "contactNumber": "+91-9700000045",
+      "pmeStatus": "FIT",
+      "pmeExpiryDate": "2027-02-10",
+      "vocationalTraining": null,
+      "competencyCertificates": [],
+      "gatePassNumber": "GP-WORKER-044",
+      "gatePassExpiryDate": "2027-04-08",
+      "isOnSite": false,
+      "currentZoneId": null,
+      "lastSeenAt": "2026-09-03T17:00:00.000Z",
+      "isPermittedToEnter": true,
+      "blockingReasons": []
+    }
+  ],
+  "permits": [
+    {
+      "permitId": "permit-001",
+      "permitNumber": "WP-2026-0002",
+      "permitType": "EXCAVATION",
+      "contractorId": "contractor-001",
+      "zoneId": "sector-1",
+      "status": "ACTIVE",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-09-02T07:00:00.000Z",
+      "validFrom": "2026-09-02T07:00:00.000Z",
+      "validTo": "2026-09-09T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-001",
+        "worker-002"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": true
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": true
+        }
+      ],
+      "closedAt": null,
+      "remarks": null
+    },
+    {
+      "permitId": "permit-002",
+      "permitNumber": "WP-2026-0003",
+      "permitType": "LIFTING",
+      "contractorId": "contractor-001",
+      "zoneId": "sector-2",
+      "status": "EXPIRED",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-07-27T07:00:00.000Z",
+      "validFrom": "2026-07-27T07:00:00.000Z",
+      "validTo": "2026-08-26T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-001",
+        "worker-002"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": true
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": false
+        }
+      ],
+      "closedAt": null,
+      "remarks": null
+    },
+    {
+      "permitId": "permit-003",
+      "permitNumber": "WP-2026-0004",
+      "permitType": "EXCAVATION",
+      "contractorId": "contractor-002",
+      "zoneId": "sector-2",
+      "status": "ACTIVE",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-09-04T07:00:00.000Z",
+      "validFrom": "2026-09-04T07:00:00.000Z",
+      "validTo": "2026-09-11T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-009",
+        "worker-010"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": true
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": true
+        }
+      ],
+      "closedAt": null,
+      "remarks": null
+    },
+    {
+      "permitId": "permit-004",
+      "permitNumber": "WP-2026-0005",
+      "permitType": "BLASTING",
+      "contractorId": "contractor-003",
+      "zoneId": "sector-3",
+      "status": "ACTIVE",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-09-05T07:00:00.000Z",
+      "validFrom": "2026-09-05T07:00:00.000Z",
+      "validTo": "2026-09-06T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-015",
+        "worker-016"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": true
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": true
+        }
+      ],
+      "closedAt": null,
+      "remarks": null
+    },
+    {
+      "permitId": "permit-005",
+      "permitNumber": "WP-2026-0006",
+      "permitType": "BLASTING",
+      "contractorId": "contractor-003",
+      "zoneId": "sector-3",
+      "status": "CLOSED",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-08-06T07:00:00.000Z",
+      "validFrom": "2026-08-06T07:00:00.000Z",
+      "validTo": "2026-08-07T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-015",
+        "worker-016"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": true
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": true
+        }
+      ],
+      "closedAt": "2026-08-07T19:30:00.000Z",
+      "remarks": null
+    },
+    {
+      "permitId": "permit-006",
+      "permitNumber": "WP-2026-0007",
+      "permitType": "ELECTRICAL_ISOLATION",
+      "contractorId": "contractor-004",
+      "zoneId": "sector-4",
+      "status": "ACTIVE",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-09-03T07:00:00.000Z",
+      "validFrom": "2026-09-03T07:00:00.000Z",
+      "validTo": "2026-09-07T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-020",
+        "worker-021"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": true
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": true
+        }
+      ],
+      "closedAt": null,
+      "remarks": null
+    },
+    {
+      "permitId": "permit-007",
+      "permitNumber": "WP-2026-0008",
+      "permitType": "LIFTING",
+      "contractorId": "contractor-006",
+      "zoneId": "sector-2",
+      "status": "REVOKED",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-07-07T07:00:00.000Z",
+      "validFrom": "2026-07-07T07:00:00.000Z",
+      "validTo": "2026-08-06T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-030",
+        "worker-031"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": true
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": false
+        }
+      ],
+      "closedAt": null,
+      "remarks": null
+    },
+    {
+      "permitId": "permit-008",
+      "permitNumber": "WP-2026-0009",
+      "permitType": "WORKING_AT_HEIGHT",
+      "contractorId": "contractor-008",
+      "zoneId": "sector-1",
+      "status": "REQUESTED",
+      "issuedBy": "Anita Sharma",
+      "issuedAt": "2026-09-17T07:00:00.000Z",
+      "validFrom": "2026-09-17T07:00:00.000Z",
+      "validTo": "2026-09-24T19:00:00.000Z",
+      "assignedWorkerIds": [
+        "worker-039",
+        "worker-040"
+      ],
+      "precautionsChecklist": [
+        {
+          "item": "Area barricaded and signage posted",
+          "confirmed": true
+        },
+        {
+          "item": "Gas testing completed before entry",
+          "confirmed": false
+        },
+        {
+          "item": "Fire watch / standby person assigned",
+          "confirmed": false
+        }
+      ],
+      "closedAt": null,
+      "remarks": null
+    }
+  ],
+  "equipment": [
+    {
+      "equipmentId": "equip-001",
+      "contractorId": "contractor-001",
+      "equipmentName": "Dumper DMP-114",
+      "equipmentType": "Dumper Truck",
+      "registrationNumber": "JH-12-0002",
+      "fitnessCertificateExpiry": "2026-09-06",
+      "lastInspectionDate": "2026-03-10",
+      "complianceState": "EXPIRING_SOON",
+      "currentZoneId": "sector-1",
+      "isOperational": true
+    },
+    {
+      "equipmentId": "equip-002",
+      "contractorId": "contractor-001",
+      "equipmentName": "Excavator EXC-22",
+      "equipmentType": "Hydraulic Excavator",
+      "registrationNumber": "JH-13-0003",
+      "fitnessCertificateExpiry": "2027-04-03",
+      "lastInspectionDate": "2026-10-05",
+      "complianceState": "VALID",
+      "currentZoneId": "sector-2",
+      "isOperational": true
+    },
+    {
+      "equipmentId": "equip-003",
+      "contractorId": "contractor-002",
+      "equipmentName": "Drill Rig DR-07",
+      "equipmentType": "Rotary Drill Rig",
+      "registrationNumber": "JH-14-0004",
+      "fitnessCertificateExpiry": "2026-08-16",
+      "lastInspectionDate": "2026-02-17",
+      "complianceState": "EXPIRED",
+      "currentZoneId": "sector-2",
+      "isOperational": false
+    },
+    {
+      "equipmentId": "equip-004",
+      "contractorId": "contractor-003",
+      "equipmentName": "Mobile Crane MC-9",
+      "equipmentType": "Mobile Crane",
+      "registrationNumber": "JH-15-0005",
+      "fitnessCertificateExpiry": "2026-06-01",
+      "lastInspectionDate": "2025-12-03",
+      "complianceState": "EXPIRED",
+      "currentZoneId": "sector-3",
+      "isOperational": false
+    },
+    {
+      "equipmentId": "equip-005",
+      "contractorId": "contractor-006",
+      "equipmentName": "Tipper TT-31",
+      "equipmentType": "Tipper Truck",
+      "registrationNumber": "JH-16-0006",
+      "fitnessCertificateExpiry": "2026-07-07",
+      "lastInspectionDate": "2026-01-08",
+      "complianceState": "EXPIRED",
+      "currentZoneId": "sector-2",
+      "isOperational": false
+    },
+    {
+      "equipmentId": "equip-006",
+      "contractorId": "contractor-007",
+      "equipmentName": "Excavator EXC-05",
+      "equipmentType": "Hydraulic Excavator",
+      "registrationNumber": "JH-17-0007",
+      "fitnessCertificateExpiry": "2025-08-01",
+      "lastInspectionDate": "2025-02-02",
+      "complianceState": "EXPIRED",
+      "currentZoneId": "sector-1",
+      "isOperational": false
+    }
+  ]
+}

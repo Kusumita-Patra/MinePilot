@@ -1,83 +1,132 @@
-<<<<<<< HEAD
-# Smart Mine AI — Predictive Hazard Modeling Pipeline
+# MinePilot — Smart Mine Digital Twin
 
-Fully software-simulated anomaly detection + risk scoring engine for the
-Smart Mine Digital Twin platform (SIH). **No external dataset download is
-needed** — telemetry is generated synthetically per the project spec.
+An AI-based Smart Mine Digital Twin platform (built for Smart India Hackathon).
+It streams live mine telemetry, renders it in a 3D digital twin, and surfaces
+AI-generated risk scores and alerts to a command-centre dashboard and a
+simplified field view.
 
-```
-smart_mine_ai/
-├── data_generator.py        # Step 1: synthetic telemetry generator
-├── risk_scoring.py          # Core scoring logic + guardrails (shared module)
-├── train_anomaly_model.py   # Step 2a: Isolation Forest
-├── train_forecast_model.py  # Step 2b: 15-min-ahead forecaster (XGBoost)
-├── inference_api.py         # Step 3: FastAPI service
-├── test_edge_cases.py       # Step 4: verification suite
-├── requirements.txt
-├── data/                    # generated CSV lands here
-└── models/                  # trained .joblib artifacts land here
-```
+The project has three runnable pieces that talk to each other over HTTP/WebSocket:
 
-## 1. Open in VS Code
+| Piece | Location | Owner | Default port |
+|---|---|---|---|
+| Frontend (Next.js dashboard + field view + 3D twin) | repo root (`src/`) | T4 | `3000` |
+| ML / risk-inference + telemetry simulator | repo root (`inference_api.py` and friends) | T2 | `8000` |
+| Backend (auth, incidents, telemetry relay, KPIs) | `backend/` | T3 | `8001` |
 
-1. Unzip the project folder and open it: `File → Open Folder…` → select `smart_mine_ai`.
-2. Install the **Python extension** (Microsoft) from the Extensions panel if you don't have it.
-3. Open a terminal in VS Code: `Terminal → New Terminal` (it opens in the project root).
+You need all three running locally for the full app to work end-to-end. The
+frontend and backend both degrade gracefully (mock data / retry-with-backoff)
+if the other services aren't up yet, so you can bring them up in any order.
 
-## 2. Create a virtual environment
+See `PLAN.md` for the full backend design and `CLAUDE.md` for team ownership
+and working conventions.
 
-```bash
-python -m venv .venv
-```
+---
 
-Activate it:
+## Prerequisites
 
-- **Windows (PowerShell):** `.venv\Scripts\Activate.ps1`
-- **macOS/Linux:** `source .venv/bin/activate`
+- **Node.js 20+** and npm
+- **Python 3.13** (recommended — better prebuilt wheels for `asyncpg`/`bcrypt`/`xgboost` than 3.14)
+- A **Postgres** database (the project uses Supabase in production; any Postgres
+  instance works for local dev) — only needed for the backend
 
-VS Code will usually prompt "Select this environment for the workspace?" — click Yes.
-You can also pick it manually: `Ctrl+Shift+P` → "Python: Select Interpreter" → choose `.venv`.
+---
 
-## 3. Install dependencies
+## 1. Frontend (Next.js) — port 3000
 
 ```bash
-pip install -r requirements.txt
+# from the repo root
+npm install
+npm run dev
 ```
 
-## 4. Run the pipeline, in order
+Open **http://localhost:3000**.
+
+Create a `.env.local` file in the repo root (gitignored) with:
 
 ```bash
-# Step 1 — generate synthetic telemetry (10 simulated days, 4 sectors)
-python data_generator.py
-
-# Step 2a — train the Isolation Forest anomaly detector
-python train_anomaly_model.py
-
-# Step 2b — train the 15-minute-ahead risk forecaster
-python train_forecast_model.py
-
-# Step 3 — verify the scoring logic + trained models with edge cases
-python test_edge_cases.py
-
-# Step 4 — start the inference API
-uvicorn inference_api:app --reload --port 8000
+NEXT_PUBLIC_API_URL=http://localhost:8001
+NEXT_PUBLIC_WS_URL=ws://localhost:8001
 ```
 
-Open **http://127.0.0.1:8000/docs** for interactive Swagger docs, or test with curl:
+(these point at the T3 backend, not the ML service directly).
+
+---
+
+## 2. ML / risk-inference service (T2) — port 8000
+
+This generates synthetic telemetry and serves risk predictions. It has its
+own Python environment, separate from the backend.
 
 ```bash
-curl -X POST http://127.0.0.1:8000/api/v1/predict-risk \
-  -H "Content-Type: application/json" \
-  -d '{
-        "sensor_id": "SNS-SEC4-CH4-01",
-        "sector_id": "sector_north_wall",
-        "telemetry": [
-          {"ch4_pct": 0.82, "co_ppm": 28.5, "dust_pm10": 3.1, "displacement_mm": 1.4, "temp_c": 27.2}
-        ]
-      }'
+# from the repo root
+python3.13 -m venv .venv-t2
+./.venv-t2/bin/pip install -r requirements.txt
+
+# one-time: generate synthetic telemetry + train the models
+./.venv-t2/bin/python data_generator.py
+./.venv-t2/bin/python train_anomaly_model.py
+./.venv-t2/bin/python train_forecast_model.py
+
+# start the service
+./.venv-t2/bin/uvicorn inference_api:app --reload --port 8000
 ```
 
-## Design notes for your SIH presentation
+Swagger docs: **http://localhost:8000/docs**.
+
+> If you skip training, `inference_api.py` still starts — it falls back to
+> rule-based (threshold-only) scoring instead of the ML models.
+
+Do not modify `inference_api.py`, `risk_scoring.py`, or `data_generator.py` —
+they belong to T2 (see `CLAUDE.md`).
+
+---
+
+## 3. Backend (T3) — port 8001
+
+```bash
+cd backend
+python3.13 -m venv .venv
+./.venv/bin/pip install -r requirements.txt
+cp .env.example .env
+# fill in .env: DATABASE_URL (your Postgres connection string) and JWT_SECRET
+```
+
+Apply migrations, then run:
+
+```bash
+./.venv/bin/alembic upgrade head
+./.venv/bin/uvicorn app.main:app --reload --port 8001
+```
+
+On startup the backend opens a WebSocket connection to the T2 service
+(`ML_SERVICE_WS_URL`, default `ws://localhost:8000/ws/telemetry`) and starts
+ingesting/persisting/rebroadcasting telemetry. If T2 isn't running yet, it
+retries with backoff — the rest of the API works fine without it.
+
+More detail (migrations, tests, known gaps): `backend/README.md`.
+
+---
+
+## Running everything together
+
+Three terminals, in any order:
+
+```bash
+# terminal 1 — ML / telemetry simulator
+./.venv-t2/bin/uvicorn inference_api:app --reload --port 8000
+
+# terminal 2 — backend
+cd backend && ./.venv/bin/uvicorn app.main:app --reload --port 8001
+
+# terminal 3 — frontend
+npm run dev
+```
+
+Then open **http://localhost:3000**.
+
+---
+
+## Design notes (T2 ML pipeline)
 
 - **Why Isolation Forest, not just thresholds:** thresholds catch a single gas
   crossing its statutory limit; Isolation Forest catches *correlated drift*
@@ -89,64 +138,23 @@ curl -X POST http://127.0.0.1:8000/api/v1/predict-risk \
   system, a false negative from an ML model is unacceptable when a statutory
   limit is already crossed. `calculate_risk_index` hard-clamps to
   `risk_score=100 / CRITICAL` on any threshold breach *before* consulting
-  either model — this can be shown to judges as a certifiable, auditable
-  safety layer that doesn't depend on model correctness.
+  either model.
 - **Why the forecast model matters operationally:** a 15-minute lead time is
   roughly enough for field staff to evacuate a sector via the incident
   ticket lifecycle (`TRIGGERED → ASSIGNED → …`) before a WARNING becomes
-  CRITICAL, which is the actual value proposition over pure reactive alerting.
+  CRITICAL.
 - **Graceful degradation:** `risk_scoring.py` never crashes if a model file
-  is missing — it falls back to rule-based scoring only. This matters if you
-  demo the FastAPI service before running the training scripts.
+  is missing — it falls back to rule-based scoring only.
 
-## If you want to ground the synthetic data in something real
-
-Not required, but if a judge asks "is this data realistic," you can point to
-public references used to set the baseline/threshold values (already
-reflected in `risk_scoring.THRESHOLDS`):
-
-- DGMS (Directorate General of Mines Safety, India) statutory gas limits
-- NIOSH Mining Program publications on methane/CO monitoring
-- CMPDI / CIL technical reports on strata monitoring instrumentation
-
-These are cited for *threshold justification* only — no dataset from them is
-required or used; all telemetry values themselves are generated by
+Threshold values in `risk_scoring.THRESHOLDS` are grounded in DGMS
+(Directorate General of Mines Safety, India) statutory gas limits, NIOSH
+Mining Program publications, and CMPDI/CIL technical reports — cited for
+threshold justification only; all telemetry itself is synthetic, generated by
 `data_generator.py`.
-=======
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+---
 
-First, run the development server:
+## Learn more (Next.js)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
->>>>>>> master
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Learn Next.js](https://nextjs.org/learn)

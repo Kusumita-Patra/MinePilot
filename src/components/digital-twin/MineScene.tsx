@@ -17,6 +17,7 @@ import MineTerrain from "./MineTerrain";
 import ModelErrorBoundary from "./ModelErrorBoundary";
 import CameraController from "./CameraController";
 import SensorPlaceholder from "./SensorPlaceholder";
+import { useModelAvailability } from "./useModelAvailability";
 import type { CameraPresetId, MineDigitalTwinHandle, SensorFrame } from "./types";
 
 interface MineSceneProps {
@@ -31,9 +32,17 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
   { modelUrl, sensors, onSelectSensor, cameraPreset, onPresetArrive },
   ref
 ) {
-  // Warm the GLB request as soon as the scene mounts; a no-op if the file
-  // doesn't exist (ModelErrorBoundary handles the eventual rejection).
-  useGLTF.preload(modelUrl);
+  // Check the model actually exists before ever calling useGLTF: it throws
+  // a rejected promise on a 404 (only catchable by ModelErrorBoundary below),
+  // and Next's dev overlay reports every boundary-caught error regardless of
+  // how gracefully the app recovers. A checkout without mine.glb yet (see
+  // public/models/README.txt) is an expected case, not a bug to surface.
+  const modelAvailable = useModelAvailability(modelUrl);
+
+  if (modelAvailable) {
+    // Only warm the GLB request once we know it will resolve.
+    useGLTF.preload(modelUrl);
+  }
 
   return (
     <>
@@ -42,11 +51,15 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
 
       <MineLighting />
 
-      <ModelErrorBoundary fallback={<MineTerrain />}>
-        <Suspense fallback={<MineTerrain />}>
-          <MineModel url={modelUrl} />
-        </Suspense>
-      </ModelErrorBoundary>
+      {modelAvailable ? (
+        <ModelErrorBoundary fallback={<MineTerrain />}>
+          <Suspense fallback={<MineTerrain />}>
+            <MineModel url={modelUrl} />
+          </Suspense>
+        </ModelErrorBoundary>
+      ) : (
+        <MineTerrain />
+      )}
 
       <SensorPlaceholder sensors={sensors} onSelectSensor={onSelectSensor} />
 

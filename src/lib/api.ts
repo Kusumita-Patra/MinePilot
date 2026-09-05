@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 import type { Incident, IncidentStatus } from "../../shared/types/telemetry";
 import { useAuthStore, type AuthUser } from "./authStore";
@@ -11,7 +11,7 @@ interface ApiEnvelope<T> {
   errors?: unknown[];
 }
 
-async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = useAuthStore.getState().token;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -82,6 +82,20 @@ export async function changePassword(currentPassword: string, newPassword: strin
   await apiFetch<Record<string, never>>("/api/auth/change-password", {
     method: "POST",
     body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+}
+
+export async function updateFullName(fullName: string): Promise<AuthUser> {
+  return apiFetch<AuthUser>("/api/auth/me", {
+    method: "PATCH",
+    body: JSON.stringify({ full_name: fullName }),
+  });
+}
+
+export async function updateEmail(newEmail: string, currentPassword: string): Promise<AuthUser> {
+  return apiFetch<AuthUser>("/api/auth/update-email", {
+    method: "POST",
+    body: JSON.stringify({ new_email: newEmail, current_password: currentPassword }),
   });
 }
 
