@@ -4,6 +4,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import { useInspections } from "@/hooks/useInspections";
 import { createInspection, updateInspection, type InspectionStatus } from "@/lib/api";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const STATUS_FLOW: Record<InspectionStatus, InspectionStatus | null> = {
   SCHEDULED: "IN_PROGRESS",
@@ -121,7 +122,7 @@ export default function InspectionsPage() {
       {error && <p className="text-xs text-amber-400">Can&apos;t reach the backend right now — showing last known inspections.</p>}
 
       {loading && inspections.length === 0 ? (
-        <p className="text-sm text-neutral-500">Loading inspections…</p>
+        <LoadingOverlay active label="Loading inspections..." />
       ) : inspections.length === 0 ? (
         <div className="bg-gray-900 border border-white/10 rounded-xl p-8 text-center">
           <p className="text-sm text-neutral-500">No inspections scheduled yet.</p>

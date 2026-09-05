@@ -1,6 +1,7 @@
 "use client";
 
 import { useUsers } from "@/hooks/useUsers";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const ROLE_LABEL: Record<string, string> = {
   mine_manager: "Mine Manager",
@@ -20,7 +21,7 @@ export default function WorkforcePage() {
       {error && <p className="text-xs text-amber-400">{error}</p>}
 
       {loading && users.length === 0 ? (
-        <p className="text-sm text-neutral-500">Loading workforce…</p>
+        <LoadingOverlay active label="Loading workforce..." />
       ) : (
         <div className="bg-gray-900 border border-white/10 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">

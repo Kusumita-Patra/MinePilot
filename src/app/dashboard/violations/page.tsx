@@ -2,6 +2,7 @@
 
 import { useIncidents } from "@/hooks/useIncidents";
 import IncidentsTable from "@/components/IncidentsTable";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 export default function ViolationsPage() {
   const { incidents, loading, error, refresh } = useIncidents();
@@ -39,7 +40,7 @@ export default function ViolationsPage() {
       )}
 
       {loading && incidents.length === 0 ? (
-        <p className="text-sm text-neutral-500">Loading violations…</p>
+        <LoadingOverlay active label="Loading violations..." />
       ) : (
         <IncidentsTable
           incidents={violations}

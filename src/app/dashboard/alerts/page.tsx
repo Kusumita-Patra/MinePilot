@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { useIncidents } from "@/hooks/useIncidents";
 import IncidentsTable from "@/components/IncidentsTable";
 import type { IncidentStatus } from "../../../../shared/types/telemetry";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const TABS: { label: string; value: IncidentStatus | "ALL" }[] = [
   { label: "All", value: "ALL" },
@@ -48,7 +49,7 @@ export default function AlertsPage() {
       </div>
 
       {loading && incidents.length === 0 ? (
-        <p className="text-sm text-neutral-500">Loading alerts…</p>
+        <LoadingOverlay active label="Loading alerts..." />
       ) : (
         <IncidentsTable incidents={filtered} onRefresh={refresh} emptyLabel="No alerts in this status." />
       )}
