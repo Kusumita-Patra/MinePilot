@@ -172,3 +172,41 @@ Flow: login → verify credentials → generate JWT → return token → fronten
 - Work **module by module.** Finish and get review on one before starting the next.
 - **Confirm the plan before writing code** for anything not already specified in `PLAN.md`.
 - When the frontend recap leaves something undecided (KPI/alert/analytics payload shapes, user roles, notifications, alert persistence), pick a sensible default, implement it, and **flag it clearly** so Banibrata can confirm later. Don't silently guess.
+
+---
+
+## 12. Implementation status (as of 2026-09-05)
+
+Running record of what's actually been built, so a new session (or teammate) doesn't have to re-derive it from git log. Update this section as work lands — don't let it go stale.
+
+### Backend — built and working (`backend/`)
+
+- **Auth** (`routers/auth.py` + `services/auth_service.py` + `schemas/auth.py`): register, login, `GET /me`, `POST /change-password`, `PATCH /me` (full name), `POST /update-email`. Email/password changes require current-password confirmation; a wrong current password returns **403**, not 401 — 401 is reserved strictly for "session/token invalid" since the frontend treats any 401 as a global logout signal.
+- **Users**: `GET /api/users` (`mine_manager` only, via `require_role`).
+- **Incidents**: full state machine (`TRIGGERED → ASSIGNED → RESOLVED → ESCALATED → SIGNED_OFF`) with per-role allowed-transition checks.
+- **Telemetry**: WebSocket ingestion from T2's simulator (`inference_api.py`), persisted to Postgres, re-broadcast to authenticated frontend clients in the exact `shared/types/telemetry.ts` `SensorFrame` shape.
+- **Inspections, KPIs, Analytics (compliance breakdown), Health** — all following the router→service→schema pattern in §6, all through the standard envelope in §7.
+- **DB**: Supabase Postgres via SQLAlchemy async + asyncpg, `NullPool` + a per-connection `prepared_statement_name_func` (uuid-based) to work around pgbouncer transaction-pooling mode rejecting named prepared statements. 2 Alembic migrations so far: initial schema, incident ticket sequence.
+
+### Frontend — built and working (`src/`)
+
+- Zustand `authStore` (JWT + user, persisted to localStorage) and a `RequireAuth` role-gated route guard; sign-up and sign-in flows for both `mine_manager` and `field_worker`.
+- Dashboard shell (`Header` + `Sidebar` + `RequireAuth`) wraps every `/dashboard/*` route automatically via `src/app/dashboard/layout.tsx`. **Settings lives at `/dashboard/settings`** inside that shell for managers (not a standalone page) — a collapsible "Update Personal Information" panel (full name / email / password, each its own accordion row; email and password changes require current-password confirmation). `/field` is the standalone field-worker view; its own `/settings` route (no sidebar) now only renders for field workers — a manager landing there gets redirected to `/dashboard/settings`.
+- The 3D digital twin was merged in from Team 1's upstream work (`MineDigitalTwinContainer`, `MineScene`, etc.). A missing `mine.glb` is handled by a `useModelAvailability` HEAD-check hook (`src/components/digital-twin/useModelAvailability.ts`) so a missing model falls back to `MineTerrain` without ever throwing (avoids a false-positive Next.js dev-overlay error).
+- **Documents panel** (`/dashboard/documents`) and **Contractors panel** (`/dashboard/contractors` + `/dashboard/contractors/[contractorId]`): compliance-risk surfaces modeled on real Indian mine-compliance workflows (Mines Act 1952, DGMS, CLRA 1970) — statutory-document expiry tracking with an approval/version/acknowledgement/audit-trail model, and contractor workforce compliance (PME/vocational-training/gate-pass expiry blocks site entry), work permits, equipment, and a safety scorecard. Types in `shared/types/documents.ts` / `shared/types/contractors.ts`, mock data in `shared/mock-data/sample-documents.json` / `sample-contractors.json`.
+  - **This is frontend-only for now** — no Documents/Contractors backend exists yet, and nothing in `PLAN.md` covers this scope. Every function in `src/lib/documentsApi.ts` / `src/lib/contractorsApi.ts` tries the real REST endpoint first (each call site has a `// TODO(Team 3): ...` comment documenting the intended contract) and falls back to the mock JSON on failure, so the UI is fully usable with the backend offline.
+  - Team 2's contractor risk-scoring model isn't wired up either; `computeFallbackRiskScore` in `src/lib/complianceUtils.ts` computes a deterministic stand-in from compliance % and incident count, marked `// TODO(Team 2): replace with POST /predict/contractor-risk`.
+  - New shared UI primitives added for this: `src/components/ui/{Drawer,Modal,Tabs,Badge,ProgressRing,EmptyState,SkeletonLoader}.tsx` — reuse these before adding new modal/drawer/tab chrome elsewhere.
+
+### Git / branch state
+
+| Branch | Contents | Status |
+|---|---|---|
+| `main` | Upstream (`Kusumita-Patra/MinePilot`) | — |
+| `t3-backend-integration` | Backend + auth + merged-in 3D twin + Settings redesign | PR #2 open into `main` |
+| `feature/documents-contractors-panels` | Documents + Contractors panels | Pushed to origin, **not yet merged** into `t3-backend-integration` |
+
+### Known follow-ups
+
+- Documents/Contractors need a real backend (models, endpoints, and a file-storage decision for actual uploads) before the `TODO(Team 3)` markers can be wired up. This is genuinely new scope — treat it with the same schema/endpoint-table rigor as the rest of this file, and confirm before building rather than improvising, per §11.
+- `POST /predict/contractor-risk` (Team 2) doesn't exist yet — see `computeFallbackRiskScore` above.
