@@ -1,3 +1,7 @@
+"use client";
+
+import Link from "next/link";
+
 interface RiskFactor {
   label: string;
   value: number;
@@ -82,9 +86,12 @@ export default function AiRiskAnalysis({ riskScore = 70 }: { riskScore?: number 
         </ul>
       </div>
 
-      <button className="w-full bg-blue-600 hover:bg-blue-500 text-xs font-medium py-2 rounded-lg transition-colors">
+      <Link
+        href="/dashboard/compliance"
+        className="w-full block text-center bg-blue-600 hover:bg-blue-500 text-xs font-medium py-2 rounded-lg transition-colors"
+      >
         View Full Analysis
-      </button>
+      </Link>
     </div>
   );
 }

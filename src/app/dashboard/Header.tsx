@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Bell, Maximize2, LogOut } from "lucide-react";
 import { useAuthStore } from "@/lib/authStore";
+import { useIncidents } from "@/hooks/useIncidents";
 
 const ROLE_LABEL: Record<string, string> = {
   mine_manager: "Mine Manager",
@@ -14,6 +15,8 @@ export default function Header() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
+  const { incidents } = useIncidents();
+  const openCount = incidents.filter((i) => i.status !== "SIGNED_OFF").length;
 
   function handleLogout() {
     logout();
@@ -35,11 +38,17 @@ export default function Header() {
       </p>
 
       <div className="flex items-center gap-4">
-        <button className="relative text-neutral-400 hover:text-white">
+        <button
+          onClick={() => router.push("/dashboard/alerts")}
+          title="View alerts"
+          className="relative text-neutral-400 hover:text-white"
+        >
           <Bell size={18} />
-          <span className="absolute -top-1 -right-1 bg-red-500 text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
-            5
-          </span>
+          {openCount > 0 && (
+            <span className="absolute -top-1 -right-1 bg-red-500 text-[9px] w-4 h-4 rounded-full flex items-center justify-center">
+              {openCount}
+            </span>
+          )}
         </button>
         <button className="text-neutral-400 hover:text-white">
           <Maximize2 size={16} />

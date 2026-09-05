@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import get_current_user
 from app.db.database import get_db
 from app.models.user import User
-from app.schemas.auth import LoginRequest, RegisterRequest
+from app.schemas.auth import ChangePasswordRequest, LoginRequest, RegisterRequest
 from app.schemas.common import success_body
 from app.schemas.user import UserResponse
 from app.services import auth_service
@@ -27,3 +27,13 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> di
 @router.get("/me")
 async def me(current_user: User = Depends(get_current_user)) -> dict:
     return success_body(UserResponse.model_validate(current_user).model_dump(mode="json"))
+
+
+@router.post("/change-password")
+async def change_password(
+    payload: ChangePasswordRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    await auth_service.change_password(db, current_user, payload)
+    return success_body({}, message="Password updated successfully")

@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.security import create_access_token, hash_password, verify_password
 from app.exceptions.custom_exceptions import DuplicateError, UnauthorizedError
 from app.models.user import User
-from app.schemas.auth import LoginRequest, RegisterRequest, TokenResponse
+from app.schemas.auth import ChangePasswordRequest, LoginRequest, RegisterRequest, TokenResponse
 from app.schemas.user import UserResponse
 
 
@@ -33,3 +33,11 @@ async def login(db: AsyncSession, payload: LoginRequest) -> TokenResponse:
 
     token = create_access_token(user.id, user.role)
     return TokenResponse(access_token=token, user=UserResponse.model_validate(user))
+
+
+async def change_password(db: AsyncSession, user: User, payload: ChangePasswordRequest) -> None:
+    if not verify_password(payload.current_password, user.password_hash):
+        raise UnauthorizedError("Current password is incorrect")
+
+    user.password_hash = hash_password(payload.new_password)
+    await db.commit()

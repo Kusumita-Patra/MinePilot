@@ -66,6 +66,25 @@ export async function login(email: string, password: string): Promise<LoginRespo
   });
 }
 
+export async function register(payload: {
+  email: string;
+  password: string;
+  full_name: string;
+  role: "mine_manager" | "field_worker";
+}): Promise<AuthUser> {
+  return apiFetch<AuthUser>("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  await apiFetch<Record<string, never>>("/api/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+}
+
 export interface KpiMetric {
   value: number;
   trend: string | null;
@@ -100,4 +119,85 @@ export interface InspectionsBreakdown {
 
 export async function getInspectionsBreakdown(): Promise<InspectionsBreakdown> {
   return apiFetch<InspectionsBreakdown>("/api/analytics/inspections");
+}
+
+export type InspectionStatus = "SCHEDULED" | "IN_PROGRESS" | "COMPLETED";
+
+export interface Inspection {
+  id: string;
+  sector_id: string;
+  status: InspectionStatus;
+  scheduled_date: string;
+  completed_at: string | null;
+  inspector_id: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getInspections(status?: InspectionStatus): Promise<Inspection[]> {
+  const search = status ? `?status=${encodeURIComponent(status)}` : "";
+  return apiFetch<Inspection[]>(`/api/inspections${search}`);
+}
+
+export async function createInspection(payload: {
+  sector_id: string;
+  scheduled_date: string;
+  notes?: string;
+}): Promise<Inspection> {
+  return apiFetch<Inspection>("/api/inspections", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateInspection(
+  id: string,
+  patch: { status?: InspectionStatus; notes?: string; completed_at?: string }
+): Promise<Inspection> {
+  return apiFetch<Inspection>(`/api/inspections/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}
+
+export async function getUsers(): Promise<AuthUser[]> {
+  return apiFetch<AuthUser[]>("/api/users");
+}
+
+export async function checkBackendHealth(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_URL}/api/health`);
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+export interface ComplianceCategoryScore {
+  category: string;
+  score_pct: number;
+}
+
+export async function getComplianceBreakdown(): Promise<ComplianceCategoryScore[]> {
+  return apiFetch<ComplianceCategoryScore[]>("/api/analytics/compliance");
+}
+
+export interface SensorFrameHistoryPoint {
+  sensor_id: string;
+  sector_id: string;
+  risk_score: number;
+  risk_level: "NORMAL" | "WARNING" | "CRITICAL";
+  timestamp: string;
+}
+
+export async function getTelemetryHistory(params: {
+  sector_id?: string;
+  limit?: number;
+}): Promise<SensorFrameHistoryPoint[]> {
+  const search = new URLSearchParams();
+  if (params.sector_id) search.set("sector_id", params.sector_id);
+  if (params.limit) search.set("limit", String(params.limit));
+  const query = search.toString();
+  return apiFetch<SensorFrameHistoryPoint[]>(`/api/telemetry/history${query ? `?${query}` : ""}`);
 }

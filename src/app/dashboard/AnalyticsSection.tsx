@@ -3,18 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useRiskRanking } from "@/hooks/useRiskRanking";
 import { useInspectionsBreakdown } from "@/hooks/useInspectionsBreakdown";
-
-// PLAN.md §7 item 10: nothing in the backend computes compliance-by-category
-// scores yet (compliance_scores has no writer) - this stays hardcoded until
-// that's designed and confirmed. Everything else on this page is wired to
-// the real backend.
-const COMPLIANCE = [
-  { label: "Safety Compliance", value: 95 },
-  { label: "Environment Compliance", value: 91 },
-  { label: "Labour Compliance", value: 93 },
-  { label: "Statutory Compliance", value: 97 },
-  { label: "Production Compliance", value: 89 },
-];
+import ComplianceOverview from "@/components/ComplianceOverview";
 
 const FALLBACK_RANKING = [
   { sector_id: "sector_north_wall", avg_risk_score: 87, risk_level: "CRITICAL" as const },
@@ -51,26 +40,7 @@ export default function AnalyticsSection() {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {/* Compliance Overview */}
-      <div className="bg-gray-900 border border-white/10 rounded-xl p-4">
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-semibold text-neutral-300 tracking-wide">COMPLIANCE OVERVIEW</p>
-          <button className="text-[11px] text-blue-400 hover:underline">View All</button>
-        </div>
-        <div className="space-y-3">
-          {COMPLIANCE.map((c) => (
-            <div key={c.label}>
-              <div className="flex justify-between text-[11px] text-neutral-400 mb-1">
-                <span>{c.label}</span>
-                <span>{c.value}%</span>
-              </div>
-              <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${c.value}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      <ComplianceOverview />
 
       {/* Sector Risk Ranking */}
       <div className="bg-gray-900 border border-white/10 rounded-xl p-4">

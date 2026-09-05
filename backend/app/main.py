@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
 from app.exceptions.handlers import register_exception_handlers
-from app.routers import analytics, auth, health, incidents, inspections, kpis, telemetry
+from app.routers import analytics, auth, health, incidents, inspections, kpis, telemetry, users
 from app.services.telemetry_service import run_ingestion_loop
 
 settings = get_settings()
@@ -44,3 +44,4 @@ app.include_router(telemetry.router)
 app.include_router(inspections.router)
 app.include_router(kpis.router)
 app.include_router(analytics.router)
+app.include_router(users.router)

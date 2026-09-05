@@ -12,6 +12,7 @@ import type { Incident } from "../../../shared/types/telemetry";
 function FieldWorkerView() {
   const { incidents, error, loading, refresh } = useIncidents();
   const workerId = useAuthStore((s) => s.user?.id);
+  const workerName = useAuthStore((s) => s.user?.full_name);
   const [remarksByTicket, setRemarksByTicket] = useState<Record<string, string>>({});
   const [busyTicket, setBusyTicket] = useState<string | null>(null);
 
@@ -36,9 +37,12 @@ function FieldWorkerView() {
       <LoadingOverlay active={loading} label="Loading assigned alerts..." />
 
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-xl font-bold">My Assigned Alerts</h1>
-        <Link href="/dashboard" className="text-xs text-blue-400 hover:underline">
-          Dashboard →
+        <div>
+          <h1 className="text-xl font-bold">My Assigned Alerts</h1>
+          {workerName && <p className="text-xs text-neutral-500">{workerName}</p>}
+        </div>
+        <Link href="/settings" className="text-xs text-blue-400 hover:underline">
+          Settings →
         </Link>
       </div>
       {error && (
