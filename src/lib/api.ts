@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 import type { Incident, IncidentStatus } from "../../shared/types/telemetry";
 import { useAuthStore, type AuthUser } from "./authStore";
@@ -11,7 +11,7 @@ interface ApiEnvelope<T> {
   errors?: unknown[];
 }
 
-async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = useAuthStore.getState().token;
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
