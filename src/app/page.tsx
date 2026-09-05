@@ -13,7 +13,7 @@ export default function Home() {
 
       <div className="flex flex-col sm:flex-row gap-4">
         <Link
-          href="/dashboard"
+          href="/login"
           className="bg-white/10 hover:bg-white/20 rounded-xl px-6 py-4 min-w-[220px] text-left transition-colors"
         >
           <p className="font-semibold">Mine Manager</p>
@@ -22,7 +22,7 @@ export default function Home() {
           </p>
         </Link>
         <Link
-          href="/field"
+          href="/login"
           className="bg-white/10 hover:bg-white/20 rounded-xl px-6 py-4 min-w-[220px] text-left transition-colors"
         >
           <p className="font-semibold">Field Worker</p>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import type { SensorFrame } from "../../shared/types/telemetry";
 import mockData from "../../shared/mock-data/sample-telemetry-stream.json";
+import { useAuthStore } from "@/lib/authStore";
 
 const WS_URL =
   process.env.NEXT_PUBLIC_WS_URL ?? "ws://localhost:8000/ws/telemetry";
@@ -47,8 +48,14 @@ export function useTelemetryWebSocket(): UseTelemetryWebSocketReturn {
 
   useEffect(() => {
     function connect() {
+      const token = useAuthStore.getState().token;
+      if (!token) {
+        seedMockData();
+        return;
+      }
+
       try {
-        const ws = new WebSocket(WS_URL);
+        const ws = new WebSocket(`${WS_URL}?token=${encodeURIComponent(token)}`);
         wsRef.current = ws;
 
         ws.onopen = () => {

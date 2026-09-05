@@ -4,13 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { useIncidents } from "@/hooks/useIncidents";
 import { updateIncident } from "@/lib/api";
+import { useAuthStore } from "@/lib/authStore";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import RequireAuth from "@/components/RequireAuth";
 import type { Incident } from "../../../shared/types/telemetry";
 
-const DEMO_WORKER_ID = "FW-DEMO-01";
-
-export default function FieldWorkerPage() {
+function FieldWorkerView() {
   const { incidents, error, loading, refresh } = useIncidents();
+  const workerId = useAuthStore((s) => s.user?.id);
+  const workerName = useAuthStore((s) => s.user?.full_name);
   const [remarksByTicket, setRemarksByTicket] = useState<Record<string, string>>({});
   const [busyTicket, setBusyTicket] = useState<string | null>(null);
 
@@ -35,9 +37,12 @@ export default function FieldWorkerPage() {
       <LoadingOverlay active={loading} label="Loading assigned alerts..." />
 
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-xl font-bold">My Assigned Alerts</h1>
-        <Link href="/dashboard" className="text-xs text-blue-400 hover:underline">
-          Dashboard →
+        <div>
+          <h1 className="text-xl font-bold">My Assigned Alerts</h1>
+          {workerName && <p className="text-xs text-neutral-500">{workerName}</p>}
+        </div>
+        <Link href="/settings" className="text-xs text-blue-400 hover:underline">
+          Settings →
         </Link>
       </div>
       {error && (
@@ -76,7 +81,7 @@ export default function FieldWorkerPage() {
               {inc.status === "TRIGGERED" && (
                 <button
                   disabled={busy}
-                  onClick={() => act(inc, { status: "ASSIGNED", assigned_worker_id: DEMO_WORKER_ID })}
+                  onClick={() => act(inc, { status: "ASSIGNED", assigned_worker_id: workerId })}
                   className="w-full mt-3 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 rounded-md py-2 text-sm font-medium"
                 >
                   Take Ticket
@@ -88,7 +93,7 @@ export default function FieldWorkerPage() {
                   Escalated to Mine Manager
                   <button
                     disabled={busy}
-                    onClick={() => act(inc, { status: "ASSIGNED", assigned_worker_id: DEMO_WORKER_ID })}
+                    onClick={() => act(inc, { status: "ASSIGNED", assigned_worker_id: workerId })}
                     className="w-full mt-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 rounded-md py-2 text-sm font-medium"
                   >
                     Take Back
@@ -136,5 +141,13 @@ export default function FieldWorkerPage() {
         })}
       </div>
     </main>
+  );
+}
+
+export default function FieldWorkerPage() {
+  return (
+    <RequireAuth allowedRoles={["field_worker"]}>
+      <FieldWorkerView />
+    </RequireAuth>
   );
 }

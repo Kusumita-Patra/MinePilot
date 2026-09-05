@@ -1,10 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { useTelemetryWebSocket } from "@/hooks/useTelemetryWebSocket";
-import TelemetryInspectorDrawer from "@/components/TelemetryInspectorDrawer";
-import Header from "@/app/dashboard/Header";
-import Sidebar from "@/app/dashboard/Sidebar";
+import { useTelemetry } from "@/lib/telemetryContext";
 import KpiCards from "@/app/dashboard/KpiCards";
 import MineDigitalTwinContainer from "@/app/dashboard/MineDigitalTwinContainer";
 import AiRiskAnalysis from "@/app/dashboard/AiRiskAnalysis";
@@ -12,13 +8,10 @@ import RecentAlerts from "@/app/dashboard/RecentAlerts";
 import AnalyticsSection from "@/app/dashboard/AnalyticsSection";
 import QuickActions from "@/app/dashboard/QuickActions";
 import IncidentSignOff from "@/app/dashboard/IncidentSignOff";
-import LoadingOverlay from "@/components/LoadingOverlay";
 import MineDigitalTwin from "@/components/digital-twin";
-import type { SensorFrame } from "../../../shared/types/telemetry";
 
 export default function DashboardPage() {
-  const { sensors, connected, usingMockData } = useTelemetryWebSocket();
-  const [selected, setSelected] = useState<SensorFrame | null>(null);
+  const { sensors, selected, setSelected } = useTelemetry();
 
   const sensorList = Object.values(sensors);
   const avgRisk = sensorList.length
@@ -26,41 +19,30 @@ export default function DashboardPage() {
     : 70;
 
   return (
-    <div className="h-screen flex flex-col bg-slate-950 text-white">
-      <LoadingOverlay active={!connected && !usingMockData} label="Connecting to mine network..." />
-      <Header />
+    <>
+      <KpiCards />
 
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar />
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex-1">
+          <MineDigitalTwinContainer>
+            <MineDigitalTwin
+              sensors={sensorList}
+              selectedSensor={selected}
+              onSelectSensor={setSelected}
+            />
+          </MineDigitalTwinContainer>
+        </div>
 
-        <main className="flex-1 overflow-y-auto p-5 space-y-4">
-          <KpiCards />
-
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <MineDigitalTwinContainer>
-                <MineDigitalTwin
-                  sensors={sensorList}
-                  selectedSensor={selected}
-                  onSelectSensor={setSelected}
-                />
-              </MineDigitalTwinContainer>
-            </div>
-
-            <AiRiskAnalysis riskScore={avgRisk} />
-          </div>
-
-          <AnalyticsSection />
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <RecentAlerts />
-            <QuickActions />
-            <IncidentSignOff />
-          </div>
-        </main>
+        <AiRiskAnalysis riskScore={avgRisk} />
       </div>
 
-      <TelemetryInspectorDrawer sensor={selected} onClose={() => setSelected(null)} />
-    </div>
+      <AnalyticsSection />
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <RecentAlerts />
+        <QuickActions />
+        <IncidentSignOff />
+      </div>
+    </>
   );
 }
