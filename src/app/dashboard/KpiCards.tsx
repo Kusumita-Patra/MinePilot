@@ -1,6 +1,6 @@
 "use client";
 
-import { ShieldCheck, Users, ClipboardList, ClipboardCheck } from "lucide-react";
+import { ShieldCheck, Users, ClipboardList, ClipboardCheck, type LucideIcon } from "lucide-react";
 import clsx from "clsx";
 import { useKpis } from "@/hooks/useKpis";
 import type { KpiSummary } from "@/lib/api";
@@ -9,7 +9,7 @@ interface KpiDef {
   label: string;
   value: string;
   trend: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   tone: "emerald" | "red" | "amber" | "blue";
 }
 

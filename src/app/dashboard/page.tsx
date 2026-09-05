@@ -8,9 +8,10 @@ import RecentAlerts from "@/app/dashboard/RecentAlerts";
 import AnalyticsSection from "@/app/dashboard/AnalyticsSection";
 import QuickActions from "@/app/dashboard/QuickActions";
 import IncidentSignOff from "@/app/dashboard/IncidentSignOff";
+import MineDigitalTwin from "@/components/digital-twin";
 
 export default function DashboardPage() {
-  const { sensors, setSelected } = useTelemetry();
+  const { sensors, selected, setSelected } = useTelemetry();
 
   const sensorList = Object.values(sensors);
   const avgRisk = sensorList.length
@@ -24,16 +25,11 @@ export default function DashboardPage() {
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
           <MineDigitalTwinContainer>
-            <div
-              className="text-center px-6 cursor-pointer"
-              onClick={() => sensorList[0] && setSelected(sensorList[0])}
-            >
-              <div className="text-5xl mb-3">🛰️</div>
-              <p className="text-neutral-400 font-medium">3D Digital Twin Viewport</p>
-              <p className="text-neutral-600 text-sm mt-1">
-                Waiting for Team 1&apos;s &lt;MineDigitalTwin /&gt; component
-              </p>
-            </div>
+            <MineDigitalTwin
+              sensors={sensorList}
+              selectedSensor={selected}
+              onSelectSensor={setSelected}
+            />
           </MineDigitalTwinContainer>
         </div>
 
