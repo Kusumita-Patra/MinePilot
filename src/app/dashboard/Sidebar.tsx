@@ -32,7 +32,7 @@ const NAV_ITEMS = [
   { label: "Documents", href: "/dashboard/documents", icon: FolderOpen },
   { label: "Contractors", href: "/dashboard/contractors", icon: Users },
   { label: "Workforce", href: "/dashboard/workforce", icon: UserCog },
-  { label: "Settings", href: "/settings", icon: Settings },
+  { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 export default function Sidebar() {

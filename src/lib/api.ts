@@ -85,6 +85,20 @@ export async function changePassword(currentPassword: string, newPassword: strin
   });
 }
 
+export async function updateFullName(fullName: string): Promise<AuthUser> {
+  return apiFetch<AuthUser>("/api/auth/me", {
+    method: "PATCH",
+    body: JSON.stringify({ full_name: fullName }),
+  });
+}
+
+export async function updateEmail(newEmail: string, currentPassword: string): Promise<AuthUser> {
+  return apiFetch<AuthUser>("/api/auth/update-email", {
+    method: "POST",
+    body: JSON.stringify({ new_email: newEmail, current_password: currentPassword }),
+  });
+}
+
 export interface KpiMetric {
   value: number;
   trend: string | null;

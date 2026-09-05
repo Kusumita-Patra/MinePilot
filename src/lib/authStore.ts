@@ -15,6 +15,7 @@ interface AuthState {
   user: AuthUser | null;
   isHydrated: boolean;
   setAuth: (token: string, user: AuthUser) => void;
+  updateUser: (patch: Partial<AuthUser>) => void;
   logout: () => void;
 }
 
@@ -25,6 +26,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isHydrated: false,
       setAuth: (token, user) => set({ token, user }),
+      updateUser: (patch) => set((state) => (state.user ? { user: { ...state.user, ...patch } } : state)),
       logout: () => set({ token: null, user: null }),
     }),
     {

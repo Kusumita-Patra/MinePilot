@@ -21,6 +21,15 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(min_length=8)
 
 
+class UpdateFullNameRequest(BaseModel):
+    full_name: str = Field(min_length=1)
+
+
+class UpdateEmailRequest(BaseModel):
+    new_email: EmailStr
+    current_password: str
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
