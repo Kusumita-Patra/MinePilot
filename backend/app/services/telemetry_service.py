@@ -117,7 +117,14 @@ async def run_ingestion_loop(stop_event: asyncio.Event) -> None:
     backoff = 1
     while not stop_event.is_set():
         try:
-            async with websockets.connect(settings.ml_service_ws_url) as upstream:
+            # T2's simulator loop doesn't reliably answer WebSocket pings on
+            # time (it's busy generating/broadcasting frames), which trips
+            # this client's default 20s ping_timeout and drops an otherwise
+            # healthy connection every ~1s. We don't control that server, so
+            # disable our own ping-based liveness check here — the constant
+            # stream of frames is itself sufficient liveness signal, and a
+            # truly dead TCP connection still surfaces as a read error below.
+            async with websockets.connect(settings.ml_service_ws_url, ping_interval=None) as upstream:
                 logger.info("Connected to upstream telemetry simulator at %s", settings.ml_service_ws_url)
                 backoff = 1
                 async for message in upstream:

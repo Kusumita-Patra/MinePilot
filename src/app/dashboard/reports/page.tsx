@@ -2,6 +2,7 @@
 
 import { useKpis } from "@/hooks/useKpis";
 import { useIncidents } from "@/hooks/useIncidents";
+import { formatSectorId } from "@/lib/format";
 
 function toCsv(rows: string[][]): string {
   return rows
@@ -99,7 +100,7 @@ export default function ReportsPage() {
                 openIncidents.map((i) => (
                   <tr key={i.ticket_id} className="border-b border-white/5 print:border-neutral-200">
                     <td className="py-2">{i.ticket_id}</td>
-                    <td className="py-2">{i.sector_id.replace(/_/g, " ")}</td>
+                    <td className="py-2">{formatSectorId(i.sector_id)}</td>
                     <td className="py-2">{i.severity}</td>
                     <td className="py-2">{i.status}</td>
                     <td className="py-2">{i.risk_score}</td>

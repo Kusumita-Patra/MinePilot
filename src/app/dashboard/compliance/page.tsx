@@ -2,6 +2,7 @@
 
 import { useRiskRanking } from "@/hooks/useRiskRanking";
 import ComplianceOverview from "@/components/ComplianceOverview";
+import { formatSectorId } from "@/lib/format";
 
 function riskTone(score: number) {
   if (score >= 75) return "bg-red-500";
@@ -33,7 +34,7 @@ export default function CompliancePage() {
             {ranking.map((r, i) => (
               <div key={r.sector_id} className="flex items-center gap-3">
                 <span className="text-[11px] text-neutral-500 w-4">{i + 1}</span>
-                <span className="text-xs flex-1 truncate">{r.sector_id.replace(/_/g, " ")}</span>
+                <span className="text-xs flex-1 truncate">{formatSectorId(r.sector_id)}</span>
                 <div className="w-24 h-1.5 bg-white/5 rounded-full overflow-hidden">
                   <div
                     className={`h-full rounded-full ${riskTone(r.avg_risk_score)}`}

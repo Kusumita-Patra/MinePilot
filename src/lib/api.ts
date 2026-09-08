@@ -1,6 +1,6 @@
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
-import type { Incident, IncidentStatus } from "../../shared/types/telemetry";
+import type { Incident, IncidentStatus, TelemetryReading } from "../../shared/types/telemetry";
 import { useAuthStore, type AuthUser } from "./authStore";
 
 interface ApiEnvelope<T> {
@@ -200,6 +200,8 @@ export async function getComplianceBreakdown(): Promise<ComplianceCategoryScore[
 export interface SensorFrameHistoryPoint {
   sensor_id: string;
   sector_id: string;
+  coordinates: { x: number; y: number; z: number };
+  telemetry: TelemetryReading;
   risk_score: number;
   risk_level: "NORMAL" | "WARNING" | "CRITICAL";
   timestamp: string;
@@ -208,10 +210,14 @@ export interface SensorFrameHistoryPoint {
 export async function getTelemetryHistory(params: {
   sector_id?: string;
   limit?: number;
+  from?: string;
+  to?: string;
 }): Promise<SensorFrameHistoryPoint[]> {
   const search = new URLSearchParams();
   if (params.sector_id) search.set("sector_id", params.sector_id);
   if (params.limit) search.set("limit", String(params.limit));
+  if (params.from) search.set("from", params.from);
+  if (params.to) search.set("to", params.to);
   const query = search.toString();
   return apiFetch<SensorFrameHistoryPoint[]>(`/api/telemetry/history${query ? `?${query}` : ""}`);
 }

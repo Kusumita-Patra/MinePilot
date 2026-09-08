@@ -3,6 +3,7 @@
 import { useIncidents } from "@/hooks/useIncidents";
 import IncidentsTable from "@/components/IncidentsTable";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { formatSectorId } from "@/lib/format";
 
 export default function ViolationsPage() {
   const { incidents, loading, error, refresh } = useIncidents();
@@ -33,7 +34,7 @@ export default function ViolationsPage() {
               key={sector}
               className="px-3 py-1.5 rounded-full text-xs bg-white/5 text-neutral-300"
             >
-              {sector.replace(/_/g, " ")} · {count}
+              {formatSectorId(sector)} · {count}
             </span>
           ))}
         </div>

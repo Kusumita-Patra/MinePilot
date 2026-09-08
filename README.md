@@ -46,9 +46,14 @@ Create a `.env.local` file in the repo root (gitignored) with:
 ```bash
 NEXT_PUBLIC_API_URL=http://localhost:8001
 NEXT_PUBLIC_WS_URL=ws://localhost:8001
+NEXT_PUBLIC_INFERENCE_API_URL=http://localhost:8000
 ```
 
-(these point at the T3 backend, not the ML service directly).
+The first two point at the T3 backend, not the ML service directly. The
+third is the one exception: it points straight at T2's `inference_api.py`
+and is used only by the Analytics → Future Predictions panel to call
+`/api/v1/predict-risk` for a short-horizon forecast. That panel degrades to
+an empty state if the ML service isn't running.
 
 ---
 
