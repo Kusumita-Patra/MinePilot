@@ -2,8 +2,9 @@
 
 Ownership: 3D Environment & Camera Specialist. Sensor pins, risk shaders,
 tooltips, raycasting/selection and telemetry belong to the other 3D
-developer — see `SensorPlaceholder.tsx` for the deliberately minimal
-integration point they'll replace.
+developer — `SensorMarkers.tsx` and `SectorHighlight.tsx` are now mounted
+directly inside `MineScene.tsx`; the placeholder integration point they
+replaced has been removed.
 
 ## Install
 
@@ -17,8 +18,8 @@ npm install -D @types/three
 
 | File | Responsibility |
 |---|---|
-| `MineDigitalTwin.tsx` | Public component. Owns `<Canvas>`, the sector-registry provider, and the camera-preset HUD buttons. |
-| `MineScene.tsx` | Everything inside `<Canvas>`: lighting, model-or-fallback, camera controller, sensor placeholder. |
+| `MineDigitalTwin.tsx` | Public component. Owns `<Canvas>`, the sector-registry provider, and the camera-preset HUD buttons. Also accepts `children` (extra Canvas content) and forwards sensor-layer props (`onHoverSensor`, `markerScale`, `showTooltips`, `emitLights`, `highlightSectors`, `sectorHighlightMode`, `canvasProps`) to `MineScene`. |
+| `MineScene.tsx` | Everything inside `<Canvas>`: lighting, model-or-fallback, camera controller, and the real sensor layer (`SensorMarkers` + `SectorHighlight`). |
 | `MineModel.tsx` | Loads `/models/mine.glb` via `useGLTF`, auto-registers any object named after a known sector id. |
 | `ModelErrorBoundary.tsx` | Catches a failed/missing GLB load and swaps in the procedural terrain — this is what makes "no model? no crash" actually work. |
 | `MineTerrain.tsx` | Procedural fallback open-pit mine (benches, floor, north wall, deep shaft, surface conveyor, haul road, surrounding terrain). |
@@ -28,8 +29,8 @@ npm install -D @types/three
 | `sectors.ts` | Sector metadata + camera presets (positions/targets derived from `mineLayout.ts`, so geometry and camera never drift apart). |
 | `mineLayout.ts` | All procedural-mine dimensions in one place. |
 | `geometryUtils.ts` | Pure math helpers (currently: beam-between-two-points, used for the haul road). |
-| `SensorPlaceholder.tsx` | **Not this developer's scope.** Minimal instanced-sphere placeholder proving the coordinate/click contract works; meant to be deleted and replaced. |
-| `types.ts` | All shared types. `SensorFrame` is re-exported from `shared/types/telemetry.ts` — not redefined. |
+| `SensorMarkers.tsx` / `SensorPin.tsx` / `SectorHighlight.tsx` | The sensor-visualization layer: markers, tooltips, selection/hover, and sector risk tinting. Mounted inside `MineScene.tsx`. |
+| `types.ts` | All shared types, including the sensor-visualization layer's (`SensorData`, `RiskLevel`, `SectorState`, etc). `SensorFrame` is re-exported from `shared/types/telemetry.ts` — not redefined. |
 | `index.tsx` | Public barrel. Default export is wrapped in `next/dynamic(..., { ssr: false })` for SSR safety. Import `MineDigitalTwinInner` if you need the ref (`next/dynamic` can't forward refs). |
 
 ## Placing a real mine model

@@ -31,15 +31,21 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
   function MineDigitalTwin(
     {
       sensors = [],
-      // `selectedSensor` is part of the shared contract (for the sensor layer
-      // to drive selection-highlight visuals) but this module doesn't read it
-      // itself — accepted here only so the prop type-checks for callers.
+      selectedSensor = null,
       onSelectSensor,
+      onHoverSensor,
       cameraPreset,
       onCameraPresetChange,
       modelUrl = DEFAULT_MODEL_URL,
       showPresetControls = true,
       className,
+      children,
+      markerScale,
+      showTooltips,
+      emitLights,
+      highlightSectors,
+      sectorHighlightMode,
+      canvasProps,
     },
     ref
   ) {
@@ -69,17 +75,27 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
               near: 0.1,
               far: 1000,
             }}
+            {...canvasProps}
           >
             <MineScene
               ref={ref}
               modelUrl={modelUrl}
               sensors={sensors}
+              selectedSensor={selectedSensor}
               onSelectSensor={onSelectSensor}
+              onHoverSensor={onHoverSensor}
               cameraPreset={effectivePreset}
               onPresetArrive={(id) => {
                 if (cameraPreset === undefined) setInternalPreset(id);
               }}
+              markerScale={markerScale}
+              showTooltips={showTooltips}
+              emitLights={emitLights}
+              highlightSectors={highlightSectors}
+              sectorHighlightMode={sectorHighlightMode}
             />
+
+            {children}
           </Canvas>
 
           {showPresetControls && (
