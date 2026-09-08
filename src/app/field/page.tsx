@@ -7,6 +7,7 @@ import { updateIncident } from "@/lib/api";
 import { useAuthStore } from "@/lib/authStore";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import RequireAuth from "@/components/RequireAuth";
+import { formatSectorId } from "@/lib/format";
 import type { Incident } from "../../../shared/types/telemetry";
 
 function FieldWorkerView() {
@@ -75,7 +76,7 @@ function FieldWorkerView() {
                   {inc.status}
                 </span>
               </div>
-              <p className="text-sm text-neutral-400">{inc.sensor_id} · {inc.sector_id}</p>
+              <p className="text-sm text-neutral-400">{inc.sensor_id} · {formatSectorId(inc.sector_id)}</p>
               <p className="text-sm mt-1">Risk: {inc.risk_score} ({inc.severity})</p>
 
               {inc.status === "TRIGGERED" && (

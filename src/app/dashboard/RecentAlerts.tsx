@@ -3,6 +3,7 @@
 import { Skull, AlertTriangle } from "lucide-react";
 import clsx from "clsx";
 import { useIncidents } from "@/hooks/useIncidents";
+import { formatSectorId } from "@/lib/format";
 
 const LEVEL_STYLES: Record<string, { icon: typeof Skull; color: string; bg: string }> = {
   CRITICAL: { icon: Skull, color: "text-red-500", bg: "bg-red-500/10" },
@@ -15,10 +16,6 @@ function formatTime(iso: string) {
   } catch {
     return "";
   }
-}
-
-function formatSector(sectorId: string) {
-  return sectorId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 export default function RecentAlerts() {
@@ -56,7 +53,7 @@ export default function RecentAlerts() {
                   {inc.ticket_id} · {inc.sensor_id}
                 </p>
                 <p className="text-[11px] text-neutral-500 truncate">
-                  {formatSector(inc.sector_id)} · risk {inc.risk_score} · {inc.status}
+                  {formatSectorId(inc.sector_id)} · risk {inc.risk_score} · {inc.status}
                 </p>
               </div>
               <span className="text-[10px] text-neutral-600 shrink-0">

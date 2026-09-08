@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useIncidents } from "@/hooks/useIncidents";
 import { updateIncident } from "@/lib/api";
+import { formatSectorId } from "@/lib/format";
 
 export default function IncidentSignOff() {
   const { incidents, refresh } = useIncidents();
@@ -34,11 +35,16 @@ export default function IncidentSignOff() {
             >
               <div className="min-w-0">
                 <p className="text-xs font-medium truncate">
-                  {inc.ticket_id} · {inc.sector_id}
+                  {inc.ticket_id} · {formatSectorId(inc.sector_id)}
                 </p>
                 <p className="text-[11px] text-neutral-500 truncate">
                   {inc.status} · risk {inc.risk_score}
                 </p>
+                {inc.field_remarks && (
+                  <p className="text-[11px] text-neutral-400 mt-1 italic truncate">
+                    “{inc.field_remarks}”
+                  </p>
+                )}
               </div>
               <button
                 disabled={busy === inc.ticket_id}

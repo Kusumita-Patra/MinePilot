@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useRiskRanking } from "@/hooks/useRiskRanking";
 import { useInspectionsBreakdown } from "@/hooks/useInspectionsBreakdown";
 import ComplianceOverview from "@/components/ComplianceOverview";
+import { formatSectorId } from "@/lib/format";
 
 const FALLBACK_RANKING = [
   { sector_id: "sector_north_wall", avg_risk_score: 87, risk_level: "CRITICAL" as const },
@@ -52,7 +53,7 @@ export default function AnalyticsSection() {
           {rankingRows.map((r, i) => (
             <div key={r.sector_id} className="flex items-center gap-3">
               <span className="text-[11px] text-neutral-500 w-4">{i + 1}</span>
-              <span className="text-xs flex-1 truncate">{r.sector_id}</span>
+              <span className="text-xs flex-1 truncate">{formatSectorId(r.sector_id)}</span>
               <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full ${riskTone(r.avg_risk_score)}`}

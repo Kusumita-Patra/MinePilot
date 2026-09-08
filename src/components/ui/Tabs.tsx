@@ -30,7 +30,7 @@ export default function Tabs({
   }
 
   return (
-    <div role="tablist" onKeyDown={handleKeyDown} className="flex gap-1 border-b border-white/10 overflow-x-auto">
+    <div role="tablist" onKeyDown={handleKeyDown} className="flex gap-1 border-b border-white/10 overflow-x-auto overflow-y-hidden">
       {tabs.map((tab) => (
         <button
           key={tab.id}

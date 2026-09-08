@@ -3,6 +3,8 @@
 import clsx from "clsx";
 import { useTelemetry } from "@/lib/telemetryContext";
 import MineDigitalTwinContainer from "@/app/dashboard/MineDigitalTwinContainer";
+import MineDigitalTwin from "@/components/digital-twin";
+import { formatSectorId } from "@/lib/format";
 
 const RISK_STYLES: Record<string, string> = {
   NORMAL: "text-emerald-400",
@@ -11,7 +13,7 @@ const RISK_STYLES: Record<string, string> = {
 };
 
 export default function MineViewPage() {
-  const { sensors, setSelected, connected, usingMockData } = useTelemetry();
+  const { sensors, selected, setSelected, connected, usingMockData } = useTelemetry();
   const sensorList = Object.values(sensors).sort((a, b) => b.risk_score - a.risk_score);
 
   return (
@@ -24,16 +26,7 @@ export default function MineViewPage() {
       </div>
 
       <MineDigitalTwinContainer>
-        <div
-          className="text-center px-6 cursor-pointer"
-          onClick={() => sensorList[0] && setSelected(sensorList[0])}
-        >
-          <div className="text-5xl mb-3">🛰️</div>
-          <p className="text-neutral-400 font-medium">3D Digital Twin Viewport</p>
-          <p className="text-neutral-600 text-sm mt-1">
-            Waiting for Team 1&apos;s &lt;MineDigitalTwin /&gt; component
-          </p>
-        </div>
+        <MineDigitalTwin sensors={sensorList} selectedSensor={selected} onSelectSensor={setSelected} />
       </MineDigitalTwinContainer>
 
       <div className="bg-gray-900 border border-white/10 rounded-xl overflow-hidden">
@@ -62,10 +55,13 @@ export default function MineViewPage() {
                   <tr
                     key={s.sensor_id}
                     onClick={() => setSelected(s)}
-                    className="border-b border-white/5 last:border-0 hover:bg-white/5 cursor-pointer"
+                    className={clsx(
+                      "border-b border-white/5 last:border-0 hover:bg-white/5 cursor-pointer",
+                      selected?.sensor_id === s.sensor_id && "bg-white/5"
+                    )}
                   >
                     <td className="px-4 py-3 font-medium">{s.sensor_id}</td>
-                    <td className="px-4 py-3 text-neutral-400">{s.sector_id.replace(/_/g, " ")}</td>
+                    <td className="px-4 py-3 text-neutral-400">{formatSectorId(s.sector_id)}</td>
                     <td className="px-4 py-3 text-neutral-400">{s.telemetry.ch4_pct}%</td>
                     <td className="px-4 py-3 text-neutral-400">{s.telemetry.co_ppm} ppm</td>
                     <td className="px-4 py-3 text-neutral-400">{s.telemetry.dust_pm10}</td>
