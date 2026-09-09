@@ -22,6 +22,7 @@ export default function AnalyticsPage() {
       <SectorRiskHistory ranking={ranking} sectorId={sectorId} onSectorChange={setUserSelected} />
 
       <FutureRiskPrediction sectorId={sectorId} />
+      
     </div>
   );
 }
