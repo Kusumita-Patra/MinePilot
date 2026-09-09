@@ -8,23 +8,29 @@ export function useTelemetryHistory(sectorId: string | null, limit = 100, rangeI
   const [points, setPoints] = useState<SensorFrameHistoryPoint[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // The requested [from, to] window itself, distinct from the span of data
+  // actually returned — a gap at the start/end of the window (an ingestion
+  // outage, e.g.) must not make the chart silently shrink to fit the data.
+  const [window, setWindow] = useState<{ from: string; to: string } | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     if (!sectorId) {
       setPoints([]);
+      setWindow(null);
       setLoading(false);
       return;
     }
     try {
-      const window = rangeId ? rangeToWindow(rangeId) : undefined;
+      const requestedWindow = rangeId ? rangeToWindow(rangeId) : undefined;
       const data = await getTelemetryHistory({
         sector_id: sectorId,
         limit,
-        from: window?.from,
-        to: window?.to,
+        from: requestedWindow?.from,
+        to: requestedWindow?.to,
       });
       setPoints([...data].reverse());
+      setWindow(requestedWindow ?? null);
       setError(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load telemetry history");
@@ -38,5 +44,5 @@ export function useTelemetryHistory(sectorId: string | null, limit = 100, rangeI
     return () => clearTimeout(timer);
   }, [refresh]);
 
-  return { points, error, loading, refresh };
+  return { points, error, loading, refresh, window };
 }

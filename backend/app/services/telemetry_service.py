@@ -4,7 +4,7 @@ import logging
 from datetime import datetime, timezone
 
 import websockets
-from sqlalchemy import select
+from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
@@ -170,21 +170,68 @@ async def get_history(
     to: datetime | None = None,
     limit: int = 200,
 ) -> list[dict]:
-    query = select(TelemetryReading, Sensor.last_coordinates).join(
+    filters = []
+    if sensor_id is not None:
+        filters.append(TelemetryReading.sensor_id == sensor_id)
+    if sector_id is not None:
+        filters.append(TelemetryReading.sector_id == sector_id)
+    if from_ is not None:
+        filters.append(TelemetryReading.recorded_at >= from_)
+    if to is not None:
+        filters.append(TelemetryReading.recorded_at <= to)
+
+    base_query = select(TelemetryReading, Sensor.last_coordinates).join(
         Sensor, Sensor.sensor_id == TelemetryReading.sensor_id
     )
-    if sensor_id is not None:
-        query = query.where(TelemetryReading.sensor_id == sensor_id)
-    if sector_id is not None:
-        query = query.where(TelemetryReading.sector_id == sector_id)
-    if from_ is not None:
-        query = query.where(TelemetryReading.recorded_at >= from_)
-    if to is not None:
-        query = query.where(TelemetryReading.recorded_at <= to)
-    query = query.order_by(TelemetryReading.recorded_at.desc()).limit(limit)
+    if filters:
+        base_query = base_query.where(and_(*filters))
 
+    count_query = select(func.count()).select_from(TelemetryReading)
+    if filters:
+        count_query = count_query.where(and_(*filters))
+    total = (await db.execute(count_query)).scalar_one()
+
+    if total <= limit:
+        query = base_query.order_by(TelemetryReading.recorded_at.desc()).limit(limit)
+        result = await db.execute(query)
+        return [_reading_to_frame(reading, coordinates) for reading, coordinates in result.all()]
+
+    # More rows exist in [from, to] than `limit` can hold. Rather than just
+    # returning the newest `limit` rows — which silently drops everything
+    # before them and stops the chart short of the requested start — spread
+    # `limit` evenly-spaced buckets across the whole window and keep the
+    # latest reading in each bucket, so the chart always spans the full
+    # selected range.
+    bucketed = base_query.add_columns(
+        func.ntile(limit).over(order_by=TelemetryReading.recorded_at).label("bucket")
+    ).subquery()
+    sampled = (
+        select(bucketed)
+        .distinct(bucketed.c.bucket)
+        .order_by(bucketed.c.bucket, bucketed.c.recorded_at.desc())
+    ).subquery()
+
+    query = select(sampled).order_by(sampled.c.recorded_at.desc())
     result = await db.execute(query)
-    return [_reading_to_frame(reading, coordinates) for reading, coordinates in result.all()]
+    return [_row_to_frame(row) for row in result.all()]
+
+
+def _row_to_frame(row) -> dict:
+    return {
+        "sensor_id": row.sensor_id,
+        "sector_id": row.sector_id,
+        "coordinates": row.last_coordinates,
+        "telemetry": {
+            "ch4_pct": row.ch4_pct,
+            "co_ppm": row.co_ppm,
+            "displacement_mm": row.displacement_mm,
+            "temp_c": row.temp_c,
+            "dust_pm10": row.dust_pm10,
+        },
+        "risk_score": row.risk_score,
+        "risk_level": row.risk_level.value,
+        "timestamp": _format_timestamp(row.recorded_at),
+    }
 
 
 def _reading_to_frame(reading: TelemetryReading, coordinates: dict) -> dict:

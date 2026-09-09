@@ -112,7 +112,7 @@ export default function SectorRiskHistory({
   const [hover, setHover] = useState<{ timestamp: number; mouseX: number; wrapWidth: number } | null>(null);
   const chartWrapRef = useRef<HTMLDivElement>(null);
 
-  const { points, loading } = useTelemetryHistory(sectorId, 500, rangeId);
+  const { points, loading, window: timeWindow } = useTelemetryHistory(sectorId, 500, rangeId);
   const metric = METRICS.find((m) => m.id === metricId)!;
 
   const chartData: ChartPoint[] = useMemo(
@@ -129,6 +129,13 @@ export default function SectorRiskHistory({
       })),
     [points]
   );
+
+  // The axis must span the requested range, not just whatever data came
+  // back — a gap at either edge (an ingestion outage, e.g.) would otherwise
+  // make the chart silently shrink to the available data instead of showing
+  // the true "N hours ago -> now" window the active tab claims to show.
+  const domainStart = timeWindow ? new Date(timeWindow.from).getTime() : chartData[0]?.timestamp;
+  const domainEnd = timeWindow ? new Date(timeWindow.to).getTime() : chartData[chartData.length - 1]?.timestamp;
 
   const hoverPoint = useMemo(
     () => (hover && chartData.length > 0 ? interpolateChartPoint(chartData, hover.timestamp) : null),
@@ -170,8 +177,8 @@ export default function SectorRiskHistory({
       return;
     }
     const fraction = Math.min(1, Math.max(0, (x - plotLeft) / (plotRight - plotLeft)));
-    const tMin = chartData[0].timestamp;
-    const tMax = chartData[chartData.length - 1].timestamp;
+    const tMin = domainStart ?? chartData[0].timestamp;
+    const tMax = domainEnd ?? chartData[chartData.length - 1].timestamp;
     setHover({ timestamp: tMin + fraction * (tMax - tMin), mouseX: x, wrapWidth: rect.width });
   }
 
@@ -268,7 +275,8 @@ export default function SectorRiskHistory({
                 <XAxis
                   dataKey="timestamp"
                   type="number"
-                  domain={["dataMin", "dataMax"]}
+                  domain={[domainStart, domainEnd]}
+                  allowDataOverflow
                   tickFormatter={(v) => formatRangeTick(v, rangeId)}
                   tick={{ fontSize: 10, fill: "#737373" }}
                   height={X_AXIS_HEIGHT}
