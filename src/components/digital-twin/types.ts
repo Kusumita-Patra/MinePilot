@@ -45,15 +45,34 @@ export interface MineSectorConfig {
   description: string;
 }
 
+/** One admin-traced tunnel path from an uploaded mine blueprint — the world-
+ * space counterpart of a backend BlueprintSection (backend/app/models/blueprint.py).
+ * The caller is responsible for converting the section's raw image-pixel
+ * path into world X/Z (this module has no notion of the source image), so
+ * `path` here is already in the same world units as everything else. */
+export interface BlueprintTunnelSection {
+  id: string;
+  sectorId: MineSectorId;
+  /** Place name as labeled on the blueprint (e.g. "North Trunk") — shown by
+   * the click-to-inspect card in place of the procedural generator's names. */
+  name: string;
+  /** World-space Y (vertical) position for this section's tunnel tube. */
+  depth: number;
+  /** World-space [x, z] points forming the tunnel's traced path, in order. */
+  path: [number, number][];
+}
+
 // ----------------------------------------------------------------------------
 // Camera
 // ----------------------------------------------------------------------------
 
 export type CameraPresetId =
   | "northWall"
+  | "mainPit"
   | "deepShaftB"
   | "surfaceConveyor"
-  | "overview";
+  | "overview"
+  | "topDown";
 
 export interface CameraPreset {
   id: CameraPresetId;
@@ -72,6 +91,13 @@ export interface MineDigitalTwinProps {
   /** Full sensor list. Passed straight through to the (placeholder) sensor
    * layer — this module never reads telemetry values itself. */
   sensors?: SensorFrame[];
+  /** Admin-traced tunnel sections from an uploaded blueprint (already
+   * converted to world coordinates by the caller). When present and
+   * non-empty, these REPLACE the procedural fallback tunnels for whichever
+   * of the 4 sectors they cover — the shaft and conveyor's own structural
+   * geometry always renders regardless. Omit/empty to keep the procedural
+   * demo network (e.g. no blueprint uploaded yet). */
+  blueprintSections?: BlueprintTunnelSection[];
   /** Currently selected sensor, if any (controlled by the parent). */
   selectedSensor?: SensorFrame | null;
   /** Fired when a sensor marker is clicked. Only wired up as a pass-through
@@ -98,4 +124,15 @@ export interface MineDigitalTwinProps {
 export interface MineDigitalTwinHandle {
   flyToPreset: (preset: CameraPresetId) => void;
   flyToPoint: (position: [number, number, number], target: [number, number, number]) => void;
+  /** Scales the camera's distance from its current orbit target by `factor`
+   * (< 1 zooms in, > 1 zooms out), clamped to ORBIT_BOUNDS. */
+  zoomBy: (factor: number) => void;
+  /** Flies in close to `point` (e.g. wherever the user clicked on a tunnel),
+   * keeping the camera's current viewing direction. */
+  focusPoint: (point: [number, number, number]) => void;
+  /** Orbits the camera around its current target by `deltaAzimuth` radians
+   * horizontally (positive = rotate right/clockwise viewed from above) and
+   * `deltaPolar` radians vertically (positive = tilt down), clamped to
+   * ORBIT_BOUNDS' polar limits. Distance from the target is unchanged. */
+  rotateBy: (deltaAzimuth: number, deltaPolar: number) => void;
 }

@@ -19,7 +19,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { Vector3 } from "three";
+import { MOUSE, Spherical, TOUCH, Vector3 } from "three";
 import { cameraPresets, DEFAULT_CAMERA_PRESET, ORBIT_BOUNDS } from "./sectors";
 import { FLOOR_Y, MINE_LAYOUT } from "./mineLayout";
 import type { CameraPresetId, MineDigitalTwinHandle } from "./types";
@@ -30,7 +30,11 @@ import type { CameraPresetId, MineDigitalTwinHandle } from "./types";
 const TRANSITION_LAMBDA = 3.2;
 const ARRIVAL_EPSILON = 0.05;
 
-const PAN_MAX_RADIUS = MINE_LAYOUT.terrainRadius * 0.55;
+// The network now spans the whole terrain disc, so panning needs to reach
+// nearly all of it — not just a tight radius around the shaft — for a drag
+// to actually "see the whole view" rather than hitting an invisible wall
+// partway across.
+const PAN_MAX_RADIUS = MINE_LAYOUT.terrainRadius * 0.95;
 const PAN_MIN_Y = FLOOR_Y - 10;
 const PAN_MAX_Y = 40;
 
@@ -78,8 +82,53 @@ const CameraController = forwardRef<MineDigitalTwinHandle, CameraControllerProps
           beginTransition(preset.position, preset.target, presetId);
         },
         flyToPoint: (position, target) => beginTransition(position, target, null),
+        zoomBy: (factor) => {
+          const controls = controlsRef.current;
+          if (!controls) return;
+          const target = controls.target;
+          const offset = camera.position.clone().sub(target);
+          const newDistance = Math.min(
+            ORBIT_BOUNDS.maxDistance,
+            Math.max(ORBIT_BOUNDS.minDistance, offset.length() * factor)
+          );
+          offset.setLength(newDistance);
+          const newPosition = target.clone().add(offset);
+          beginTransition([newPosition.x, newPosition.y, newPosition.z], [target.x, target.y, target.z], null);
+        },
+        rotateBy: (deltaAzimuth, deltaPolar) => {
+          const controls = controlsRef.current;
+          if (!controls) return;
+          const target = controls.target;
+          const offset = camera.position.clone().sub(target);
+          const spherical = new Spherical().setFromVector3(offset);
+          spherical.theta += deltaAzimuth;
+          spherical.phi = Math.min(
+            ORBIT_BOUNDS.maxPolarAngle,
+            Math.max(ORBIT_BOUNDS.minPolarAngle, spherical.phi + deltaPolar)
+          );
+          spherical.makeSafe();
+          const newOffset = new Vector3().setFromSpherical(spherical);
+          const newPosition = target.clone().add(newOffset);
+          beginTransition([newPosition.x, newPosition.y, newPosition.z], [target.x, target.y, target.z], null);
+        },
+        focusPoint: (point) => {
+          const targetPoint = new Vector3(...point);
+          // Keep whatever direction the user is currently looking from, just
+          // pull the camera in close along it — reads as "zoom into what I
+          // clicked" rather than snapping to some unrelated fixed angle.
+          const currentDir = camera.position.clone().sub(controlsRef.current?.target ?? targetPoint);
+          const dir = currentDir.lengthSq() > 1e-6 ? currentDir.normalize() : new Vector3(0.6, 0.5, 0.6).normalize();
+          const focusDistance = Math.max(ORBIT_BOUNDS.minDistance * 3, 40);
+          const newPosition = targetPoint.clone().add(dir.multiplyScalar(focusDistance));
+          beginTransition(
+            [newPosition.x, newPosition.y, newPosition.z],
+            [targetPoint.x, targetPoint.y, targetPoint.z],
+            null
+          );
+        },
       }),
-      []
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [camera]
     );
 
     // Controlled usage: fly whenever the parent changes `activePreset`.
@@ -149,6 +198,13 @@ const CameraController = forwardRef<MineDigitalTwinHandle, CameraControllerProps
         maxPolarAngle={ORBIT_BOUNDS.maxPolarAngle}
         enablePan
         screenSpacePanning={false}
+        panSpeed={1.3}
+        // The mine now spans a huge area, so the primary "just drag" gesture
+        // pans across it (like sliding a map) instead of orbiting in place —
+        // orbiting moves to the right mouse button / two-finger touch, still
+        // reachable but no longer the default single-drag action.
+        mouseButtons={{ LEFT: MOUSE.PAN, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.ROTATE }}
+        touches={{ ONE: TOUCH.PAN, TWO: TOUCH.DOLLY_ROTATE }}
       />
     );
   }

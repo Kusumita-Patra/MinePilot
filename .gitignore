@@ -24,6 +24,9 @@ env/
 # Generated data
 data/*.csv
 
+# Uploaded blueprint images (local disk storage, not source-controlled)
+backend/uploads/
+
 # Logs / experiments
 logs/
 runs/

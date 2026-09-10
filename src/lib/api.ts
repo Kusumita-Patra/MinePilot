@@ -14,7 +14,10 @@ interface ApiEnvelope<T> {
 export async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = useAuthStore.getState().token;
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    // A FormData body needs the browser to set its own multipart boundary —
+    // forcing JSON here would silently send the wrong Content-Type for any
+    // file upload (spreading options.headers below never removes this key).
+    ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
     ...(options.headers as Record<string, string> | undefined),
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;

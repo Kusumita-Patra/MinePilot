@@ -3,6 +3,7 @@
 import {
   LayoutDashboard,
   Box,
+  MapPinned,
   ShieldCheck,
   ClipboardList,
   AlertTriangle,
@@ -25,6 +26,7 @@ import { useContractors } from "@/hooks/useContractors";
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "3D Mine View", href: "/dashboard/mine-view", icon: Box },
+  { label: "Blueprint", href: "/dashboard/blueprint", icon: MapPinned },
   { label: "Compliance", href: "/dashboard/compliance", icon: ShieldCheck },
   { label: "Inspections", href: "/dashboard/inspections", icon: ClipboardList },
   { label: "Violations", href: "/dashboard/violations", icon: AlertTriangle },

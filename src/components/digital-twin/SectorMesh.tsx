@@ -19,6 +19,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import type { Group } from "three";
+import type { ThreeEvent } from "@react-three/fiber";
 import type { MineSectorId } from "./types";
 import { useSectorRegistry } from "./SectorRegistry";
 
@@ -27,6 +28,10 @@ interface SectorMeshProps {
   children: ReactNode;
   position?: [number, number, number];
   rotation?: [number, number, number];
+  /** Fires for a click anywhere inside this sector (bubbles up from
+   * whichever child mesh was actually hit, so `event.point` is the real
+   * world-space click location — not just the sector's own origin). */
+  onClick?: (event: ThreeEvent<MouseEvent>) => void;
 }
 
 export default function SectorMesh({
@@ -34,6 +39,7 @@ export default function SectorMesh({
   children,
   position = [0, 0, 0],
   rotation = [0, 0, 0],
+  onClick,
 }: SectorMeshProps) {
   const groupRef = useRef<Group>(null);
   const { register } = useSectorRegistry();
@@ -51,6 +57,7 @@ export default function SectorMesh({
       userData={{ sectorId }}
       position={position}
       rotation={rotation}
+      onClick={onClick}
     >
       {children}
     </group>

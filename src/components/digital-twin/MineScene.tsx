@@ -9,7 +9,7 @@
 // providers stay uncluttered.
 // ============================================================================
 
-import { forwardRef, Suspense } from "react";
+import { forwardRef, Suspense, useImperativeHandle, useRef } from "react";
 import { useGLTF } from "@react-three/drei";
 import MineLighting from "./MineLighting";
 import MineModel from "./MineModel";
@@ -18,18 +18,19 @@ import ModelErrorBoundary from "./ModelErrorBoundary";
 import CameraController from "./CameraController";
 import SensorPlaceholder from "./SensorPlaceholder";
 import { useModelAvailability } from "./useModelAvailability";
-import type { CameraPresetId, MineDigitalTwinHandle, SensorFrame } from "./types";
+import type { BlueprintTunnelSection, CameraPresetId, MineDigitalTwinHandle, SensorFrame } from "./types";
 
 interface MineSceneProps {
   modelUrl: string;
   sensors: SensorFrame[];
+  blueprintSections?: BlueprintTunnelSection[];
   onSelectSensor?: (sensor: SensorFrame) => void;
   cameraPreset?: CameraPresetId;
   onPresetArrive?: (preset: CameraPresetId) => void;
 }
 
 const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function MineScene(
-  { modelUrl, sensors, onSelectSensor, cameraPreset, onPresetArrive },
+  { modelUrl, sensors, blueprintSections, onSelectSensor, cameraPreset, onPresetArrive },
   ref
 ) {
   // Check the model actually exists before ever calling useGLTF: it throws
@@ -44,26 +45,59 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
     useGLTF.preload(modelUrl);
   }
 
+  // A local ref to the camera's imperative handle — forwarded out to the
+  // caller's own `ref` below, and also used directly here so a tunnel click
+  // (bubbled up from MineTerrain) can trigger a camera focus without the
+  // caller having to wire that up itself.
+  const cameraRef = useRef<MineDigitalTwinHandle>(null);
+  useImperativeHandle(
+    ref,
+    (): MineDigitalTwinHandle => ({
+      flyToPreset: (id) => cameraRef.current?.flyToPreset(id),
+      flyToPoint: (position, target) => cameraRef.current?.flyToPoint(position, target),
+      zoomBy: (factor) => cameraRef.current?.zoomBy(factor),
+      focusPoint: (point) => cameraRef.current?.focusPoint(point),
+      rotateBy: (deltaAzimuth, deltaPolar) => cameraRef.current?.rotateBy(deltaAzimuth, deltaPolar),
+    }),
+    []
+  );
+
+  const handleSelectTunnel = (point: [number, number, number]) => {
+    cameraRef.current?.focusPoint(point);
+  };
+
   return (
     <>
-      <color attach="background" args={["#0b0e12"]} />
-      <fog attach="fog" args={["#0b0e12", 90, 260]} />
+      <color attach="background" args={["#050a14"]} />
+      <fog attach="fog" args={["#050a14", 160, 520]} />
 
       <MineLighting />
 
       {modelAvailable ? (
-        <ModelErrorBoundary fallback={<MineTerrain />}>
-          <Suspense fallback={<MineTerrain />}>
+        <ModelErrorBoundary
+          fallback={
+            <MineTerrain sensors={sensors} blueprintSections={blueprintSections} onSelectTunnel={handleSelectTunnel} />
+          }
+        >
+          <Suspense
+            fallback={
+              <MineTerrain
+                sensors={sensors}
+                blueprintSections={blueprintSections}
+                onSelectTunnel={handleSelectTunnel}
+              />
+            }
+          >
             <MineModel url={modelUrl} />
           </Suspense>
         </ModelErrorBoundary>
       ) : (
-        <MineTerrain />
+        <MineTerrain sensors={sensors} blueprintSections={blueprintSections} onSelectTunnel={handleSelectTunnel} />
       )}
 
       <SensorPlaceholder sensors={sensors} onSelectSensor={onSelectSensor} />
 
-      <CameraController ref={ref} activePreset={cameraPreset} onPresetArrive={onPresetArrive} />
+      <CameraController ref={cameraRef} activePreset={cameraPreset} onPresetArrive={onPresetArrive} />
     </>
   );
 });

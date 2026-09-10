@@ -1,3 +1,4 @@
+from app.models.blueprint import BlueprintSection, MineBlueprint
 from app.models.compliance_score import ComplianceScore
 from app.models.incident import Incident
 from app.models.inspection import Inspection
@@ -12,4 +13,6 @@ __all__ = [
     "Incident",
     "Inspection",
     "ComplianceScore",
+    "MineBlueprint",
+    "BlueprintSection",
 ]

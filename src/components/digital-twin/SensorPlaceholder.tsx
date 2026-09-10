@@ -23,12 +23,7 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import { Color, InstancedMesh, Object3D } from "three";
 import type { SensorFrame } from "./types";
-
-const RISK_COLOR: Record<SensorFrame["risk_level"], string> = {
-  NORMAL: "#00E676",
-  WARNING: "#FFD600",
-  CRITICAL: "#D50000",
-};
+import { RISK_COLOR } from "./riskColors";
 
 interface SensorPlaceholderProps {
   sensors: SensorFrame[];
@@ -66,7 +61,7 @@ export default function SensorPlaceholder({ sensors, onSelectSensor }: SensorPla
         if (sensor) onSelectSensor?.(sensor);
       }}
     >
-      <sphereGeometry args={[0.8, 12, 12]} />
+      <sphereGeometry args={[0.4, 12, 12]} />
       <meshStandardMaterial toneMapped={false} />
     </instancedMesh>
   );
