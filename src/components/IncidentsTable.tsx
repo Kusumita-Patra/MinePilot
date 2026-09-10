@@ -3,6 +3,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { updateIncident } from "@/lib/api";
+import { formatSectorId } from "@/lib/format";
 import type { Incident } from "../../shared/types/telemetry";
 
 const SEVERITY_STYLES: Record<string, string> = {
@@ -18,10 +19,6 @@ const STATUS_STYLES: Record<string, string> = {
   ESCALATED: "text-amber-400",
   SIGNED_OFF: "text-neutral-500",
 };
-
-function formatSector(sectorId: string) {
-  return sectorId.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
 
 function formatTime(iso: string) {
   try {
@@ -90,7 +87,7 @@ export default function IncidentsTable({
                   <td className="px-4 py-3 font-medium">{inc.ticket_id}</td>
                   <td className="px-4 py-3 text-neutral-400">
                     <div>{inc.sensor_id}</div>
-                    <div className="text-[11px] text-neutral-600">{formatSector(inc.sector_id)}</div>
+                    <div className="text-[11px] text-neutral-600">{formatSectorId(inc.sector_id)}</div>
                   </td>
                   <td className="px-4 py-3">
                     <span

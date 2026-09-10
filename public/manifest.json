@@ -1,0 +1,16 @@
+{
+  "name": "MinePilot",
+  "short_name": "MinePilot",
+  "description": "Smart mine digital twin — field worker alerts",
+  "start_url": "/field",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/Logo.png",
+      "sizes": "500x500",
+      "type": "image/png"
+    }
+  ]
+}

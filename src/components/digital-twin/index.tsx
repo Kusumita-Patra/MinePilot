@@ -31,3 +31,50 @@ export { default as MineDigitalTwinInner } from "./MineDigitalTwin";
 export * from "./types";
 export { mineSectors, mineSectorList, cameraPresets, cameraPresetList } from "./sectors";
 export { useSectorRegistry, SectorRegistryProvider } from "./SectorRegistry";
+
+export { SensorMarkers, useSectorStates } from "./SensorMarkers";
+export { SensorPin } from "./SensorPin";
+export type { SensorPinProps } from "./SensorPin";
+export { SensorTooltip } from "./SensorTooltip";
+export type { SensorTooltipProps } from "./SensorTooltip";
+
+export { RiskEffectClock, RiskHalo, SelectionIndicator, ShockwaveRings } from "./RiskEffects";
+
+export { SectorHighlight, SectorTint, defaultResolveSectorId } from "./SectorHighlight";
+export type {
+  SectorHighlightMode,
+  SectorHighlightProps,
+  SectorTintProps,
+} from "./SectorHighlight";
+
+export {
+  RISK_COLORS,
+  RISK_EFFECTS,
+  RISK_LEVELS,
+  RISK_PRIORITY,
+  RISK_THRESHOLDS,
+  classifyRiskLevel,
+  computeSectorStates,
+  getRiskColor,
+  getRiskColorObject,
+  hasSensorChanged,
+  isRiskLevel,
+  maxRiskLevel,
+  resolveRiskLevel,
+  sensorPosition,
+} from "./sensorUtils";
+export type { RiskEffectConfig } from "./sensorUtils";
+
+export { getRiskMaterials, updateRiskMaterials, disposeRiskMaterials } from "./riskMaterials";
+
+export { useTelemetrySocket, normalizeSensorPayload } from "./useTelemetrySocket";
+export type {
+  TelemetrySocketOptions,
+  TelemetrySocketResult,
+  TelemetryStatus,
+} from "./useTelemetrySocket";
+
+export { useMockTelemetry } from "./useMockTelemetry";
+export type { MockTelemetryOptions } from "./useMockTelemetry";
+
+export { mockSensors } from "./mockSensors";

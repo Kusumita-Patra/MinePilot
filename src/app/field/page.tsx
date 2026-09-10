@@ -3,14 +3,14 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useIncidents } from "@/hooks/useIncidents";
-import { updateIncident } from "@/lib/api";
+import type { IncidentPatch } from "@/lib/offlineQueue";
 import { useAuthStore } from "@/lib/authStore";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import RequireAuth from "@/components/RequireAuth";
 import type { Incident } from "../../../shared/types/telemetry";
 
 function FieldWorkerView() {
-  const { incidents, error, loading, refresh } = useIncidents();
+  const { incidents, loading, isOffline, pendingCount, updateIncidentOffline } = useIncidents();
   const workerId = useAuthStore((s) => s.user?.id);
   const workerName = useAuthStore((s) => s.user?.full_name);
   const [remarksByTicket, setRemarksByTicket] = useState<Record<string, string>>({});
@@ -19,20 +19,19 @@ function FieldWorkerView() {
   // Field staff only care about tickets that aren't closed out yet.
   const active = incidents.filter((i) => i.status !== "SIGNED_OFF");
 
-  async function act(ticket: Incident, patch: Parameters<typeof updateIncident>[1]) {
+  async function act(ticket: Incident, patch: IncidentPatch) {
     setBusyTicket(ticket.ticket_id);
     try {
-      await updateIncident(ticket.ticket_id, patch);
-      await refresh();
-    } catch (e) {
-      console.error(e);
+      // Applies immediately in the UI and queues for sync — works the same
+      // whether the connection is up or down, so this never needs to know
+      // or care which case it's in.
+      await updateIncidentOffline(ticket.ticket_id, patch);
     } finally {
       setBusyTicket(null);
     }
   }
 
   return (
-
     <main className="min-h-screen bg-slate-950 text-white p-4 max-w-md mx-auto">
       <LoadingOverlay active={loading} label="Loading assigned alerts..." />
 
@@ -45,10 +44,21 @@ function FieldWorkerView() {
           Settings →
         </Link>
       </div>
-      {error && (
-        <p className="text-xs text-amber-400 mb-3">
-          Can&apos;t reach the backend right now — showing last known tickets.
-        </p>
+
+      {(isOffline || pendingCount > 0) && (
+        <div
+          className={`text-xs rounded-md px-3 py-2 mb-3 mt-2 ${
+            isOffline
+              ? "bg-amber-500/10 text-amber-400 border border-amber-500/30"
+              : "bg-sky-500/10 text-sky-400 border border-sky-500/30"
+          }`}
+        >
+          {isOffline
+            ? pendingCount > 0
+              ? `Offline — ${pendingCount} change${pendingCount === 1 ? "" : "s"} will sync when you're back in range.`
+              : "Offline — showing your last downloaded tickets."
+            : `Syncing ${pendingCount} pending change${pendingCount === 1 ? "" : "s"}...`}
+        </div>
       )}
 
       <div className="space-y-3 mt-4">

@@ -9,7 +9,10 @@
 // backend and the sensor-visualization half of the 3D module. Do not fork it.
 // ============================================================================
 
+import type { ReactNode } from "react";
+import type { CanvasProps } from "@react-three/fiber";
 import type { SensorFrame } from "../../../shared/types/telemetry";
+import type { SectorHighlightMode } from "./SectorHighlight";
 
 export type { SensorFrame };
 
@@ -116,6 +119,28 @@ export interface MineDigitalTwinProps {
    * dashboard wants to drive the camera from its own toolbar instead). */
   showPresetControls?: boolean;
   className?: string;
+
+  /** Fired on hover/unhover of a sensor marker. Fires with null when the
+   * pointer leaves. */
+  onHoverSensor?: (sensor: SensorFrame | null) => void;
+  /** Extra content rendered inside the Canvas alongside the built-in mine
+   * environment (e.g. an overlay mesh). The module owns its own environment
+   * via `modelUrl` regardless of whether children are passed. */
+  children?: ReactNode;
+  /** Uniform size multiplier for every sensor marker. */
+  markerScale?: number;
+  /** Show the 3D hover tooltip on sensor markers. Default true. */
+  showTooltips?: boolean;
+  /** Attach a point light to CRITICAL sensors. Off by default: every light
+   * adds real cost to the scene's shaders, so only enable it when the number
+   * of simultaneously critical sensors stays small. */
+  emitLights?: boolean;
+  /** Tint sector meshes by their aggregated risk. Default true. */
+  highlightSectors?: boolean;
+  sectorHighlightMode?: SectorHighlightMode;
+  /** Forwarded to <Canvas> so camera, dpr, shadows etc. stay configurable
+   * beyond the built-in defaults. */
+  canvasProps?: Omit<CanvasProps, "children">;
 }
 
 /** Imperative handle exposed via `ref` for parents that want to trigger
@@ -135,4 +160,91 @@ export interface MineDigitalTwinHandle {
    * `deltaPolar` radians vertically (positive = tilt down), clamped to
    * ORBIT_BOUNDS' polar limits. Distance from the target is unchanged. */
   rotateBy: (deltaAzimuth: number, deltaPolar: number) => void;
+}
+
+// ----------------------------------------------------------------------------
+// Sensor visualization layer
+//
+// These types mirror the backend telemetry payload (SensorFrame above).
+// Field names are part of the cross-team contract and must not be renamed.
+// ----------------------------------------------------------------------------
+
+export type RiskLevel = "NORMAL" | "WARNING" | "CRITICAL";
+
+export interface SensorCoordinates {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface SensorTelemetry {
+  ch4_pct: number;
+  co_ppm: number;
+  displacement_mm: number;
+  temp_c: number;
+  dust_pm10: number;
+}
+
+/** The canonical sensor payload delivered over /ws/telemetry. */
+export interface SensorData {
+  sensor_id: string;
+
+  sector_id: string;
+
+  coordinates: SensorCoordinates;
+
+  telemetry: SensorTelemetry;
+
+  risk_score: number;
+
+  risk_level: RiskLevel;
+
+  timestamp: string;
+
+  historicalData?: unknown[];
+}
+
+/**
+ * Aggregated risk state for one mine sector, derived from every sensor that
+ * reports into it. Consumed by <SectorHighlight />.
+ */
+export interface SectorState {
+  sector_id: string;
+  /** CRITICAL wins over WARNING, WARNING wins over NORMAL. */
+  risk_level: RiskLevel;
+  max_risk_score: number;
+  sensor_count: number;
+  warning_count: number;
+  critical_count: number;
+  /** Sensor driving the sector's current risk level. */
+  worst_sensor_id: string | null;
+}
+
+export type SectorStates = Record<string, SectorState>;
+
+export interface SensorMarkersProps {
+  /** Live sensor list. Updating this prop updates the visualization. */
+  sensors: SensorData[];
+
+  /** Currently selected sensor, or null. Owned by the parent. */
+  selectedSensor: SensorData | null;
+
+  /** Receives the complete SensorData object on click. */
+  onSelectSensor: (sensor: SensorData) => void;
+
+  /** Optional hover notification. Fires with null when the pointer leaves. */
+  onHoverSensor?: (sensor: SensorData | null) => void;
+
+  /** Uniform size multiplier for every marker. Tune to your mine's scale. */
+  markerScale?: number;
+
+  /** Show the 3D hover tooltip. Default true. */
+  showTooltips?: boolean;
+
+  /**
+   * Attach a point light to CRITICAL sensors. Off by default: every light adds
+   * real cost to the scene's shaders, so only enable it when the number of
+   * simultaneously critical sensors stays small.
+   */
+  emitLights?: boolean;
 }

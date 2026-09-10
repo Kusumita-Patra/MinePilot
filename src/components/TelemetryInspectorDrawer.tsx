@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import clsx from "clsx";
+import { formatSectorId } from "@/lib/format";
 import type { SensorFrame } from "../../shared/types/telemetry";
 
 interface Props {
@@ -23,7 +24,7 @@ export default function TelemetryInspectorDrawer({ sensor, onClose }: Props) {
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         <div>
           <h2 className="text-white font-semibold">{sensor.sensor_id}</h2>
-          <p className="text-neutral-400 text-sm">{sensor.sector_id}</p>
+          <p className="text-neutral-400 text-sm">{formatSectorId(sensor.sector_id)}</p>
         </div>
         <button onClick={onClose} className="text-neutral-400 hover:text-white">
           <X size={20} />

@@ -4,7 +4,7 @@
 // digital-twin/MineScene.tsx
 //
 // Everything that lives INSIDE <Canvas>: lighting, the model-or-fallback
-// terrain, bounded/animated camera, and the sensor placeholder layer. Kept
+// terrain, bounded/animated camera, and the sensor visualization layer. Kept
 // separate from MineDigitalTwin.tsx so the Canvas wrapper, HUD and context
 // providers stay uncluttered.
 // ============================================================================
@@ -16,23 +16,53 @@ import MineModel from "./MineModel";
 import MineTerrain from "./MineTerrain";
 import ModelErrorBoundary from "./ModelErrorBoundary";
 import CameraController from "./CameraController";
-import SensorPlaceholder from "./SensorPlaceholder";
+import { SensorMarkers, useSectorStates } from "./SensorMarkers";
+import { SectorHighlight, type SectorHighlightMode } from "./SectorHighlight";
 import { useModelAvailability } from "./useModelAvailability";
 import type { BlueprintTunnelSection, CameraPresetId, MineDigitalTwinHandle, SensorFrame } from "./types";
 
 interface MineSceneProps {
   modelUrl: string;
   sensors: SensorFrame[];
+<<<<<<< HEAD
   blueprintSections?: BlueprintTunnelSection[];
+=======
+  selectedSensor?: SensorFrame | null;
+>>>>>>> 8f16d12db94d58a0ca9ef67072f3c213fd250cc2
   onSelectSensor?: (sensor: SensorFrame) => void;
+  onHoverSensor?: (sensor: SensorFrame | null) => void;
   cameraPreset?: CameraPresetId;
   onPresetArrive?: (preset: CameraPresetId) => void;
+  markerScale?: number;
+  showTooltips?: boolean;
+  emitLights?: boolean;
+  highlightSectors?: boolean;
+  sectorHighlightMode?: SectorHighlightMode;
 }
 
 const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function MineScene(
+<<<<<<< HEAD
   { modelUrl, sensors, blueprintSections, onSelectSensor, cameraPreset, onPresetArrive },
+=======
+  {
+    modelUrl,
+    sensors,
+    selectedSensor = null,
+    onSelectSensor,
+    onHoverSensor,
+    cameraPreset,
+    onPresetArrive,
+    markerScale = 1,
+    showTooltips = true,
+    emitLights = false,
+    highlightSectors = true,
+    sectorHighlightMode = "overlay",
+  },
+>>>>>>> 8f16d12db94d58a0ca9ef67072f3c213fd250cc2
   ref
 ) {
+  const sectorStates = useSectorStates(sensors);
+
   // Check the model actually exists before ever calling useGLTF: it throws
   // a rejected promise on a 404 (only catchable by ModelErrorBoundary below),
   // and Next's dev overlay reports every boundary-caught error regardless of
@@ -95,7 +125,19 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
         <MineTerrain sensors={sensors} blueprintSections={blueprintSections} onSelectTunnel={handleSelectTunnel} />
       )}
 
-      <SensorPlaceholder sensors={sensors} onSelectSensor={onSelectSensor} />
+      <SensorMarkers
+        sensors={sensors}
+        selectedSensor={selectedSensor}
+        onSelectSensor={onSelectSensor ?? (() => {})}
+        onHoverSensor={onHoverSensor}
+        markerScale={markerScale}
+        showTooltips={showTooltips}
+        emitLights={emitLights}
+      />
+
+      {highlightSectors && (
+        <SectorHighlight sectorStates={sectorStates} mode={sectorHighlightMode} />
+      )}
 
       <CameraController ref={cameraRef} activePreset={cameraPreset} onPresetArrive={onPresetArrive} />
     </>

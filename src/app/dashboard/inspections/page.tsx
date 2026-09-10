@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { useInspections } from "@/hooks/useInspections";
 import { createInspection, updateInspection, type InspectionStatus } from "@/lib/api";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { formatSectorId } from "@/lib/format";
 
 const STATUS_FLOW: Record<InspectionStatus, InspectionStatus | null> = {
   SCHEDULED: "IN_PROGRESS",
@@ -145,7 +146,7 @@ export default function InspectionsPage() {
                   const next = STATUS_FLOW[insp.status];
                   return (
                     <tr key={insp.id} className="border-b border-white/5 last:border-0 hover:bg-white/5">
-                      <td className="px-4 py-3">{insp.sector_id.replace(/_/g, " ")}</td>
+                      <td className="px-4 py-3">{formatSectorId(insp.sector_id)}</td>
                       <td className="px-4 py-3 text-neutral-400">{insp.scheduled_date}</td>
                       <td className="px-4 py-3">
                         <span className={clsx("px-2 py-0.5 rounded-full text-[11px]", STATUS_STYLES[insp.status])}>
