@@ -107,45 +107,99 @@ async def _process_frame(db: AsyncSession, raw: dict) -> None:
     if risk_level != RiskLevel.NORMAL:
         await incident_service.trigger_incident(db, sensor_id, sector_id, risk_score, risk_level)
 
-    await broadcast_manager.broadcast(_to_contract_frame(raw))
+
+# Every NullPool session pays a full fresh-connection round trip to Supabase
+# (~1s observed here) before it can run a single query — versus ~0.1s for a
+# query on an already-open connection. At typical telemetry arrival rates
+# (faster than 1 frame/s across sensors), paying that ~1s *per frame* means
+# persistence can never keep up with real time, so the backlog — and the
+# visible lag between "now" and the latest stored reading — only grows.
+# Batching many queued frames onto one reused connection amortizes that
+# fixed cost across the whole batch instead of paying it every frame.
+_BATCH_MAX = 50
+
+
+async def _persist_frames(queue: "asyncio.Queue[dict]") -> None:
+    """Drains the frame queue and persists it in batches, each batch sharing
+    one DB connection, decoupled from the upstream WebSocket read loop below.
+    Reading every frame promptly off the socket matters regardless of how
+    fast persistence is — T2's own send-side queue is bounded and drops
+    frames outright once its client falls behind — so this stays a separate
+    task from the reader even though it can now keep up with it."""
+    while True:
+        batch = [await queue.get()]
+        while len(batch) < _BATCH_MAX:
+            try:
+                batch.append(queue.get_nowait())
+            except asyncio.QueueEmpty:
+                break
+        try:
+            async with AsyncSessionLocal() as db:
+                for raw in batch:
+                    try:
+                        await _process_frame(db, raw)
+                    except Exception:
+                        logger.exception("Failed to persist a queued telemetry frame")
+                        # A failed frame can leave the shared session's
+                        # transaction aborted; roll back so the rest of this
+                        # batch doesn't fail too.
+                        await db.rollback()
+        except Exception:
+            logger.exception("Failed to open a DB session for a batch of queued telemetry frames")
 
 
 async def run_ingestion_loop(stop_event: asyncio.Event) -> None:
     """Background task: connects to T2's simulated /ws/telemetry as a client,
     persists every frame, triggers incidents, and re-broadcasts to the
     frontend-facing WebSocket. Retries with exponential backoff on disconnect."""
-    backoff = 1
-    while not stop_event.is_set():
+    # Bounded but generous: a DB hiccup of even a minute or two at typical
+    # frame rates fits comfortably, so the reader below never has to wait on
+    # persistence to keep consuming the socket.
+    queue: "asyncio.Queue[dict]" = asyncio.Queue(maxsize=5000)
+    writer_task = asyncio.create_task(_persist_frames(queue))
+    try:
+        backoff = 1
+        while not stop_event.is_set():
+            try:
+                # T2's simulator loop doesn't reliably answer WebSocket pings on
+                # time (it's busy generating/broadcasting frames), which trips
+                # this client's default 20s ping_timeout and drops an otherwise
+                # healthy connection every ~1s. We don't control that server, so
+                # disable our own ping-based liveness check here — the constant
+                # stream of frames is itself sufficient liveness signal, and a
+                # truly dead TCP connection still surfaces as a read error below.
+                async with websockets.connect(settings.ml_service_ws_url, ping_interval=None) as upstream:
+                    logger.info("Connected to upstream telemetry simulator at %s", settings.ml_service_ws_url)
+                    backoff = 1
+                    async for message in upstream:
+                        if stop_event.is_set():
+                            break
+                        try:
+                            raw = json.loads(message)
+                        except Exception:
+                            logger.exception("Failed to parse an upstream telemetry frame")
+                            continue
+                        # Broadcast immediately (in-memory, effectively free) so
+                        # live viewers aren't held up by a DB round-trip either;
+                        # persistence/incident-triggering happens off-queue.
+                        await broadcast_manager.broadcast(_to_contract_frame(raw))
+                        await queue.put(raw)
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:
+                if stop_event.is_set():
+                    break
+                logger.warning(
+                    "Upstream telemetry connection lost (%s); retrying in %ss", exc, backoff
+                )
+                await asyncio.sleep(backoff)
+                backoff = min(backoff * 2, 30)
+    finally:
+        writer_task.cancel()
         try:
-            # T2's simulator loop doesn't reliably answer WebSocket pings on
-            # time (it's busy generating/broadcasting frames), which trips
-            # this client's default 20s ping_timeout and drops an otherwise
-            # healthy connection every ~1s. We don't control that server, so
-            # disable our own ping-based liveness check here — the constant
-            # stream of frames is itself sufficient liveness signal, and a
-            # truly dead TCP connection still surfaces as a read error below.
-            async with websockets.connect(settings.ml_service_ws_url, ping_interval=None) as upstream:
-                logger.info("Connected to upstream telemetry simulator at %s", settings.ml_service_ws_url)
-                backoff = 1
-                async for message in upstream:
-                    if stop_event.is_set():
-                        break
-                    try:
-                        raw = json.loads(message)
-                        async with AsyncSessionLocal() as db:
-                            await _process_frame(db, raw)
-                    except Exception:
-                        logger.exception("Failed to process an upstream telemetry frame")
+            await writer_task
         except asyncio.CancelledError:
-            raise
-        except Exception as exc:
-            if stop_event.is_set():
-                break
-            logger.warning(
-                "Upstream telemetry connection lost (%s); retrying in %ss", exc, backoff
-            )
-            await asyncio.sleep(backoff)
-            backoff = min(backoff * 2, 30)
+            pass
 
 
 async def get_latest_frames(db: AsyncSession, sector_id: str | None = None) -> list[dict]:
