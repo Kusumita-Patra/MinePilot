@@ -32,14 +32,11 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
   function MineDigitalTwin(
     {
       sensors = [],
-<<<<<<< HEAD
       blueprintSections = [],
-      // `selectedSensor` is part of the shared contract (for the sensor layer
-      // to drive selection-highlight visuals) but this module doesn't read it
-      // itself — accepted here only so the prop type-checks for callers.
-=======
+      // `selectedSensor` drives selection-highlight visuals in the sensor
+      // layer (MineScene / the sensor-visualization side) — this component
+      // just threads it through, it doesn't read it itself.
       selectedSensor = null,
->>>>>>> 8f16d12db94d58a0ca9ef67072f3c213fd250cc2
       onSelectSensor,
       onHoverSensor,
       cameraPreset,
@@ -105,11 +102,8 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
               ref={cameraHandleRef}
               modelUrl={modelUrl}
               sensors={sensors}
-<<<<<<< HEAD
               blueprintSections={blueprintSections}
-=======
               selectedSensor={selectedSensor}
->>>>>>> 8f16d12db94d58a0ca9ef67072f3c213fd250cc2
               onSelectSensor={onSelectSensor}
               onHoverSensor={onHoverSensor}
               cameraPreset={effectivePreset}

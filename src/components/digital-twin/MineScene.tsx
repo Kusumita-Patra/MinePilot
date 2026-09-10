@@ -24,11 +24,8 @@ import type { BlueprintTunnelSection, CameraPresetId, MineDigitalTwinHandle, Sen
 interface MineSceneProps {
   modelUrl: string;
   sensors: SensorFrame[];
-<<<<<<< HEAD
   blueprintSections?: BlueprintTunnelSection[];
-=======
   selectedSensor?: SensorFrame | null;
->>>>>>> 8f16d12db94d58a0ca9ef67072f3c213fd250cc2
   onSelectSensor?: (sensor: SensorFrame) => void;
   onHoverSensor?: (sensor: SensorFrame | null) => void;
   cameraPreset?: CameraPresetId;
@@ -41,12 +38,10 @@ interface MineSceneProps {
 }
 
 const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function MineScene(
-<<<<<<< HEAD
-  { modelUrl, sensors, blueprintSections, onSelectSensor, cameraPreset, onPresetArrive },
-=======
   {
     modelUrl,
     sensors,
+    blueprintSections,
     selectedSensor = null,
     onSelectSensor,
     onHoverSensor,
@@ -58,7 +53,6 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
     highlightSectors = true,
     sectorHighlightMode = "overlay",
   },
->>>>>>> 8f16d12db94d58a0ca9ef67072f3c213fd250cc2
   ref
 ) {
   const sectorStates = useSectorStates(sensors);
