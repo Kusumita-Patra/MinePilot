@@ -13,7 +13,7 @@ import SettingsToast, { type ToastState } from "./SettingsToast";
 const ROLE_LABEL: Record<string, string> = {
   administrator: "Administrator",
   mine_manager: "Mine Manager",
-  field_worker: "Field Worker",
+  field_worker: "Field Inspector",
 };
 
 type OpenField = "name" | "email" | "password" | null;

@@ -14,10 +14,10 @@ export default function MineLighting() {
   return (
     <>
       {/* Cool sky / warm ground fill — keeps shadow areas from going pure black */}
-      <hemisphereLight args={["#8fb4d9", "#2b241d", 0.55]} />
+      <hemisphereLight args={["#8fb4d9", "#2b241d", 0.68]} />
 
       {/* Soft ambient base so nothing is fully unlit */}
-      <ambientLight intensity={0.12} />
+      <ambientLight intensity={0.18} />
 
       {/* Primary "sun" — cast from the north-east, moderate intensity */}
       <directionalLight

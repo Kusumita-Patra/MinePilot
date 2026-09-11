@@ -10,7 +10,7 @@ import Badge from "@/components/ui/Badge";
 const ROLE_LABEL: Record<UserRole, string> = {
   administrator: "Administrator",
   mine_manager: "Mine Manager",
-  field_worker: "Field Worker",
+  field_worker: "Field Inspector",
 };
 
 const ROLE_BADGE: Record<UserRole, string> = {
@@ -25,6 +25,11 @@ const ROLE_BADGE: Record<UserRole, string> = {
  * read-only roster, same as before). */
 export default function UserManagementPanel({ canManage }: { canManage: boolean }) {
   const currentUser = useAuthStore((s) => s.user);
+  // Only a real administrator can create/promote/touch an administrator
+  // account — this mirrors a hard backend rule (services/user_service.py),
+  // not just a UI preference, so a delegated `users.manage` grant (which a
+  // mine_manager can hold) can never be used to mint or modify an admin.
+  const isAdministrator = currentUser?.role === "administrator";
   const [users, setUsers] = useState<AuthUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -101,6 +106,11 @@ export default function UserManagementPanel({ canManage }: { canManage: boolean 
               <tbody>
                 {users.map((u) => {
                   const isSelf = u.id === currentUser?.id;
+                  // A non-administrator (even with users.manage granted) can
+                  // never touch an administrator account's role or status —
+                  // matches the backend guard exactly.
+                  const isProtectedAdmin = u.role === "administrator" && !isAdministrator;
+                  const rowLocked = isSelf || isProtectedAdmin;
                   return (
                     <tr key={u.id} className="border-b border-white/5 last:border-0">
                       <td className="px-4 py-2.5 text-neutral-200">
@@ -124,22 +134,34 @@ export default function UserManagementPanel({ canManage }: { canManage: boolean 
                         <td className="px-4 py-2.5">
                           <div className="flex items-center justify-end gap-2">
                             <select
-                              disabled={isSelf}
+                              disabled={rowLocked}
                               value={u.role}
                               onChange={(e) =>
                                 setPendingAction({ type: "role", user: u, role: e.target.value as UserRole })
                               }
-                              title={isSelf ? "You cannot change your own role" : "Change role"}
+                              title={
+                                isSelf
+                                  ? "You cannot change your own role"
+                                  : isProtectedAdmin
+                                    ? "Only an administrator can change another administrator's role"
+                                    : "Change role"
+                              }
                               className="bg-neutral-900/70 border border-white/10 rounded-md px-2 py-1 text-xs text-white disabled:opacity-30 focus:outline-none focus:border-amber-500"
                             >
-                              <option value="administrator">Administrator</option>
+                              {isAdministrator && <option value="administrator">Administrator</option>}
                               <option value="mine_manager">Mine Manager</option>
-                              <option value="field_worker">Field Worker</option>
+                              <option value="field_worker">Field Inspector</option>
                             </select>
                             <button
-                              disabled={isSelf}
+                              disabled={rowLocked}
                               onClick={() => setPendingAction({ type: "status", user: u, isActive: !u.is_active })}
-                              title={isSelf ? "You cannot deactivate your own account" : undefined}
+                              title={
+                                isSelf
+                                  ? "You cannot deactivate your own account"
+                                  : isProtectedAdmin
+                                    ? "Only an administrator can activate or deactivate another administrator's account"
+                                    : undefined
+                              }
                               className="text-xs px-2 py-1 rounded-md border border-white/10 text-neutral-300 hover:bg-white/5 disabled:opacity-30"
                             >
                               {u.is_active ? "Deactivate" : "Activate"}
@@ -158,7 +180,12 @@ export default function UserManagementPanel({ canManage }: { canManage: boolean 
 
       {canManage && (
         <>
-          <CreateUserModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={refresh} />
+          <CreateUserModal
+            open={createOpen}
+            allowAdministrator={isAdministrator}
+            onClose={() => setCreateOpen(false)}
+            onCreated={refresh}
+          />
 
           <Modal open={!!pendingAction} onClose={() => setPendingAction(null)} title="Confirm action">
             {pendingAction && (
@@ -198,10 +225,12 @@ export default function UserManagementPanel({ canManage }: { canManage: boolean 
 
 function CreateUserModal({
   open,
+  allowAdministrator,
   onClose,
   onCreated,
 }: {
   open: boolean;
+  allowAdministrator: boolean;
   onClose: () => void;
   onCreated: () => void;
 }) {
@@ -278,9 +307,9 @@ function CreateUserModal({
             onChange={(e) => setRole(e.target.value as UserRole)}
             className="mt-1 w-full bg-neutral-900/70 border border-white/10 rounded-md px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-amber-500"
           >
-            <option value="field_worker">Field Worker</option>
+            <option value="field_worker">Field Inspector</option>
             <option value="mine_manager">Mine Manager</option>
-            <option value="administrator">Administrator</option>
+            {allowAdministrator && <option value="administrator">Administrator</option>}
           </select>
         </label>
         {error && <p className="text-xs text-red-400">{error}</p>}

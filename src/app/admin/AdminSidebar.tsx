@@ -2,8 +2,10 @@
 
 import {
   LayoutDashboard,
+  Box,
   MapPinned,
   Layers,
+  Radio,
   Users,
   KeySquare,
   ShieldCheck,
@@ -24,8 +26,10 @@ const NAV_GROUPS: {
   {
     heading: "Mine Configuration",
     items: [
+      { label: "3D Mine View", href: "/admin/mine/view", icon: Box },
       { label: "Blueprint", href: "/admin/mine/blueprint", icon: MapPinned },
       { label: "Levels & Zones", href: "/admin/mine/zones", icon: Layers },
+      { label: "Sensors", href: "/admin/mine/sensors", icon: Radio },
     ],
   },
   {

@@ -42,13 +42,14 @@ const NAV_ITEMS = [
   { label: "Workforce", href: "/dashboard/workforce", icon: UserCog },
 ];
 
-// Only shown when an administrator has granted the matching capability via
-// /admin/roles — see usePermissions. Kept separate from NAV_ITEMS so it's
-// obvious at a glance which links are always-on vs. permission-gated.
+// Only appear in the sidebar at all when an administrator has granted the
+// matching capability via /admin/roles (see usePermissions) — the item
+// itself is added/removed, with no separate section or label calling it out
+// as "granted"; it should look exactly like any other nav item.
 const GRANTABLE_NAV_ITEMS = [
-  { label: "Governance", href: "/dashboard/governance", icon: Gavel, capability: "governance.view" },
-  { label: "Audit Logs", href: "/dashboard/audit-logs", icon: ScrollText, capability: "audit_logs.view" },
-  { label: "System Health", href: "/dashboard/system-health", icon: Activity, capability: "system_health.view" },
+  { label: "Governance", href: "/dashboard/governance", icon: Gavel, capability: "governance.view", badge: undefined },
+  { label: "Audit Logs", href: "/dashboard/audit-logs", icon: ScrollText, capability: "audit_logs.view", badge: undefined },
+  { label: "System Health", href: "/dashboard/system-health", icon: Activity, capability: "system_health.view", badge: undefined },
 ];
 
 export default function Sidebar() {
@@ -64,7 +65,7 @@ export default function Sidebar() {
     documents: documentStats.expired + documentStats.missing,
     contractors: contractorStats.contractorsWithGaps,
   };
-  const grantedNavItems = GRANTABLE_NAV_ITEMS.filter((item) => can(item.capability));
+  const visibleNavItems = [...NAV_ITEMS, ...GRANTABLE_NAV_ITEMS.filter((item) => can(item.capability))];
 
   useEffect(() => {
     const tick = () => setTime(new Date().toLocaleTimeString());
@@ -79,7 +80,7 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex flex-col w-56 shrink-0 bg-slate-950 border-r border-white/10 py-4">
       <nav className="flex-1 flex flex-col gap-1 px-3">
-        {NAV_ITEMS.map(({ label, href, icon: Icon, badge }) => {
+        {visibleNavItems.map(({ label, href, icon: Icon, badge }) => {
           const active = pathname === href;
           const count = badge ? badgeCounts[badge] : 0;
           return (
@@ -103,32 +104,6 @@ export default function Sidebar() {
             </Link>
           );
         })}
-
-        {grantedNavItems.length > 0 && (
-          <>
-            <p className="px-3 pt-3 text-[10px] font-semibold tracking-wider text-neutral-600 uppercase">
-              Granted Access
-            </p>
-            {grantedNavItems.map(({ label, href, icon: Icon }) => {
-              const active = pathname === href;
-              return (
-                <Link
-                  key={label}
-                  href={href}
-                  className={clsx(
-                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
-                    active
-                      ? "bg-amber-500/15 text-amber-400 border border-amber-400/30"
-                      : "text-neutral-400 hover:bg-white/5 hover:text-white"
-                  )}
-                >
-                  <Icon size={16} />
-                  {label}
-                </Link>
-              );
-            })}
-          </>
-        )}
 
         <Link
           href="/dashboard/settings"

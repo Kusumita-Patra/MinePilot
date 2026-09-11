@@ -33,6 +33,7 @@ export { mineSectors, mineSectorList, cameraPresets, cameraPresetList } from "./
 export { useSectorRegistry, SectorRegistryProvider } from "./SectorRegistry";
 
 export { SensorMarkers, useSectorStates } from "./SensorMarkers";
+export { SensorLocationMarkers } from "./SensorLocationMarkers";
 export { SensorPin } from "./SensorPin";
 export type { SensorPinProps } from "./SensorPin";
 export { SensorTooltip } from "./SensorTooltip";

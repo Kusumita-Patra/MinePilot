@@ -19,7 +19,7 @@
 
 import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, ZoomIn, ZoomOut } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, MapPin, ZoomIn, ZoomOut } from "lucide-react";
 import clsx from "clsx";
 import { SectorRegistryProvider } from "./SectorRegistry";
 import MineScene from "./MineScene";
@@ -33,6 +33,7 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
     {
       sensors = [],
       blueprintSections = [],
+      sensorLocations = [],
       // `selectedSensor` drives selection-highlight visuals in the sensor
       // layer (MineScene / the sensor-visualization side) — this component
       // just threads it through, it doesn't read it itself.
@@ -58,6 +59,13 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
     // manage camera state itself.
     const [internalPreset, setInternalPreset] = useState<CameraPresetId>(DEFAULT_CAMERA_PRESET);
     const effectivePreset = cameraPreset ?? internalPreset;
+
+    // Off by default — this is a registry/configuration overlay (where
+    // sensors are physically placed) rather than part of the live
+    // monitoring view, so it should be an opt-in reveal, not always-on
+    // clutter. Owned locally rather than lifted to the parent since no
+    // caller needs to drive it externally.
+    const [showSensorLocations, setShowSensorLocations] = useState(false);
 
     const handlePresetClick = useCallback(
       (id: CameraPresetId) => {
@@ -103,6 +111,8 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
               modelUrl={modelUrl}
               sensors={sensors}
               blueprintSections={blueprintSections}
+              sensorLocations={sensorLocations}
+              showSensorLocations={showSensorLocations}
               selectedSensor={selectedSensor}
               onSelectSensor={onSelectSensor}
               onHoverSensor={onHoverSensor}
@@ -119,6 +129,25 @@ const MineDigitalTwin = forwardRef<MineDigitalTwinHandle, MineDigitalTwinProps>(
 
             {children}
           </Canvas>
+
+          {sensorLocations.length > 0 && (
+            <div className="absolute top-3 left-3 z-10">
+              <button
+                type="button"
+                onClick={() => setShowSensorLocations((v) => !v)}
+                title="Toggle registered sensor placements"
+                className={clsx(
+                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-[11px] font-medium border transition-colors backdrop-blur-sm",
+                  showSensorLocations
+                    ? "bg-blue-600 border-blue-500 text-white"
+                    : "bg-neutral-900/70 border-white/10 text-neutral-300 hover:bg-neutral-800/80 hover:text-white"
+                )}
+              >
+                <MapPin size={12} />
+                Sensor Locations
+              </button>
+            </div>
+          )}
 
           {showPresetControls && (
             <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">

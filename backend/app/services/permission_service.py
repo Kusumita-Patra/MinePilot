@@ -3,8 +3,8 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.permissions import CAPABILITIES
-from app.exceptions.custom_exceptions import NotFoundError
+from app.core.permissions import CAPABILITIES, FIELD_WORKER_FIXED_CAPABILITIES
+from app.exceptions.custom_exceptions import AppException, NotFoundError
 from app.models.enums import UserRole
 from app.models.role_permission import RolePermission
 
@@ -16,6 +16,8 @@ async def get_my_permissions(db: AsyncSession, role: UserRole) -> dict[str, bool
     about it instead of hardcoding controls by role)."""
     if role == UserRole.administrator:
         return {capability: True for capability, _ in CAPABILITIES}
+    if role == UserRole.field_worker:
+        return {capability: capability in FIELD_WORKER_FIXED_CAPABILITIES for capability, _ in CAPABILITIES}
 
     result = await db.execute(select(RolePermission).where(RolePermission.role == role))
     rows = {r.capability: r.allowed for r in result.scalars().all()}
@@ -24,9 +26,13 @@ async def get_my_permissions(db: AsyncSession, role: UserRole) -> dict[str, bool
 
 async def is_allowed(db: AsyncSession, role: UserRole, capability: str) -> bool:
     """administrator is handled entirely in require_permission (core/security.py)
-    and never reaches here. No row for (role, capability) = deny — the secure
-    default, and the reason every capability must be seeded for both
-    mine_manager and field_worker in its introducing migration."""
+    and never reaches here. field_worker ("Field Inspector") access is fixed
+    by product decision, not read from the table — see FIELD_WORKER_FIXED_CAPABILITIES.
+    Only mine_manager is ever looked up dynamically; no row for
+    (mine_manager, capability) = deny, the secure default."""
+    if role == UserRole.field_worker:
+        return capability in FIELD_WORKER_FIXED_CAPABILITIES
+
     result = await db.execute(
         select(RolePermission.allowed).where(RolePermission.role == role, RolePermission.capability == capability)
     )
@@ -35,23 +41,21 @@ async def is_allowed(db: AsyncSession, role: UserRole, capability: str) -> bool:
 
 
 async def list_matrix(db: AsyncSession) -> list[dict]:
-    result = await db.execute(
-        select(RolePermission).where(
-            RolePermission.role.in_([UserRole.mine_manager, UserRole.field_worker])
-        )
-    )
-    rows = {(r.role, r.capability): r for r in result.scalars().all()}
+    """mine_manager is the only dynamically-editable row here — field_worker's
+    cell always reports its fixed value with `id: None`, which the frontend
+    (correctly) renders as non-interactive since there's no row to PATCH."""
+    result = await db.execute(select(RolePermission).where(RolePermission.role == UserRole.mine_manager))
+    mgr_rows = {r.capability: r for r in result.scalars().all()}
 
     matrix = []
     for capability, label in CAPABILITIES:
-        mgr = rows.get((UserRole.mine_manager, capability))
-        wkr = rows.get((UserRole.field_worker, capability))
+        mgr = mgr_rows.get(capability)
         matrix.append(
             {
                 "capability": capability,
                 "label": label,
                 "mine_manager": {"id": mgr.id if mgr else None, "allowed": mgr.allowed if mgr else False},
-                "field_worker": {"id": wkr.id if wkr else None, "allowed": wkr.allowed if wkr else False},
+                "field_worker": {"id": None, "allowed": capability in FIELD_WORKER_FIXED_CAPABILITIES},
             }
         )
     return matrix
@@ -63,6 +67,11 @@ async def update_permission(
     permission = await db.get(RolePermission, permission_id)
     if permission is None:
         raise NotFoundError("Permission row not found")
+    if permission.role != UserRole.mine_manager:
+        # Defense in depth: list_matrix never hands out a field_worker/admin
+        # row id to PATCH against, but reject explicitly in case one is ever
+        # reached directly (e.g. a stale id from before this change).
+        raise AppException("Only Mine Manager permissions can be changed", status_code=409)
     permission.allowed = allowed
     permission.updated_by = updated_by
     await db.commit()

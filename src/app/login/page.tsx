@@ -47,7 +47,7 @@ export default function LoginPage() {
         <div>
           <h1 className="text-lg font-bold">Sign in</h1>
           <p className="text-xs text-neutral-500 mt-1">
-            Mine manager and field worker accounts both sign in here.
+            Mine manager and field inspector accounts both sign in here.
           </p>
         </div>
 

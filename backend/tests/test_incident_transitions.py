@@ -69,13 +69,24 @@ async def test_administrator_bypasses_permission_table_entirely():
 
 
 @pytest.mark.asyncio
-async def test_non_admin_allowed_when_permission_row_is_true():
+async def test_mine_manager_allowed_when_permission_row_is_true():
     manager = make_user(UserRole.mine_manager)
     await _check_role_permission(_FakeSession(True), manager, IncidentStatus.SIGNED_OFF)  # should not raise
 
 
 @pytest.mark.asyncio
-async def test_non_admin_denied_when_permission_row_is_false():
-    worker = make_user(UserRole.field_worker)
+async def test_mine_manager_denied_when_permission_row_is_false():
+    manager = make_user(UserRole.mine_manager)
     with pytest.raises(ForbiddenError):
-        await _check_role_permission(_FakeSession(False), worker, IncidentStatus.SIGNED_OFF)
+        await _check_role_permission(_FakeSession(False), manager, IncidentStatus.SIGNED_OFF)
+
+
+@pytest.mark.asyncio
+async def test_field_inspector_access_is_fixed_not_db_driven():
+    # field_worker ("Field Inspector") never reads role_permissions — access
+    # is hardcoded to incidents.transition only, regardless of what a stale
+    # or malicious db session would return.
+    worker = make_user(UserRole.field_worker)
+    await _check_role_permission(_FakeSession(False), worker, IncidentStatus.ASSIGNED)  # transition: fixed-allowed
+    with pytest.raises(ForbiddenError):
+        await _check_role_permission(_FakeSession(True), worker, IncidentStatus.SIGNED_OFF)  # sign_off: fixed-denied

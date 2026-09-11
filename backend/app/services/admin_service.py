@@ -48,6 +48,21 @@ async def list_audit_logs(db: AsyncSession, limit: int = 50, offset: int = 0) ->
     return [_audit_row_to_response(row) for row in result.scalars().all()]
 
 
+async def list_audit_logs_for_resource(
+    db: AsyncSession, resource_type: str, resource_id: str, limit: int = 50
+) -> list[dict]:
+    """A single resource's history (e.g. one sensor's register/move/status-change
+    trail) — reuses admin_audit_logs rather than a second per-resource history
+    table, per the instruction not to build a duplicate audit system."""
+    result = await db.execute(
+        select(AdminAuditLog)
+        .where(AdminAuditLog.resource_type == resource_type, AdminAuditLog.resource_id == resource_id)
+        .order_by(AdminAuditLog.created_at.desc())
+        .limit(limit)
+    )
+    return [_audit_row_to_response(row).model_dump(mode="json") for row in result.scalars().all()]
+
+
 async def get_dashboard_summary(db: AsyncSession) -> dict:
     total_users = (await db.execute(select(func.count()).select_from(User))).scalar_one()
 

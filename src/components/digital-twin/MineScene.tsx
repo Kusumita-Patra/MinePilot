@@ -17,14 +17,23 @@ import MineTerrain from "./MineTerrain";
 import ModelErrorBoundary from "./ModelErrorBoundary";
 import CameraController from "./CameraController";
 import { SensorMarkers, useSectorStates } from "./SensorMarkers";
+import { SensorLocationMarkers } from "./SensorLocationMarkers";
 import { SectorHighlight, type SectorHighlightMode } from "./SectorHighlight";
 import { useModelAvailability } from "./useModelAvailability";
-import type { BlueprintTunnelSection, CameraPresetId, MineDigitalTwinHandle, SensorFrame } from "./types";
+import type {
+  BlueprintTunnelSection,
+  CameraPresetId,
+  MineDigitalTwinHandle,
+  SensorFrame,
+  SensorLocationMarker,
+} from "./types";
 
 interface MineSceneProps {
   modelUrl: string;
   sensors: SensorFrame[];
   blueprintSections?: BlueprintTunnelSection[];
+  sensorLocations?: SensorLocationMarker[];
+  showSensorLocations?: boolean;
   selectedSensor?: SensorFrame | null;
   onSelectSensor?: (sensor: SensorFrame) => void;
   onHoverSensor?: (sensor: SensorFrame | null) => void;
@@ -42,6 +51,8 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
     modelUrl,
     sensors,
     blueprintSections,
+    sensorLocations = [],
+    showSensorLocations = false,
     selectedSensor = null,
     onSelectSensor,
     onHoverSensor,
@@ -93,7 +104,13 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
   return (
     <>
       <color attach="background" args={["#050a14"]} />
-      <fog attach="fog" args={["#050a14", 160, 520]} />
+      {/* Near/far are re-tuned every frame in CameraController to track the
+          camera's current zoom distance — a fixed far plane (the old
+          160-520 here) fogs out the entire terrain once the camera is
+          zoomed out past it, which read as "the view goes dark and empty."
+          These starting values just avoid a flash of wrong fog before the
+          first frame runs. */}
+      <fog attach="fog" args={["#050a14", 200, 900]} />
 
       <MineLighting />
 
@@ -131,6 +148,10 @@ const MineScene = forwardRef<MineDigitalTwinHandle, MineSceneProps>(function Min
 
       {highlightSectors && (
         <SectorHighlight sectorStates={sectorStates} mode={sectorHighlightMode} />
+      )}
+
+      {showSensorLocations && sensorLocations.length > 0 && (
+        <SensorLocationMarkers markers={sensorLocations} />
       )}
 
       <CameraController ref={cameraRef} activePreset={cameraPreset} onPresetArrive={onPresetArrive} />

@@ -29,7 +29,7 @@ async def create_user(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permission("users.manage")),
 ) -> dict:
-    user = await user_service.create_user(db, payload)
+    user = await user_service.create_user(db, payload, current_user)
     await audit_service.record(
         db,
         actor=current_user,

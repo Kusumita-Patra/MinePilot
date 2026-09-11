@@ -53,7 +53,7 @@ export default function AdminDashboardPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <StatCard label="Total Users" value={summary.total_users} icon={Users} />
             <StatCard label="Mine Managers" value={summary.users_by_role.mine_manager ?? 0} icon={HardHat} />
-            <StatCard label="Field Workers" value={summary.users_by_role.field_worker ?? 0} icon={HardHat} />
+            <StatCard label="Field Inspectors" value={summary.users_by_role.field_worker ?? 0} icon={HardHat} />
             <StatCard label="Administrators" value={summary.users_by_role.administrator ?? 0} icon={Users} />
           </div>
 

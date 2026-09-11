@@ -7,6 +7,7 @@ from app.models.incident import Incident
 from app.models.inspection import Inspection
 from app.models.role_permission import RolePermission
 from app.models.sensor import Sensor
+from app.models.sensor_config import SensorConfig
 from app.models.telemetry_reading import TelemetryReading
 from app.models.user import User
 
@@ -23,4 +24,5 @@ __all__ = [
     "AlertRule",
     "ComplianceRequirement",
     "RolePermission",
+    "SensorConfig",
 ]

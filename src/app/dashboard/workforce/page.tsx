@@ -11,9 +11,9 @@ export default function WorkforcePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-lg font-semibold">Workforce</h1>
-          {!loading && can("users.manage") && (
-            <p className="text-xs text-amber-400 mt-0.5">
-              You&apos;ve been granted user management access by an administrator.
+          {!loading && !can("users.manage") && (
+            <p className="text-xs text-neutral-500 mt-0.5">
+              Read-only view. Contact an administrator for user management access.
             </p>
           )}
         </div>

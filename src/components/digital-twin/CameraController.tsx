@@ -19,7 +19,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
-import { MOUSE, Spherical, TOUCH, Vector3 } from "three";
+import { Fog, MOUSE, Spherical, TOUCH, Vector3 } from "three";
 import { cameraPresets, DEFAULT_CAMERA_PRESET, ORBIT_BOUNDS } from "./sectors";
 import { FLOOR_Y, MINE_LAYOUT } from "./mineLayout";
 import type { CameraPresetId, MineDigitalTwinHandle } from "./types";
@@ -45,7 +45,7 @@ interface CameraControllerProps {
 
 const CameraController = forwardRef<MineDigitalTwinHandle, CameraControllerProps>(
   function CameraController({ activePreset, onPresetArrive }, ref) {
-    const { camera } = useThree();
+    const { camera, scene } = useThree();
     const controlsRef = useRef<OrbitControlsImpl>(null);
 
     const transition = useRef<{
@@ -169,6 +169,20 @@ const CameraController = forwardRef<MineDigitalTwinHandle, CameraControllerProps
           controls.enabled = true;
           if (transition.current.arrivingPreset) onPresetArrive?.(transition.current.arrivingPreset);
         }
+      }
+
+      // Keep the fog's far plane ahead of whatever is actually visible,
+      // scaled to the camera's current zoom distance. A fixed far plane
+      // fogs out the whole terrain once the camera zooms past it (the far
+      // side of the ~520-radius network can be up to
+      // distanceToTarget + terrainRadius away from the camera), which read
+      // as the view going dark/empty when zoomed out. `near` scales down
+      // too so close-up detail doesn't get hazy at tight zoom levels.
+      const fog = scene.fog;
+      if (fog instanceof Fog) {
+        const distanceToTarget = camera.position.distanceTo(controls.target);
+        fog.near = Math.max(20, distanceToTarget * 0.2);
+        fog.far = distanceToTarget + MINE_LAYOUT.terrainRadius + 150;
       }
 
       // Bounded panning: clamp the orbit target to a horizontal radius and

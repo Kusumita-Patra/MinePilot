@@ -10,7 +10,7 @@ import { useIncidents } from "@/hooks/useIncidents";
 const ROLE_LABEL: Record<string, string> = {
   administrator: "Administrator",
   mine_manager: "Mine Manager",
-  field_worker: "Field Worker",
+  field_worker: "Field Inspector",
 };
 
 export default function Header() {

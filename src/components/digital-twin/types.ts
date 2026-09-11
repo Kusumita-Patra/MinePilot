@@ -65,6 +65,26 @@ export interface BlueprintTunnelSection {
   path: [number, number][];
 }
 
+/** One administrator-registered sensor's physical placement (backend
+ * SensorConfig, backend/app/models/sensor_config.py) — independent of live
+ * telemetry. The caller converts pixel_x/pixel_y/depth to world coordinates
+ * (same convention as BlueprintTunnelSection) before passing this in; this
+ * module has no notion of the source blueprint image. Rendered by the
+ * optional "sensor locations" overlay so a registered-but-not-yet-streaming
+ * sensor is still visible somewhere in the 3D view. */
+export interface SensorLocationMarker {
+  id: string;
+  sensorId: string;
+  displayName: string;
+  sensorType: string;
+  status: "ACTIVE" | "INACTIVE" | "MAINTENANCE" | "RETIRED";
+  /** Whether this sensor has sent telemetry recently (backend-computed) —
+   * distinct from `status`, which is an admin-set lifecycle state. */
+  isReporting: boolean;
+  /** World-space [x, y, z] position. */
+  position: [number, number, number];
+}
+
 // ----------------------------------------------------------------------------
 // Camera
 // ----------------------------------------------------------------------------
@@ -101,6 +121,11 @@ export interface MineDigitalTwinProps {
    * geometry always renders regardless. Omit/empty to keep the procedural
    * demo network (e.g. no blueprint uploaded yet). */
   blueprintSections?: BlueprintTunnelSection[];
+  /** Registered-sensor placements (already converted to world coordinates
+   * by the caller, same as blueprintSections). Rendered behind a built-in
+   * HUD toggle ("Sensor Locations") — off by default, since it's a
+   * registry/configuration overlay rather than part of the live view. */
+  sensorLocations?: SensorLocationMarker[];
   /** Currently selected sensor, if any (controlled by the parent). */
   selectedSensor?: SensorFrame | null;
   /** Fired when a sensor marker is clicked. Only wired up as a pass-through

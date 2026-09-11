@@ -56,6 +56,30 @@ class RequirementAppliesTo(str, enum.Enum):
     CONTRACTOR = "CONTRACTOR"
 
 
+class SensorType(str, enum.Enum):
+    METHANE = "METHANE"
+    CARBON_MONOXIDE = "CARBON_MONOXIDE"
+    TEMPERATURE = "TEMPERATURE"
+    VENTILATION = "VENTILATION"
+    HUMIDITY = "HUMIDITY"
+    PRESSURE = "PRESSURE"
+    VIBRATION = "VIBRATION"
+    DUST = "DUST"
+    ELECTRICAL = "ELECTRICAL"
+    NOISE = "NOISE"
+
+
+class SensorConfigStatus(str, enum.Enum):
+    # Deliberately no OFFLINE here — "no recent telemetry" is a computed
+    # signal (see sensor_config_service.py's is_reporting), not something an
+    # administrator sets. Conflating the two was explicitly called out as a
+    # mistake to avoid.
+    ACTIVE = "ACTIVE"
+    INACTIVE = "INACTIVE"
+    MAINTENANCE = "MAINTENANCE"
+    RETIRED = "RETIRED"
+
+
 # Single shared instances so Alembic/SQLAlchemy emit exactly one Postgres
 # ENUM type per name, even though the type is referenced from several tables.
 risk_level_enum = PgEnum(RiskLevel, name="risk_level")
@@ -66,3 +90,5 @@ compliance_category_enum = PgEnum(ComplianceCategory, name="compliance_category"
 zone_type_enum = PgEnum(ZoneType, name="zone_type")
 section_status_enum = PgEnum(SectionStatus, name="section_status")
 requirement_applies_to_enum = PgEnum(RequirementAppliesTo, name="requirement_applies_to")
+sensor_type_enum = PgEnum(SensorType, name="sensor_type")
+sensor_config_status_enum = PgEnum(SensorConfigStatus, name="sensor_config_status")

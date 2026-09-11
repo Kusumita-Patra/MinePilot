@@ -25,3 +25,9 @@ CAPABILITIES: list[tuple[str, str]] = [
 ]
 
 CAPABILITY_KEYS = {key for key, _ in CAPABILITIES}
+
+# field_worker ("Field Inspector") access is fixed by product decision, not
+# admin-editable: they can transition incidents (assign/resolve/escalate)
+# and nothing else. Only mine_manager's row in role_permissions is ever
+# read/written dynamically — see permission_service.py.
+FIELD_WORKER_FIXED_CAPABILITIES = {"incidents.transition"}

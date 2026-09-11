@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import clsx from "clsx";
 import { formatSectorId } from "@/lib/format";
+import { getSensor, type SensorConfig } from "@/lib/sensorsApi";
 import type { SensorFrame } from "../../shared/types/telemetry";
 
 interface Props {
@@ -16,7 +18,46 @@ const riskColor: Record<string, string> = {
   CRITICAL: "text-red-500 border-red-500/40 bg-red-500/10",
 };
 
+const CALIBRATION_COLOR: Record<string, string> = {
+  VALID: "text-emerald-400",
+  DUE_SOON: "text-amber-400",
+  OVERDUE: "text-red-400",
+};
+
+/** Sensor markers in the 3D twin render exclusively from live telemetry
+ * (frozen SensorFrame contract, unchanged) — this drawer additionally fetches
+ * the administrator-configured registry entry (if one exists for this
+ * sensor_id) purely to display extra metadata alongside the live reading.
+ * Read-only; no write path from here. A sensor with no registry entry yet
+ * (404) still shows its live telemetry as before, just without this section. */
+function useSensorConfig(sensorId: string | undefined) {
+  const [config, setConfig] = useState<SensorConfig | null>(null);
+
+  useEffect(() => {
+    if (!sensorId) {
+      const timer = setTimeout(() => setConfig(null), 0);
+      return () => clearTimeout(timer);
+    }
+    let cancelled = false;
+    getSensor(sensorId).then(
+      (c) => {
+        if (!cancelled) setConfig(c);
+      },
+      () => {
+        if (!cancelled) setConfig(null);
+      }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [sensorId]);
+
+  return config;
+}
+
 export default function TelemetryInspectorDrawer({ sensor, onClose }: Props) {
+  const config = useSensorConfig(sensor?.sensor_id);
+
   if (!sensor) return null;
 
   return (
@@ -52,7 +93,46 @@ export default function TelemetryInspectorDrawer({ sensor, onClose }: Props) {
         <p className="text-xs text-neutral-500">
           Last updated: {new Date(sensor.timestamp).toLocaleTimeString()}
         </p>
+
+        {config && (
+          <div className="border-t border-white/10 pt-4 space-y-2">
+            <p className="text-xs font-semibold text-neutral-400 tracking-wide uppercase">
+              Registry Information
+            </p>
+            <ConfigRow label="Type" value={config.sensor_type.replace(/_/g, " ")} />
+            <ConfigRow label="Name" value={config.display_name} />
+            {config.manufacturer && <ConfigRow label="Manufacturer" value={config.manufacturer} />}
+            {(config.warning_threshold != null || config.critical_threshold != null) && (
+              <ConfigRow
+                label="Thresholds"
+                value={`Warn ${config.warning_threshold ?? "—"} · Critical ${config.critical_threshold ?? "—"}`}
+              />
+            )}
+            {config.calibration_status && (
+              <ConfigRow
+                label="Calibration"
+                value={
+                  <span className={CALIBRATION_COLOR[config.calibration_status]}>
+                    {config.calibration_status.replace(/_/g, " ")}
+                  </span>
+                }
+              />
+            )}
+            <p className="text-[10px] text-neutral-600">
+              Configured by an administrator — read-only here.
+            </p>
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function ConfigRow({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center justify-between text-xs">
+      <span className="text-neutral-500">{label}</span>
+      <span className="text-neutral-200">{value}</span>
     </div>
   );
 }

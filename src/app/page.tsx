@@ -25,7 +25,7 @@ export default function Home() {
           href="/login"
           className="bg-white/10 hover:bg-white/20 rounded-xl px-6 py-4 min-w-[220px] text-left transition-colors"
         >
-          <p className="font-semibold">Field Worker</p>
+          <p className="font-semibold">Field Inspector</p>
           <p className="text-sm text-neutral-400">
             Assigned alerts & resolution workflow
           </p>

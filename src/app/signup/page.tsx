@@ -49,7 +49,7 @@ export default function SignupPage() {
         <div>
           <h1 className="text-lg font-bold">Create an account</h1>
           <p className="text-xs text-neutral-500 mt-1">
-            Sign up as a mine manager or a field worker.
+            Sign up as a mine manager or a field inspector.
           </p>
         </div>
 
@@ -112,7 +112,7 @@ export default function SignupPage() {
                   : "bg-black/30 border-white/10 text-neutral-400"
               }`}
             >
-              Field Worker
+              Field Inspector
             </button>
           </div>
         </div>

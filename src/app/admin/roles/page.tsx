@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, X, ShieldCheck } from "lucide-react";
+import { Check, X, ShieldCheck, Lock } from "lucide-react";
 import { getPermissionMatrix, updatePermission, type RolePermissionMatrixRow } from "@/lib/api";
 
 export default function AdminRolesPage() {
@@ -30,7 +30,6 @@ export default function AdminRolesPage() {
         prev.map((row) => ({
           ...row,
           mine_manager: row.mine_manager.id === cellId ? { ...row.mine_manager, allowed: nextAllowed } : row.mine_manager,
-          field_worker: row.field_worker.id === cellId ? { ...row.field_worker, allowed: nextAllowed } : row.field_worker,
         }))
       );
     } catch (e) {
@@ -45,10 +44,12 @@ export default function AdminRolesPage() {
       <div>
         <h1 className="text-lg font-semibold text-white">Roles &amp; Permissions</h1>
         <p className="text-sm text-neutral-500 mt-0.5">
-          Live, backend-enforced access control — toggling a cell here immediately changes what that role can
-          do, no redeploy required. Administrator is always a fixed superuser (not editable here, by design:
-          an admin can never accidentally lock every administrator out of the system). Every toggle below is
-          the actual authorization check the API runs on each request, not a cosmetic label.
+          Only Mine Manager access is admin-editable. Toggling a cell there immediately changes what that role
+          can do, no redeploy required — it&apos;s the actual authorization check the API runs on each
+          request, not a cosmetic label. Administrator is always a fixed superuser, and Field Inspector is
+          fixed to incident transitions only (assign/resolve/escalate) — neither is editable here, by design,
+          so an admin can never accidentally lock every administrator out or widen a field inspector&apos;s
+          access beyond what the role is meant for.
         </p>
       </div>
 
@@ -63,7 +64,7 @@ export default function AdminRolesPage() {
                 <th className="px-4 py-2.5 font-medium">Capability</th>
                 <th className="px-4 py-2.5 font-medium text-center">Administrator</th>
                 <th className="px-4 py-2.5 font-medium text-center">Mine Manager</th>
-                <th className="px-4 py-2.5 font-medium text-center">Field Worker</th>
+                <th className="px-4 py-2.5 font-medium text-center">Field Inspector</th>
               </tr>
             </thead>
             <tbody>
@@ -86,11 +87,7 @@ export default function AdminRolesPage() {
                     />
                   </td>
                   <td className="px-4 py-2.5 text-center">
-                    <PermissionToggle
-                      cell={row.field_worker}
-                      saving={savingId === row.field_worker.id}
-                      onToggle={(next) => toggle(row.field_worker.id, next)}
-                    />
+                    <FixedBadge allowed={row.field_worker.allowed} />
                   </td>
                 </tr>
               ))}
@@ -131,5 +128,20 @@ function PermissionToggle({
         <X size={14} />
       )}
     </button>
+  );
+}
+
+/** Field Inspector's cells are never editable — access is fixed to incident
+ * transitions only, by product decision (see backend/app/core/permissions.py's
+ * FIELD_WORKER_FIXED_CAPABILITIES). Shown as a locked badge, not a toggle. */
+function FixedBadge({ allowed }: { allowed: boolean }) {
+  return (
+    <span
+      title="Field Inspector access is fixed — not editable"
+      className={`inline-flex items-center gap-1 text-[11px] ${allowed ? "text-emerald-400" : "text-neutral-600"}`}
+    >
+      <Lock size={11} />
+      {allowed ? <Check size={13} /> : <X size={13} />}
+    </span>
   );
 }

@@ -3,24 +3,22 @@
 import { useMemo } from "react";
 import { useTelemetry } from "@/lib/telemetryContext";
 import { useActiveBlueprint } from "@/hooks/useBlueprint";
+import { useSensorConfigs } from "@/hooks/useSensors";
+import { pixelToWorldXZ } from "@/lib/blueprintCoords";
 import KpiCards from "@/app/dashboard/KpiCards";
-import MineDigitalTwinContainer from "@/app/dashboard/MineDigitalTwinContainer";
+import MineDigitalTwinContainer from "@/components/digital-twin/MineDigitalTwinContainer";
 import AiRiskAnalysis from "@/app/dashboard/AiRiskAnalysis";
 import RecentAlerts from "@/app/dashboard/RecentAlerts";
 import AnalyticsSection from "@/app/dashboard/AnalyticsSection";
 import QuickActions from "@/app/dashboard/QuickActions";
 import IncidentSignOff from "@/app/dashboard/IncidentSignOff";
 import MineDigitalTwin from "@/components/digital-twin";
-import type { BlueprintTunnelSection } from "@/components/digital-twin";
-
-// A blueprint image can be any pixel size; normalize it to roughly the same
-// world-unit footprint the procedural fallback network already uses so the
-// two are visually comparable regardless of the source image's resolution.
-const BLUEPRINT_WORLD_SPAN = 500;
+import type { BlueprintTunnelSection, SensorLocationMarker } from "@/components/digital-twin";
 
 export default function DashboardPage() {
   const { sensors, selected, setSelected } = useTelemetry();
   const { blueprint } = useActiveBlueprint();
+  const { sensors: sensorConfigs } = useSensorConfigs();
 
   const sensorList = Object.values(sensors);
   const avgRisk = sensorList.length
@@ -29,20 +27,32 @@ export default function DashboardPage() {
 
   const blueprintSections = useMemo<BlueprintTunnelSection[]>(() => {
     if (!blueprint) return [];
-    const scale = BLUEPRINT_WORLD_SPAN / Math.max(blueprint.image_width, blueprint.image_height);
     return blueprint.sections.map((section) => ({
       id: section.id,
       sectorId: section.sector_id,
       name: section.name,
       depth: section.depth,
-      path: section.path.map(
-        ([px, py]): [number, number] => [
-          (px - blueprint.image_width / 2) * scale,
-          (py - blueprint.image_height / 2) * scale,
-        ]
-      ),
+      path: section.path.map(([px, py]) => pixelToWorldXZ(px, py, blueprint.image_width, blueprint.image_height)),
     }));
   }, [blueprint]);
+
+  const sensorLocations = useMemo<SensorLocationMarker[]>(() => {
+    if (!blueprint) return [];
+    return sensorConfigs
+      .filter((s) => s.blueprint_id === blueprint.id)
+      .map((s) => {
+        const [x, z] = pixelToWorldXZ(s.pixel_x, s.pixel_y, blueprint.image_width, blueprint.image_height);
+        return {
+          id: s.id,
+          sensorId: s.sensor_id,
+          displayName: s.display_name,
+          sensorType: s.sensor_type,
+          status: s.status,
+          isReporting: s.is_reporting,
+          position: [x, s.depth, z] as [number, number, number],
+        };
+      });
+  }, [blueprint, sensorConfigs]);
 
   return (
     <>
@@ -54,6 +64,7 @@ export default function DashboardPage() {
             <MineDigitalTwin
               sensors={sensorList}
               blueprintSections={blueprintSections}
+              sensorLocations={sensorLocations}
               selectedSensor={selected}
               onSelectSensor={setSelected}
             />
