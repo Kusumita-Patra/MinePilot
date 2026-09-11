@@ -11,6 +11,7 @@ import UpdatePasswordForm from "./UpdatePasswordForm";
 import SettingsToast, { type ToastState } from "./SettingsToast";
 
 const ROLE_LABEL: Record<string, string> = {
+  administrator: "Administrator",
   mine_manager: "Mine Manager",
   field_worker: "Field Worker",
 };

@@ -13,7 +13,7 @@ from app.schemas.auth import (
 )
 from app.schemas.common import success_body
 from app.schemas.user import UserResponse
-from app.services import auth_service
+from app.services import auth_service, permission_service
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -33,6 +33,19 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)) -> di
 @router.get("/me")
 async def me(current_user: User = Depends(get_current_user)) -> dict:
     return success_body(UserResponse.model_validate(current_user).model_dump(mode="json"))
+
+
+@router.get("/permissions")
+async def my_permissions(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """What the signed-in user can actually do, per the dynamic role_permissions
+    table (administrator = everything). The frontend uses this to decide what
+    to render — the backend's require_permission(...) checks remain the real
+    authorization boundary regardless of what this reports."""
+    permissions = await permission_service.get_my_permissions(db, current_user.role)
+    return success_body(permissions)
 
 
 @router.post("/change-password")

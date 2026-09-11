@@ -14,6 +14,9 @@ import {
   Users,
   UserCog,
   Settings,
+  Gavel,
+  ScrollText,
+  Activity,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -22,6 +25,7 @@ import clsx from "clsx";
 import { useIncidents } from "@/hooks/useIncidents";
 import { useDocuments } from "@/hooks/useDocuments";
 import { useContractors } from "@/hooks/useContractors";
+import { usePermissions } from "@/hooks/usePermissions";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -36,7 +40,15 @@ const NAV_ITEMS = [
   { label: "Documents", href: "/dashboard/documents", icon: FolderOpen, badge: "documents" as const },
   { label: "Contractors", href: "/dashboard/contractors", icon: Users, badge: "contractors" as const },
   { label: "Workforce", href: "/dashboard/workforce", icon: UserCog },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+];
+
+// Only shown when an administrator has granted the matching capability via
+// /admin/roles — see usePermissions. Kept separate from NAV_ITEMS so it's
+// obvious at a glance which links are always-on vs. permission-gated.
+const GRANTABLE_NAV_ITEMS = [
+  { label: "Governance", href: "/dashboard/governance", icon: Gavel, capability: "governance.view" },
+  { label: "Audit Logs", href: "/dashboard/audit-logs", icon: ScrollText, capability: "audit_logs.view" },
+  { label: "System Health", href: "/dashboard/system-health", icon: Activity, capability: "system_health.view" },
 ];
 
 export default function Sidebar() {
@@ -45,12 +57,14 @@ export default function Sidebar() {
   const { incidents } = useIncidents();
   const { stats: documentStats } = useDocuments();
   const { stats: contractorStats } = useContractors();
+  const { can } = usePermissions();
   const openCount = incidents.filter((i) => i.status !== "SIGNED_OFF").length;
   const badgeCounts: Record<string, number> = {
     incidents: openCount,
     documents: documentStats.expired + documentStats.missing,
     contractors: contractorStats.contractorsWithGaps,
   };
+  const grantedNavItems = GRANTABLE_NAV_ITEMS.filter((item) => can(item.capability));
 
   useEffect(() => {
     const tick = () => setTime(new Date().toLocaleTimeString());
@@ -89,6 +103,45 @@ export default function Sidebar() {
             </Link>
           );
         })}
+
+        {grantedNavItems.length > 0 && (
+          <>
+            <p className="px-3 pt-3 text-[10px] font-semibold tracking-wider text-neutral-600 uppercase">
+              Granted Access
+            </p>
+            {grantedNavItems.map(({ label, href, icon: Icon }) => {
+              const active = pathname === href;
+              return (
+                <Link
+                  key={label}
+                  href={href}
+                  className={clsx(
+                    "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
+                    active
+                      ? "bg-amber-500/15 text-amber-400 border border-amber-400/30"
+                      : "text-neutral-400 hover:bg-white/5 hover:text-white"
+                  )}
+                >
+                  <Icon size={16} />
+                  {label}
+                </Link>
+              );
+            })}
+          </>
+        )}
+
+        <Link
+          href="/dashboard/settings"
+          className={clsx(
+            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors mt-1",
+            pathname === "/dashboard/settings"
+              ? "bg-blue-600/20 text-blue-400 border border-blue-500/30"
+              : "text-neutral-400 hover:bg-white/5 hover:text-white"
+          )}
+        >
+          <Settings size={16} />
+          Settings
+        </Link>
       </nav>
 
       <div className="px-4 pt-4 border-t border-white/10 mt-2">

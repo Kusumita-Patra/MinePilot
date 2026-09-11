@@ -2,12 +2,15 @@
 
 import { useState } from "react";
 import { useIncidents } from "@/hooks/useIncidents";
+import { usePermissions } from "@/hooks/usePermissions";
 import { updateIncident } from "@/lib/api";
 import { formatSectorId } from "@/lib/format";
 
 export default function IncidentSignOff() {
   const { incidents, refresh } = useIncidents();
+  const { can } = usePermissions();
   const [busy, setBusy] = useState<string | null>(null);
+  const canSignOff = can("incidents.sign_off");
 
   const pending = incidents.filter((i) => i.status === "RESOLVED" || i.status === "ESCALATED");
 
@@ -47,8 +50,9 @@ export default function IncidentSignOff() {
                 )}
               </div>
               <button
-                disabled={busy === inc.ticket_id}
+                disabled={busy === inc.ticket_id || !canSignOff}
                 onClick={() => signOff(inc.ticket_id)}
+                title={canSignOff ? undefined : "Your sign-off access was not granted"}
                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 rounded-md px-3 py-1.5 text-[11px] font-medium shrink-0"
               >
                 Sign Off

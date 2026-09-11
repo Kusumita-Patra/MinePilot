@@ -4,9 +4,9 @@ from datetime import date
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import get_current_user, require_role
+from app.core.security import get_current_user, require_permission
 from app.db.database import get_db
-from app.models.enums import InspectionStatus, UserRole
+from app.models.enums import InspectionStatus
 from app.models.user import User
 from app.schemas.common import success_body
 from app.schemas.inspection import InspectionCreate, InspectionResponse, InspectionUpdate
@@ -31,7 +31,7 @@ async def list_inspections(
 async def create_inspection(
     payload: InspectionCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(UserRole.mine_manager)),
+    current_user: User = Depends(require_permission("inspections.schedule")),
 ) -> dict:
     inspection = await inspection_service.create_inspection(db, payload)
     return success_body(

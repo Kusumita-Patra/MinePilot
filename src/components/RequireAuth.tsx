@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuthStore, type UserRole } from "@/lib/authStore";
 
 const ROLE_HOME: Record<UserRole, string> = {
+  administrator: "/admin",
   mine_manager: "/dashboard",
   field_worker: "/field",
 };

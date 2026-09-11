@@ -5,7 +5,7 @@ import anyio
 from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.exceptions.custom_exceptions import AppException, NotFoundError
 from app.models.blueprint import BlueprintSection, MineBlueprint
@@ -98,6 +98,8 @@ async def create_section(
         level_label=payload.level_label,
         depth=payload.depth,
         path=[list(p) for p in payload.path],
+        zone_type=payload.zone_type,
+        status=payload.status,
     )
     db.add(section)
     await db.commit()
@@ -127,6 +129,10 @@ async def update_section(
         section.depth = payload.depth
     if payload.path is not None:
         section.path = [list(p) for p in payload.path]
+    if payload.zone_type is not None:
+        section.zone_type = payload.zone_type
+    if payload.status is not None:
+        section.status = payload.status
 
     await db.commit()
     await db.refresh(section)
@@ -137,3 +143,29 @@ async def delete_section(db: AsyncSession, blueprint_id: uuid.UUID, section_id: 
     section = await get_section(db, blueprint_id, section_id)
     await db.delete(section)
     await db.commit()
+
+
+async def list_history(db: AsyncSession) -> list[dict]:
+    """All uploaded blueprints, oldest first, annotated with a computed
+    version number and whether each is the currently-active one (most recent
+    = active, per MineBlueprint's docstring — no new column needed)."""
+    result = await db.execute(
+        select(MineBlueprint)
+        .options(selectinload(MineBlueprint.sections), joinedload(MineBlueprint.uploader))
+        .order_by(MineBlueprint.created_at.asc())
+    )
+    blueprints = list(result.unique().scalars().all())
+    total = len(blueprints)
+    return [
+        {
+            "id": bp.id,
+            "name": bp.name,
+            "version": index + 1,
+            "is_active": index == total - 1,
+            "uploaded_by": bp.uploaded_by,
+            "uploaded_by_name": bp.uploader.full_name if bp.uploader else "Unknown",
+            "section_count": len(bp.sections),
+            "created_at": bp.created_at,
+        }
+        for index, bp in enumerate(blueprints)
+    ]

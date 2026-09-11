@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from app.models.enums import SectionStatus, ZoneType
+
 # Mirrors MineSectorId in src/components/digital-twin/types.ts — kept as a
 # plain Literal (not a Postgres enum) for the same reason Inspection.sector_id
 # is a plain string column: this is a display/aggregation grouping, not a
@@ -28,6 +30,8 @@ class BlueprintSectionResponse(BaseModel):
     level_label: str
     depth: float
     path: list[PathPoint]
+    zone_type: ZoneType
+    status: SectionStatus
     created_at: datetime
     updated_at: datetime
 
@@ -38,6 +42,8 @@ class BlueprintSectionCreate(BaseModel):
     level_label: str = Field(min_length=1, max_length=50)
     depth: float
     path: list[PathPoint] = Field(min_length=2)
+    zone_type: ZoneType = ZoneType.NORMAL
+    status: SectionStatus = SectionStatus.ACTIVE
 
 
 class BlueprintSectionUpdate(BaseModel):
@@ -46,6 +52,8 @@ class BlueprintSectionUpdate(BaseModel):
     level_label: str | None = Field(default=None, min_length=1, max_length=50)
     depth: float | None = None
     path: list[PathPoint] | None = Field(default=None, min_length=2)
+    zone_type: ZoneType | None = None
+    status: SectionStatus | None = None
 
 
 class BlueprintResponse(BaseModel):
@@ -60,3 +68,14 @@ class BlueprintResponse(BaseModel):
     uploaded_by: uuid.UUID
     created_at: datetime
     sections: list[BlueprintSectionResponse] = []
+
+
+class BlueprintHistoryItem(BaseModel):
+    id: uuid.UUID
+    name: str
+    version: int
+    is_active: bool
+    uploaded_by: uuid.UUID
+    uploaded_by_name: str
+    section_count: int
+    created_at: datetime

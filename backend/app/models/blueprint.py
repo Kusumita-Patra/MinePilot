@@ -1,11 +1,16 @@
 import uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, JSON, String, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+from app.models.enums import SectionStatus, ZoneType, section_status_enum, zone_type_enum
+
+if TYPE_CHECKING:
+    from app.models.user import User
 
 
 class MineBlueprint(Base):
@@ -28,6 +33,7 @@ class MineBlueprint(Base):
     sections: Mapped[list["BlueprintSection"]] = relationship(
         back_populates="blueprint", cascade="all, delete-orphan", order_by="BlueprintSection.created_at"
     )
+    uploader: Mapped["User"] = relationship(viewonly=True)
 
 
 class BlueprintSection(Base):
@@ -50,6 +56,10 @@ class BlueprintSection(Base):
     level_label: Mapped[str] = mapped_column(String, nullable=False)
     depth: Mapped[float] = mapped_column(Float, nullable=False)
     path: Mapped[list] = mapped_column(JSON, nullable=False)  # [[x, y], ...] pixel coords on the source image
+    zone_type: Mapped[ZoneType] = mapped_column(zone_type_enum, nullable=False, server_default=ZoneType.NORMAL.value)
+    status: Mapped[SectionStatus] = mapped_column(
+        section_status_enum, nullable=False, server_default=SectionStatus.ACTIVE.value
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

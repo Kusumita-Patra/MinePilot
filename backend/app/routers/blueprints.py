@@ -4,19 +4,19 @@ from fastapi import APIRouter, Depends, File, Form, UploadFile, status
 from fastapi.responses import FileResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.security import get_current_user, require_role
+from app.core.security import get_current_user, require_permission
 from app.db.database import get_db
 from app.exceptions.custom_exceptions import NotFoundError
-from app.models.enums import UserRole
 from app.models.user import User
 from app.schemas.blueprint import (
+    BlueprintHistoryItem,
     BlueprintResponse,
     BlueprintSectionCreate,
     BlueprintSectionResponse,
     BlueprintSectionUpdate,
 )
 from app.schemas.common import success_body
-from app.services import blueprint_service
+from app.services import audit_service, blueprint_service
 
 router = APIRouter(prefix="/api/blueprints", tags=["blueprints"])
 
@@ -32,6 +32,16 @@ async def get_active_blueprint(
     return success_body(BlueprintResponse.model_validate(blueprint).model_dump(mode="json"))
 
 
+@router.get("/history")
+async def get_blueprint_history(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    history = await blueprint_service.list_history(db)
+    data = [BlueprintHistoryItem(**item).model_dump(mode="json") for item in history]
+    return success_body(data)
+
+
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def upload_blueprint(
     file: UploadFile = File(...),
@@ -39,10 +49,18 @@ async def upload_blueprint(
     width: int = Form(...),
     height: int = Form(...),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(UserRole.mine_manager)),
+    current_user: User = Depends(require_permission("blueprint.write")),
 ) -> dict:
     blueprint = await blueprint_service.create_blueprint(
         db, file=file, name=name, width=width, height=height, uploaded_by=current_user.id
+    )
+    await audit_service.record(
+        db,
+        actor=current_user,
+        action="blueprint.upload",
+        resource_type="blueprint",
+        resource_id=str(blueprint.id),
+        description=f"Uploaded mine blueprint '{blueprint.name}'",
     )
     return success_body(
         BlueprintResponse.model_validate(blueprint).model_dump(mode="json"),
@@ -68,9 +86,17 @@ async def create_section(
     blueprint_id: uuid.UUID,
     payload: BlueprintSectionCreate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(UserRole.mine_manager)),
+    current_user: User = Depends(require_permission("blueprint.write")),
 ) -> dict:
     section = await blueprint_service.create_section(db, blueprint_id, payload)
+    await audit_service.record(
+        db,
+        actor=current_user,
+        action="blueprint.section_create",
+        resource_type="blueprint_section",
+        resource_id=str(section.id),
+        description=f"Added section '{section.name}' to blueprint",
+    )
     return success_body(
         BlueprintSectionResponse.model_validate(section).model_dump(mode="json"),
         message="Section added successfully",
@@ -83,9 +109,17 @@ async def update_section(
     section_id: uuid.UUID,
     payload: BlueprintSectionUpdate,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(UserRole.mine_manager)),
+    current_user: User = Depends(require_permission("blueprint.write")),
 ) -> dict:
     section = await blueprint_service.update_section(db, blueprint_id, section_id, payload)
+    await audit_service.record(
+        db,
+        actor=current_user,
+        action="blueprint.section_update",
+        resource_type="blueprint_section",
+        resource_id=str(section.id),
+        description=f"Updated section '{section.name}'",
+    )
     return success_body(
         BlueprintSectionResponse.model_validate(section).model_dump(mode="json"),
         message="Section updated successfully",
@@ -97,6 +131,14 @@ async def delete_section(
     blueprint_id: uuid.UUID,
     section_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(require_role(UserRole.mine_manager)),
+    current_user: User = Depends(require_permission("blueprint.write")),
 ) -> None:
     await blueprint_service.delete_section(db, blueprint_id, section_id)
+    await audit_service.record(
+        db,
+        actor=current_user,
+        action="blueprint.section_delete",
+        resource_type="blueprint_section",
+        resource_id=str(section_id),
+        description="Deleted a blueprint section",
+    )

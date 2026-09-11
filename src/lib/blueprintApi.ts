@@ -10,6 +10,9 @@ export type BlueprintSectorId =
   | "sector_surface_conveyor"
   | "sector_main_pit";
 
+export type BlueprintZoneType = "NORMAL" | "RESTRICTED" | "EMERGENCY" | "HIGH_RISK" | "WORK_ZONE";
+export type BlueprintSectionStatus = "ACTIVE" | "CLOSED" | "UNDER_MAINTENANCE";
+
 export interface BlueprintSection {
   id: string;
   blueprint_id: string;
@@ -18,8 +21,21 @@ export interface BlueprintSection {
   level_label: string;
   depth: number;
   path: [number, number][];
+  zone_type: BlueprintZoneType;
+  status: BlueprintSectionStatus;
   created_at: string;
   updated_at: string;
+}
+
+export interface BlueprintHistoryItem {
+  id: string;
+  name: string;
+  version: number;
+  is_active: boolean;
+  uploaded_by: string;
+  uploaded_by_name: string;
+  section_count: number;
+  created_at: string;
 }
 
 export interface MineBlueprint {
@@ -60,6 +76,8 @@ export async function createBlueprintSection(
     level_label: string;
     depth: number;
     path: [number, number][];
+    zone_type?: BlueprintZoneType;
+    status?: BlueprintSectionStatus;
   }
 ): Promise<BlueprintSection> {
   return apiFetch<BlueprintSection>(`/api/blueprints/${blueprintId}/sections`, {
@@ -68,8 +86,31 @@ export async function createBlueprintSection(
   });
 }
 
+export async function updateBlueprintSection(
+  blueprintId: string,
+  sectionId: string,
+  payload: Partial<{
+    sector_id: BlueprintSectorId;
+    name: string;
+    level_label: string;
+    depth: number;
+    path: [number, number][];
+    zone_type: BlueprintZoneType;
+    status: BlueprintSectionStatus;
+  }>
+): Promise<BlueprintSection> {
+  return apiFetch<BlueprintSection>(`/api/blueprints/${blueprintId}/sections/${sectionId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function deleteBlueprintSection(blueprintId: string, sectionId: string): Promise<void> {
   await apiFetch<void>(`/api/blueprints/${blueprintId}/sections/${sectionId}`, { method: "DELETE" });
+}
+
+export async function getBlueprintHistory(): Promise<BlueprintHistoryItem[]> {
+  return apiFetch<BlueprintHistoryItem[]>("/api/blueprints/history");
 }
 
 /** The image endpoint requires auth, and a plain <img src="..."> can't send

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { useInspections } from "@/hooks/useInspections";
+import { usePermissions } from "@/hooks/usePermissions";
 import { createInspection, updateInspection, type InspectionStatus } from "@/lib/api";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { formatSectorId } from "@/lib/format";
@@ -31,6 +32,8 @@ function todayIso() {
 
 export default function InspectionsPage() {
   const { inspections, loading, error, refresh } = useInspections();
+  const { can } = usePermissions();
+  const canSchedule = can("inspections.schedule");
   const [sectorId, setSectorId] = useState("");
   const [scheduledDate, setScheduledDate] = useState(todayIso());
   const [notes, setNotes] = useState("");
@@ -77,6 +80,7 @@ export default function InspectionsPage() {
         <span className="text-xs text-neutral-500">{inspections.length} total</span>
       </div>
 
+      {canSchedule && (
       <form
         onSubmit={handleSchedule}
         className="bg-gray-900 border border-white/10 rounded-xl p-4 flex flex-wrap items-end gap-3"
@@ -119,6 +123,7 @@ export default function InspectionsPage() {
         </button>
         {formError && <p className="text-xs text-red-400 w-full">{formError}</p>}
       </form>
+      )}
 
       {error && <p className="text-xs text-amber-400">Can&apos;t reach the backend right now — showing last known inspections.</p>}
 

@@ -1,12 +1,14 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Maximize2, LogOut } from "lucide-react";
+import { Bell, Maximize2, LogOut, ShieldCheck } from "lucide-react";
 import { useAuthStore } from "@/lib/authStore";
 import { useIncidents } from "@/hooks/useIncidents";
 
 const ROLE_LABEL: Record<string, string> = {
+  administrator: "Administrator",
   mine_manager: "Mine Manager",
   field_worker: "Field Worker",
 };
@@ -38,6 +40,16 @@ export default function Header() {
       </p>
 
       <div className="flex items-center gap-4">
+        {user?.role === "administrator" && (
+          <Link
+            href="/admin"
+            title="Admin Command Center"
+            className="flex items-center gap-1.5 text-xs font-medium text-amber-400 hover:text-amber-300 border border-amber-400/30 hover:border-amber-300/50 rounded-md px-2.5 py-1.5 transition-colors"
+          >
+            <ShieldCheck size={13} />
+            <span className="hidden sm:inline">Admin Console</span>
+          </Link>
+        )}
         <button
           onClick={() => router.push("/dashboard/alerts")}
           title="View alerts"

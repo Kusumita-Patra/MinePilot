@@ -182,6 +182,43 @@ export async function getUsers(): Promise<AuthUser[]> {
   return apiFetch<AuthUser[]>("/api/users");
 }
 
+/** What the signed-in user can actually do, per the dynamic role_permissions
+ * table (administrator gets every capability back as true). Used to decide
+ * what UI to show — see src/hooks/usePermissions.ts. The backend's
+ * require_permission(...) checks remain the real authorization boundary. */
+export async function getMyPermissions(): Promise<Record<string, boolean>> {
+  return apiFetch<Record<string, boolean>>("/api/auth/permissions");
+}
+
+export async function createUser(payload: {
+  email: string;
+  password: string;
+  full_name: string;
+  role: "administrator" | "mine_manager" | "field_worker";
+}): Promise<AuthUser> {
+  return apiFetch<AuthUser>("/api/users", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateUserRole(
+  userId: string,
+  role: "administrator" | "mine_manager" | "field_worker"
+): Promise<AuthUser> {
+  return apiFetch<AuthUser>(`/api/users/${userId}/role`, {
+    method: "PATCH",
+    body: JSON.stringify({ role }),
+  });
+}
+
+export async function updateUserStatus(userId: string, isActive: boolean): Promise<AuthUser> {
+  return apiFetch<AuthUser>(`/api/users/${userId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ is_active: isActive }),
+  });
+}
+
 export async function checkBackendHealth(): Promise<boolean> {
   try {
     const res = await fetch(`${API_URL}/api/health`);
@@ -223,4 +260,171 @@ export async function getTelemetryHistory(params: {
   if (params.to) search.set("to", params.to);
   const query = search.toString();
   return apiFetch<SensorFrameHistoryPoint[]>(`/api/telemetry/history${query ? `?${query}` : ""}`);
+}
+
+// ---------------------------------------------------------------------------
+// Administrator-only endpoints (backend enforces the role check — these are
+// only reachable at all when the signed-in user is an administrator).
+// ---------------------------------------------------------------------------
+
+export interface AdminDashboardSummary {
+  total_users: number;
+  users_by_role: Record<string, number>;
+  active_blueprint_name: string | null;
+  active_blueprint_section_count: number;
+  offline_sensor_count: number;
+  open_incident_count: number;
+  recent_audit_logs: AuditLogEntry[];
+}
+
+export async function getAdminDashboard(): Promise<AdminDashboardSummary> {
+  return apiFetch<AdminDashboardSummary>("/api/admin/dashboard");
+}
+
+export type ComponentHealthStatus = "healthy" | "degraded" | "unavailable";
+
+export interface ComponentHealth {
+  name: string;
+  status: ComponentHealthStatus;
+  detail: string;
+}
+
+export async function getSystemHealth(): Promise<{ components: ComponentHealth[] }> {
+  return apiFetch<{ components: ComponentHealth[] }>("/api/admin/system-health");
+}
+
+export interface AuditLogEntry {
+  id: string;
+  actor_user_id: string;
+  actor_role: string;
+  action: string;
+  resource_type: string;
+  resource_id: string | null;
+  description: string;
+  metadata: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export async function getAuditLogs(params?: { limit?: number; offset?: number }): Promise<AuditLogEntry[]> {
+  const search = new URLSearchParams();
+  if (params?.limit) search.set("limit", String(params.limit));
+  if (params?.offset) search.set("offset", String(params.offset));
+  const query = search.toString();
+  return apiFetch<AuditLogEntry[]>(`/api/admin/audit-logs${query ? `?${query}` : ""}`);
+}
+
+export interface MineStructureSection {
+  id: string;
+  name: string;
+  sector_id: string;
+  zone_type: string;
+  status: string;
+  depth: number;
+}
+
+export interface MineStructureLevel {
+  level_label: string;
+  sections: MineStructureSection[];
+}
+
+export interface MineStructure {
+  blueprint_id: string | null;
+  blueprint_name: string | null;
+  levels: MineStructureLevel[];
+}
+
+export async function getMineStructure(): Promise<MineStructure> {
+  return apiFetch<MineStructure>("/api/admin/mine-structure");
+}
+
+export interface AlertRule {
+  id: string;
+  rule_key: string;
+  display_name: string;
+  warning_threshold: number | null;
+  critical_threshold: number | null;
+  unit: string | null;
+  is_active: boolean;
+  updated_at: string;
+}
+
+export async function getAlertRules(): Promise<AlertRule[]> {
+  return apiFetch<AlertRule[]>("/api/admin/alert-rules");
+}
+
+export async function updateAlertRule(
+  ruleId: string,
+  patch: { warning_threshold?: number; critical_threshold?: number; is_active?: boolean }
+): Promise<AlertRule> {
+  return apiFetch<AlertRule>(`/api/admin/alert-rules/${ruleId}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}
+
+export type ComplianceRequirementAppliesTo = "WORKER" | "CONTRACTOR";
+
+export interface ComplianceRequirement {
+  id: string;
+  applies_to: ComplianceRequirementAppliesTo;
+  document_type: string;
+  warning_threshold_days: number;
+  critical_threshold_days: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export async function getComplianceRequirements(): Promise<ComplianceRequirement[]> {
+  return apiFetch<ComplianceRequirement[]>("/api/admin/compliance-rules");
+}
+
+export async function createComplianceRequirement(payload: {
+  applies_to: ComplianceRequirementAppliesTo;
+  document_type: string;
+  warning_threshold_days: number;
+  critical_threshold_days: number;
+}): Promise<ComplianceRequirement> {
+  return apiFetch<ComplianceRequirement>("/api/admin/compliance-rules", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateComplianceRequirement(
+  requirementId: string,
+  patch: Partial<{
+    document_type: string;
+    warning_threshold_days: number;
+    critical_threshold_days: number;
+    is_active: boolean;
+  }>
+): Promise<ComplianceRequirement> {
+  return apiFetch<ComplianceRequirement>(`/api/admin/compliance-rules/${requirementId}`, {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+}
+
+export interface RolePermissionCell {
+  id: string | null;
+  allowed: boolean;
+}
+
+export interface RolePermissionMatrixRow {
+  capability: string;
+  label: string;
+  mine_manager: RolePermissionCell;
+  field_worker: RolePermissionCell;
+}
+
+export async function getPermissionMatrix(): Promise<RolePermissionMatrixRow[]> {
+  return apiFetch<RolePermissionMatrixRow[]>("/api/admin/permissions");
+}
+
+export async function updatePermission(permissionId: string, allowed: boolean): Promise<{ id: string; allowed: boolean }> {
+  return apiFetch<{ id: string; allowed: boolean }>(`/api/admin/permissions/${permissionId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ allowed }),
+  });
 }

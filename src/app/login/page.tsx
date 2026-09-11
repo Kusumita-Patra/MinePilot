@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { login } from "@/lib/api";
-import { useAuthStore } from "@/lib/authStore";
+import { useAuthStore, type UserRole } from "@/lib/authStore";
+
+const ROLE_HOME: Record<UserRole, string> = {
+  administrator: "/admin",
+  mine_manager: "/dashboard",
+  field_worker: "/field",
+};
 
 export default function LoginPage() {
   const router = useRouter();
@@ -22,7 +28,7 @@ export default function LoginPage() {
     try {
       const { access_token, user } = await login(email, password);
       setAuth(access_token, user);
-      router.replace(user.role === "mine_manager" ? "/dashboard" : "/field");
+      router.replace(ROLE_HOME[user.role]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

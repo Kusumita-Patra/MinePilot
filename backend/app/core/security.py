@@ -76,6 +76,36 @@ def require_role(*allowed_roles: UserRole):
     return dependency
 
 
+def require_permission(capability: str):
+    """Dynamic, admin-editable authorization: checks the `role_permissions`
+    table for (current_user.role, capability) rather than a hardcoded role
+    list. `administrator` is always a superuser here and never touches the
+    table — this is what keeps a bad/malicious permission edit from ever
+    being able to lock every administrator out of the system. See
+    core/permissions.py for the capability catalog and app/services/
+    permission_service.py for the lookup."""
+
+    async def dependency(
+        current_user: User = Depends(get_current_user),
+        db: AsyncSession = Depends(get_db),
+    ) -> User:
+        if current_user.role == UserRole.administrator:
+            return current_user
+
+        # Local import: permission_service is a service module and importing
+        # it at module load time would invert the usual core -> services
+        # dependency direction; deferring the import avoids that without
+        # actually creating a cycle (nothing in permission_service imports
+        # core.security).
+        from app.services import permission_service
+
+        if not await permission_service.is_allowed(db, current_user.role, capability):
+            raise ForbiddenError("You do not have permission to perform this action")
+        return current_user
+
+    return dependency
+
+
 async def get_current_user_ws(token: str | None, db: AsyncSession) -> User | None:
     """Same validation as get_current_user, but for the WS handshake where a
     missing/invalid token should close the socket rather than raise an HTTPException."""

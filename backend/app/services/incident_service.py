@@ -8,6 +8,7 @@ from app.models.enums import IncidentStatus, RiskLevel, UserRole
 from app.models.incident import Incident
 from app.models.user import User
 from app.schemas.incident import IncidentUpdate
+from app.services import permission_service
 from app.utils.ticket_id import next_ticket_id
 
 VALID_TRANSITIONS: dict[IncidentStatus, set[IncidentStatus]] = {
@@ -17,16 +18,6 @@ VALID_TRANSITIONS: dict[IncidentStatus, set[IncidentStatus]] = {
     IncidentStatus.RESOLVED: {IncidentStatus.SIGNED_OFF},
     IncidentStatus.SIGNED_OFF: set(),
 }
-
-# PLAN.md §2/§7 (assumption #5): field_worker handles the field-side of the
-# workflow, mine_manager owns final sign-off. Role rules apply to the
-# *target* status of a transition.
-FIELD_WORKER_ALLOWED_TARGETS = {
-    IncidentStatus.ASSIGNED,
-    IncidentStatus.RESOLVED,
-    IncidentStatus.ESCALATED,
-}
-MINE_MANAGER_ALLOWED_TARGETS = {IncidentStatus.SIGNED_OFF}
 
 
 async def list_incidents(
@@ -56,14 +47,21 @@ async def get_incident(db: AsyncSession, ticket_id: str) -> Incident:
     return incident
 
 
-def _check_role_permission(current_user: User, target_status: IncidentStatus) -> None:
-    if current_user.role == UserRole.mine_manager:
-        if target_status in MINE_MANAGER_ALLOWED_TARGETS or target_status in FIELD_WORKER_ALLOWED_TARGETS:
-            return
-    elif current_user.role == UserRole.field_worker:
-        if target_status in FIELD_WORKER_ALLOWED_TARGETS:
-            return
-    raise ForbiddenError(f"Your role cannot transition an incident to {target_status.value}")
+def _capability_for_target(target_status: IncidentStatus) -> str:
+    """Which admin-editable capability (see core/permissions.py) governs
+    transitioning an incident to this target status."""
+    return "incidents.sign_off" if target_status == IncidentStatus.SIGNED_OFF else "incidents.transition"
+
+
+async def _check_role_permission(db: AsyncSession, current_user: User, target_status: IncidentStatus) -> None:
+    # Administrator is always a superuser (§3: administrator ⊇ manager
+    # access) and never consults the permissions table.
+    if current_user.role == UserRole.administrator:
+        return
+
+    capability = _capability_for_target(target_status)
+    if not await permission_service.is_allowed(db, current_user.role, capability):
+        raise ForbiddenError(f"Your role cannot transition an incident to {target_status.value}")
 
 
 async def update_incident(
@@ -77,7 +75,7 @@ async def update_incident(
             raise InvalidTransitionError(
                 f"Cannot transition incident from {incident.status.value} to {payload.status.value}"
             )
-        _check_role_permission(current_user, payload.status)
+        await _check_role_permission(db, current_user, payload.status)
 
         incident.status = payload.status
         if payload.status == IncidentStatus.RESOLVED:

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { updateIncident } from "@/lib/api";
+import { usePermissions } from "@/hooks/usePermissions";
 import { formatSectorId } from "@/lib/format";
 import type { Incident } from "../../shared/types/telemetry";
 
@@ -43,6 +44,8 @@ export default function IncidentsTable({
   emptyLabel?: string;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
+  const { can } = usePermissions();
+  const hasSignOffPermission = can("incidents.sign_off");
 
   async function signOff(ticketId: string) {
     setBusy(ticketId);
@@ -81,7 +84,7 @@ export default function IncidentsTable({
           </thead>
           <tbody>
             {incidents.map((inc) => {
-              const canSignOff = inc.status === "RESOLVED" || inc.status === "ESCALATED";
+              const canSignOff = hasSignOffPermission && (inc.status === "RESOLVED" || inc.status === "ESCALATED");
               return (
                 <tr key={inc.ticket_id} className="border-b border-white/5 last:border-0 hover:bg-white/5">
                   <td className="px-4 py-3 font-medium">{inc.ticket_id}</td>

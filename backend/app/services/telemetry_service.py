@@ -48,6 +48,22 @@ class BroadcastManager:
 
 broadcast_manager = BroadcastManager()
 
+# Updated every time a frame arrives from T2's upstream simulator; read by
+# admin_service.get_system_health() as the telemetry-ingestion liveness signal.
+# Deliberately not threaded into the ingestion/persistence logic itself.
+_last_frame_at: datetime | None = None
+
+
+def get_ingestion_status() -> dict:
+    if _last_frame_at is None:
+        return {"status": "unavailable", "detail": "No telemetry frame received since startup"}
+    age_seconds = (datetime.now(timezone.utc) - _last_frame_at).total_seconds()
+    if age_seconds <= 15:
+        return {"status": "healthy", "detail": f"Last frame {age_seconds:.0f}s ago"}
+    if age_seconds <= 60:
+        return {"status": "degraded", "detail": f"Last frame {age_seconds:.0f}s ago"}
+    return {"status": "unavailable", "detail": f"Last frame {age_seconds:.0f}s ago"}
+
 
 def _to_contract_frame(raw: dict) -> dict:
     return {field: raw[field] for field in CONTRACT_FIELDS if field in raw}
@@ -184,6 +200,8 @@ async def run_ingestion_loop(stop_event: asyncio.Event) -> None:
                         # persistence/incident-triggering happens off-queue.
                         await broadcast_manager.broadcast(_to_contract_frame(raw))
                         await queue.put(raw)
+                        global _last_frame_at
+                        _last_frame_at = datetime.now(timezone.utc)
             except asyncio.CancelledError:
                 raise
             except Exception as exc:

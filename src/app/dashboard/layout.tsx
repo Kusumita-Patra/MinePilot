@@ -27,7 +27,7 @@ function DashboardChrome({ children }: { children: React.ReactNode }) {
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RequireAuth allowedRoles={["mine_manager"]}>
+    <RequireAuth allowedRoles={["mine_manager", "administrator"]}>
       <TelemetryProvider>
         <DashboardChrome>{children}</DashboardChrome>
       </TelemetryProvider>

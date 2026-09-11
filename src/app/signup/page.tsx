@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { register, login } from "@/lib/api";
-import { useAuthStore, type UserRole } from "@/lib/authStore";
+import { useAuthStore } from "@/lib/authStore";
+
+// Public signup only ever creates these two roles — administrator accounts
+// are never self-registerable (see backend/scripts/promote_to_admin.py).
+type SelfRegisterableRole = "mine_manager" | "field_worker";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -13,7 +17,7 @@ export default function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [role, setRole] = useState<UserRole>("mine_manager");
+  const [role, setRole] = useState<SelfRegisterableRole>("mine_manager");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
