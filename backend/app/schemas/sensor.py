@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.enums import SensorConfigStatus, SensorType
+from app.models.enums import SensorConfigStatus, SensorSourceType, SensorType
 from app.schemas.blueprint import SectorId
 
 CalibrationStatus = Literal["VALID", "DUE_SOON", "OVERDUE"]
@@ -31,6 +31,7 @@ class SensorConfigResponse(BaseModel):
     manufacturer: str | None
     model: str | None
     status: SensorConfigStatus
+    source_type: SensorSourceType
     blueprint_id: uuid.UUID
     section_id: uuid.UUID | None
     sector_id: str
@@ -61,6 +62,7 @@ class SensorConfigCreate(BaseModel):
     sensor_type: SensorType
     manufacturer: str | None = Field(default=None, max_length=200)
     model: str | None = Field(default=None, max_length=200)
+    source_type: SensorSourceType = SensorSourceType.REAL
     blueprint_id: uuid.UUID
     section_id: uuid.UUID | None = None
     sector_id: SectorId
@@ -80,6 +82,7 @@ class SensorConfigUpdate(BaseModel):
     sensor_type: SensorType | None = None
     manufacturer: str | None = Field(default=None, max_length=200)
     model: str | None = Field(default=None, max_length=200)
+    source_type: SensorSourceType | None = None
     warning_threshold: float | None = None
     critical_threshold: float | None = None
     installation_date: date | None = None

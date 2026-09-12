@@ -22,12 +22,16 @@ CAPABILITIES: list[tuple[str, str]] = [
     ("governance.edit", "Edit alert rules / compliance rules"),
     ("audit_logs.view", "View audit logs"),
     ("system_health.view", "View system health"),
+    ("corrective_actions.manage", "Create / assign / prioritize corrective actions"),
+    ("corrective_actions.verify", "Verify completed corrective actions"),
 ]
 
 CAPABILITY_KEYS = {key for key, _ in CAPABILITIES}
 
 # field_worker ("Field Inspector") access is fixed by product decision, not
-# admin-editable: they can transition incidents (assign/resolve/escalate)
-# and nothing else. Only mine_manager's row in role_permissions is ever
-# read/written dynamically — see permission_service.py.
-FIELD_WORKER_FIXED_CAPABILITIES = {"incidents.transition"}
+# admin-editable: they can transition incidents (assign/resolve/escalate),
+# verify completed corrective actions (the same "confirms the physical fix
+# on the ground" role they already play for incidents), and nothing else.
+# Only mine_manager's row in role_permissions is ever read/written
+# dynamically — see permission_service.py.
+FIELD_WORKER_FIXED_CAPABILITIES = {"incidents.transition", "corrective_actions.verify"}

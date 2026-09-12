@@ -9,10 +9,11 @@ from app.models.role_permission import RolePermission
 from app.services import permission_service
 
 
-def test_field_worker_fixed_capabilities_is_exactly_incidents_transition():
+def test_field_worker_fixed_capabilities_is_exactly_incidents_transition_and_verify():
     # Locks in the product decision: Field Inspector can only ever transition
-    # incidents (assign/resolve/escalate) — nothing admin-editable.
-    assert FIELD_WORKER_FIXED_CAPABILITIES == {"incidents.transition"}
+    # incidents (assign/resolve/escalate) and verify completed corrective
+    # actions — nothing else admin-editable.
+    assert FIELD_WORKER_FIXED_CAPABILITIES == {"incidents.transition", "corrective_actions.verify"}
 
 
 @pytest.mark.asyncio

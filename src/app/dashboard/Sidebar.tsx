@@ -17,6 +17,7 @@ import {
   Gavel,
   ScrollText,
   Activity,
+  Leaf,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -39,6 +40,7 @@ const NAV_ITEMS = [
   { label: "Reports", href: "/dashboard/reports", icon: FileText },
   { label: "Documents", href: "/dashboard/documents", icon: FolderOpen, badge: "documents" as const },
   { label: "Contractors", href: "/dashboard/contractors", icon: Users, badge: "contractors" as const },
+  { label: "Sustainability", href: "/dashboard/sustainability", icon: Leaf },
   { label: "Workforce", href: "/dashboard/workforce", icon: UserCog },
 ];
 

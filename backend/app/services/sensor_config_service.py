@@ -146,6 +146,7 @@ async def create_sensor(db: AsyncSession, payload: SensorConfigCreate, created_b
         sensor_type=payload.sensor_type,
         manufacturer=payload.manufacturer,
         model=payload.model,
+        source_type=payload.source_type,
         blueprint_id=payload.blueprint_id,
         section_id=payload.section_id,
         sector_id=payload.sector_id,

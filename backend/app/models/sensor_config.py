@@ -6,7 +6,14 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
-from app.models.enums import SensorConfigStatus, SensorType, sensor_config_status_enum, sensor_type_enum
+from app.models.enums import (
+    SensorConfigStatus,
+    SensorSourceType,
+    SensorType,
+    sensor_config_status_enum,
+    sensor_source_type_enum,
+    sensor_type_enum,
+)
 
 
 class SensorConfig(Base):
@@ -41,6 +48,13 @@ class SensorConfig(Base):
     model: Mapped[str | None] = mapped_column(String, nullable=True)
     status: Mapped[SensorConfigStatus] = mapped_column(
         sensor_config_status_enum, nullable=False, server_default=SensorConfigStatus.ACTIVE.value
+    )
+    # Data-provenance flag for the Sustainability module (environmental
+    # sensors especially — there's no real hardware integration yet, so most
+    # rows will be SIMULATED/MANUAL). Defaults to REAL so every pre-existing
+    # safety sensor's behavior is unchanged by this column's addition.
+    source_type: Mapped[SensorSourceType] = mapped_column(
+        sensor_source_type_enum, nullable=False, server_default=SensorSourceType.REAL.value
     )
 
     blueprint_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("mine_blueprints.id"), nullable=False)

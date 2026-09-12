@@ -11,13 +11,17 @@ from app.routers import (
     analytics,
     auth,
     blueprints,
+    corrective_actions,
+    environment,
     health,
     incidents,
     inspections,
     kpis,
     sensors,
+    sustainability,
     telemetry,
     users,
+    water,
 )
 from app.services.telemetry_service import run_ingestion_loop
 
@@ -60,3 +64,7 @@ app.include_router(users.router)
 app.include_router(blueprints.router)
 app.include_router(admin.router)
 app.include_router(sensors.router)
+app.include_router(environment.router)
+app.include_router(water.router)
+app.include_router(corrective_actions.router)
+app.include_router(sustainability.router)
