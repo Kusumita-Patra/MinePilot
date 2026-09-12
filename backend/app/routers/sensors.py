@@ -79,8 +79,10 @@ async def create_sensor(
         resource_type="sensor",
         resource_id=config.sensor_id,
         description=f"Registered sensor {config.sensor_id} ({config.sensor_type.value}) at {config.level_label}/{config.sector_id}",
+        commit=False,
     )
-    enriched = await sensor_config_service.get_sensor(db, config.sensor_id)
+    enriched = await sensor_config_service.enrich_one(db, config)
+    await db.commit()
     return success_body(
         SensorConfigResponse(**enriched).model_dump(mode="json"),
         message="Sensor registered successfully",
@@ -103,8 +105,10 @@ async def update_sensor(
         resource_id=config.sensor_id,
         description=f"Updated configuration for sensor {config.sensor_id}",
         metadata={"changed_fields": list(payload.model_dump(exclude_unset=True).keys())},
+        commit=False,
     )
-    enriched = await sensor_config_service.get_sensor(db, sensor_id)
+    enriched = await sensor_config_service.enrich_one(db, config)
+    await db.commit()
     return success_body(
         SensorConfigResponse(**enriched).model_dump(mode="json"),
         message="Sensor updated successfully",
@@ -132,8 +136,10 @@ async def update_sensor_status(
         resource_type="sensor",
         resource_id=config.sensor_id,
         description=f"{verb} sensor {config.sensor_id}",
+        commit=False,
     )
-    enriched = await sensor_config_service.get_sensor(db, sensor_id)
+    enriched = await sensor_config_service.enrich_one(db, config)
+    await db.commit()
     return success_body(
         SensorConfigResponse(**enriched).model_dump(mode="json"),
         message="Sensor status updated successfully",
@@ -159,8 +165,10 @@ async def update_sensor_location(
             f"{previous_location['sector_id']} to {config.level_label}/{config.sector_id}"
         ),
         metadata={"previous_location": previous_location},
+        commit=False,
     )
-    enriched = await sensor_config_service.get_sensor(db, sensor_id)
+    enriched = await sensor_config_service.enrich_one(db, config)
+    await db.commit()
     return success_body(
         SensorConfigResponse(**enriched).model_dump(mode="json"),
         message="Sensor location updated successfully",

@@ -72,6 +72,14 @@ def _is_reporting(last_seen_at: datetime | None) -> bool:
     return age.total_seconds() <= OFFLINE_SENSOR_THRESHOLD_SECONDS
 
 
+async def enrich_one(db: AsyncSession, config: SensorConfig) -> dict:
+    """Single-config convenience wrapper around `_enrich`, for a router that
+    already holds the just-written ORM object in hand — reads it back via the
+    same open transaction instead of re-SELECTing the row it just wrote."""
+    enriched = await _enrich(db, [config])
+    return enriched[0]
+
+
 async def _enrich(db: AsyncSession, configs: list[SensorConfig]) -> list[dict]:
     sensor_ids = [c.sensor_id for c in configs]
     readings = await _latest_readings(db, sensor_ids)
@@ -153,7 +161,16 @@ async def create_sensor(db: AsyncSession, payload: SensorConfigCreate, created_b
         created_by=created_by,
     )
     db.add(config)
-    await db.commit()
+    # Deliberately no commit here — the caller stages an audit-log insert
+    # alongside this write and commits both together in one round trip (see
+    # audit_service.record's `commit` param). Still on the same open
+    # connection, so flush()+refresh() only add cheap same-connection
+    # queries, not another NullPool connection teardown/rebuild.
+    # refresh() is required (not optional): `updated_at`'s onupdate=func.now()
+    # leaves that column expired after flush, and _enrich()'s synchronous
+    # getattr() over every column would otherwise trigger an implicit lazy
+    # load outside an awaited context (sqlalchemy.exc.MissingGreenlet).
+    await db.flush()
     await db.refresh(config)
     return config
 
@@ -162,7 +179,9 @@ async def update_sensor(db: AsyncSession, sensor_id: str, payload: SensorConfigU
     config = await get_sensor_config(db, sensor_id)
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(config, field, value)
-    await db.commit()
+    # No commit — see create_sensor's comment above; the caller commits once
+    # after also staging the audit-log entry for this update.
+    await db.flush()
     await db.refresh(config)
     return config
 
@@ -170,7 +189,8 @@ async def update_sensor(db: AsyncSession, sensor_id: str, payload: SensorConfigU
 async def update_status(db: AsyncSession, sensor_id: str, new_status: SensorConfigStatus) -> SensorConfig:
     config = await get_sensor_config(db, sensor_id)
     config.status = new_status
-    await db.commit()
+    # No commit — see create_sensor's comment above.
+    await db.flush()
     await db.refresh(config)
     return config
 
@@ -190,7 +210,8 @@ async def update_location(db: AsyncSession, sensor_id: str, payload: SensorLocat
     config.depth = payload.depth
     config.pixel_x = payload.pixel_x
     config.pixel_y = payload.pixel_y
-    await db.commit()
+    # No commit — see create_sensor's comment above.
+    await db.flush()
     await db.refresh(config)
     return config, previous_location
 
