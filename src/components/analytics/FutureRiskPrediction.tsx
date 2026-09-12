@@ -60,7 +60,7 @@ export default function FutureRiskPrediction({ sectorId }: { sectorId: string | 
     };
   }, [sectorId]);
 
-  const forecast = prediction?.forecast_15min ?? null;
+  const forecast = prediction?.forecast ?? null;
   const trend = forecast ? forecast.predicted_risk_score - (prediction?.risk_score ?? 0) : 0;
   const suggestions = prediction ? suggestionsForFactors(prediction.anomaly_factors) : [];
 

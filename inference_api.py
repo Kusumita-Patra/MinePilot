@@ -6,7 +6,7 @@ Docs at:   http://127.0.0.1:8000/docs
 
 Accepts telemetry (single reading or a short rolling window) and returns
 an immediate risk classification using risk_scoring.calculate_risk_index,
-plus an optional 15-minutes-ahead forecast if the forecast model is present.
+plus an optional 1-hour-ahead forecast if the forecast model is present.
 """
 
 import os
@@ -58,7 +58,7 @@ class PredictRiskRequest(BaseModel):
     # Accept either a single latest reading, or a short window (list) of
     # recent readings — the API uses the most recent one for scoring and,
     # if a forecast model is available and enough history is given, produces
-    # a 15-min-ahead forecast from the rolling window.
+    # a 1-hour-ahead forecast from the rolling window.
     telemetry: List[TelemetryReading] = Field(..., min_items=1)
 
 
@@ -68,7 +68,7 @@ class PredictRiskResponse(BaseModel):
     risk_score: int
     risk_level: str
     anomaly_factors: List[str]
-    forecast_15min: Optional[dict] = None
+    forecast: Optional[dict] = None
 
 
 _forecast_model = None
@@ -178,7 +178,7 @@ def predict_risk(req: PredictRiskRequest):
         risk_score=result["risk_score"],
         risk_level=result["risk_level"],
         anomaly_factors=result["anomaly_factors"],
-        forecast_15min=forecast_out,
+        forecast=forecast_out,
     )
 
 

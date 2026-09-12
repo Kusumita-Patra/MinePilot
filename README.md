@@ -144,10 +144,9 @@ Then open **http://localhost:3000**.
   limit is already crossed. `calculate_risk_index` hard-clamps to
   `risk_score=100 / CRITICAL` on any threshold breach *before* consulting
   either model.
-- **Why the forecast model matters operationally:** a 15-minute lead time is
-  roughly enough for field staff to evacuate a sector via the incident
-  ticket lifecycle (`TRIGGERED → ASSIGNED → …`) before a WARNING becomes
-  CRITICAL.
+- **Why the forecast model matters operationally:** a 1-hour lead time gives
+  field staff enough runway to evacuate a sector via the incident ticket
+  lifecycle (`TRIGGERED → ASSIGNED → …`) before a WARNING becomes CRITICAL.
 - **Graceful degradation:** `risk_scoring.py` never crashes if a model file
   is missing — it falls back to rule-based scoring only.
 

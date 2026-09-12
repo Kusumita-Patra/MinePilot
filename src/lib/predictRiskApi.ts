@@ -18,7 +18,7 @@ export interface PredictRiskResponse {
   risk_score: number;
   risk_level: "NORMAL" | "WARNING" | "CRITICAL";
   anomaly_factors: string[];
-  forecast_15min: PredictRiskForecast | null;
+  forecast: PredictRiskForecast | null;
 }
 
 export async function predictRisk(params: {

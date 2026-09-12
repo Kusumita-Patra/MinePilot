@@ -1,9 +1,9 @@
 """
-Time-Series Forecasting: Risk Index 15 Minutes Ahead
+Time-Series Forecasting: Risk Index 1 Hour Ahead
 ======================================================
 Builds rolling-window rate-of-change features per sector and trains a
-regressor to predict the current-rule-based risk_score value 15 minutes
-into the future (30 samples ahead at 30s/sample).
+regressor to predict the current-rule-based risk_score value 1 hour
+into the future (120 samples ahead at 30s/sample).
 
 Tries XGBoost first (best performance); falls back automatically to
 sklearn's GradientBoostingRegressor if xgboost isn't installed, so this
@@ -26,7 +26,7 @@ from risk_scoring import FEATURE_ORDER, THRESHOLDS, WEIGHTS
 DATA_PATH = "data/telemetry_timeseries.csv"
 MODEL_DIR = "models"
 ROLLING_WINDOW = 10
-HORIZON_STEPS = 30  # 30 samples * 30s = 15 minutes ahead
+HORIZON_STEPS = 120  # 120 samples * 30s = 60 minutes ahead
 
 try:
     from xgboost import XGBRegressor
@@ -102,7 +102,7 @@ def main():
 
     mae = mean_absolute_error(y_test, preds)
     r2 = r2_score(y_test, preds)
-    print(f"15-min-ahead risk forecast -> MAE: {mae:.2f} points, R^2: {r2:.3f}")
+    print(f"1-hour-ahead risk forecast -> MAE: {mae:.2f} points, R^2: {r2:.3f}")
 
     joblib.dump(model, f"{MODEL_DIR}/forecast_model.joblib")
     joblib.dump({"feature_cols": feature_cols, "backend": BACKEND, "horizon_steps": HORIZON_STEPS},
