@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Radio } from "lucide-react";
 import { getAlertRules, updateAlertRule, type AlertRule } from "@/lib/api";
+
+// The only rule_key with a live telemetry field behind it — see backend
+// governance_risk_service.py's GAS_CONCENTRATION_RULE_KEY. The rest
+// (ventilation, equipment_health, document_expiry, contractor_risk,
+// incident_risk) have no telemetry-derived data source to evaluate against
+// yet, so they stay governance records only.
+const LIVE_RULE_KEYS = new Set(["gas_concentration"]);
 
 /** Shared by /admin/alerts (always editable) and a manager/worker's own
  * dashboard when granted `governance.edit` — read-only otherwise. */
@@ -52,14 +59,23 @@ export default function AlertRulesPanel({ canEdit }: { canEdit: boolean }) {
 
   return (
     <div className="space-y-4">
+      <div className="bg-emerald-500/10 border border-emerald-400/20 rounded-lg p-3 flex items-start gap-2">
+        <Radio size={15} className="text-emerald-400 shrink-0 mt-0.5" />
+        <p className="text-xs text-emerald-200/90">
+          <strong>Gas Concentration</strong> is now live-enforced: our own backend (not Team 2&apos;s{" "}
+          <code className="px-1 py-0.5 bg-black/20 rounded">risk_scoring.py</code>, which this project still
+          never modifies) re-checks every telemetry frame against this threshold and escalates the sensor&apos;s
+          risk level when breached — it can only raise Team 2&apos;s assessment, never lower it. Editing the
+          value here changes real alerting within ~15s.
+        </p>
+      </div>
       <div className="bg-amber-500/10 border border-amber-400/20 rounded-lg p-3 flex items-start gap-2">
         <AlertTriangle size={15} className="text-amber-400 shrink-0 mt-0.5" />
         <p className="text-xs text-amber-200/90">
-          Governance record only, not yet consumed by the live risk engine. Actual risk scoring runs in
-          Team 2&apos;s <code className="px-1 py-0.5 bg-black/20 rounded">risk_scoring.py</code>, which this
-          project does not modify — editing a value here updates this stored record but does not currently
-          change what triggers a real alert or incident. Kept here so thresholds have one authoritative,
-          auditable home, ready for future integration.
+          The other rules below are still governance records only — Ventilation, Equipment Health, Document
+          Expiry, Contractor Risk, and Incident Risk have no live telemetry-derived data source to evaluate
+          against yet, so editing them updates the stored record but does not currently change what triggers
+          a real alert or incident.
         </p>
       </div>
 
@@ -81,7 +97,20 @@ export default function AlertRulesPanel({ canEdit }: { canEdit: boolean }) {
             <tbody>
               {rules.map((rule) => (
                 <tr key={rule.id} className="border-b border-white/5 last:border-0">
-                  <td className="px-4 py-2.5 text-neutral-200">{rule.display_name}</td>
+                  <td className="px-4 py-2.5 text-neutral-200">
+                    <div className="flex items-center gap-2">
+                      {rule.display_name}
+                      {LIVE_RULE_KEYS.has(rule.rule_key) ? (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 uppercase tracking-wide">
+                          Live
+                        </span>
+                      ) : (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-neutral-700/40 text-neutral-500 uppercase tracking-wide">
+                          Record only
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-4 py-2.5">
                     {canEdit ? (
                       <input

@@ -9,6 +9,7 @@ import {
   getSensorHistory,
   updateSensor,
   updateSensorStatus,
+  SENSOR_TYPE_WITH_LIVE_METRIC,
   type SensorConfig,
   type SensorConfigStatus,
   type SensorHistoryEntry,
@@ -71,6 +72,8 @@ export default function SensorDetailPage() {
 
   if (loading) return <p className="text-sm text-neutral-500">Loading…</p>;
   if (error || !sensor) return <p className="text-sm text-red-400">{error ?? "Sensor not found"}</p>;
+
+  const isLiveEnforced = sensor.sensor_type in SENSOR_TYPE_WITH_LIVE_METRIC;
 
   return (
     <div className="space-y-4">
@@ -147,9 +150,19 @@ export default function SensorDetailPage() {
           </div>
           <div className="bg-gray-900 border border-white/10 rounded-xl p-4 space-y-2">
             <p className="text-xs font-semibold text-neutral-300 tracking-wide uppercase">Thresholds</p>
-            <p className="text-[11px] text-amber-400/80">
-              Governance record only — not yet consumed by the live risk engine (owned by Team 2).
-            </p>
+            {isLiveEnforced ? (
+              <p className="text-[11px] text-emerald-400/80">
+                Live-enforced: our backend re-checks every {SENSOR_TYPE_WITH_LIVE_METRIC[sensor.sensor_type]} reading
+                against these values and escalates this sensor&apos;s risk level on breach — it can only raise Team
+                2&apos;s assessment, never lower it. Changing a value here takes effect within ~15s.
+              </p>
+            ) : (
+              <p className="text-[11px] text-amber-400/80">
+                Governance record only — {sensor.sensor_type.replace(/_/g, " ").toLowerCase()} sensors have no
+                matching live telemetry field yet, so this threshold isn&apos;t evaluated. Methane, Carbon
+                Monoxide, Temperature, Dust, and Vibration sensors are live-enforced.
+              </p>
+            )}
             <Row label="Warning" value={sensor.warning_threshold != null ? String(sensor.warning_threshold) : "—"} />
             <Row label="Critical" value={sensor.critical_threshold != null ? String(sensor.critical_threshold) : "—"} />
           </div>

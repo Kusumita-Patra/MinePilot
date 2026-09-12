@@ -16,6 +16,20 @@ export type SensorType =
 export type SensorConfigStatus = "ACTIVE" | "INACTIVE" | "MAINTENANCE" | "RETIRED";
 export type CalibrationStatus = "VALID" | "DUE_SOON" | "OVERDUE";
 
+// Mirrors backend governance_risk_service.py's SENSOR_TYPE_METRIC exactly —
+// the sensor types whose warning/critical thresholds are now live-enforced
+// (escalate this sensor's risk level on breach) because the frozen
+// SensorFrame telemetry contract carries a matching raw field. Sensor types
+// not listed here (VENTILATION, HUMIDITY, PRESSURE, ELECTRICAL, NOISE) have
+// no matching field yet, so their thresholds stay display-only.
+export const SENSOR_TYPE_WITH_LIVE_METRIC: Partial<Record<SensorType, string>> = {
+  METHANE: "ch4_pct",
+  CARBON_MONOXIDE: "co_ppm",
+  TEMPERATURE: "temp_c",
+  DUST: "dust_pm10",
+  VIBRATION: "displacement_mm",
+};
+
 export interface CurrentReading {
   ch4_pct: number;
   co_ppm: number;

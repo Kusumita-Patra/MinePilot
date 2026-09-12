@@ -9,10 +9,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.db.database import AsyncSessionLocal
+from app.models.alert_rule import AlertRule
 from app.models.enums import RiskLevel
 from app.models.sensor import Sensor
+from app.models.sensor_config import SensorConfig
 from app.models.telemetry_reading import TelemetryReading
-from app.services import incident_service
+from app.services import governance_risk_service, incident_service
 
 logger = logging.getLogger("minepilot.backend.telemetry")
 settings = get_settings()
@@ -77,7 +79,57 @@ def _format_timestamp(value: datetime) -> str:
     return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+# Governance thresholds (AlertRule/SensorConfig) are evaluated against every
+# single frame, but the frame-read loop below is deliberately DB-free (see
+# its own comment on why broadcast happens before persistence) — so this
+# cache is refreshed on a timer instead of once per frame. A NullPool session
+# open (~1s, see _BATCH_MAX's comment) amortized over a whole TTL window
+# rather than paid per frame is the same trade-off already made elsewhere in
+# this file; a stale-by-at-most-TTL admin edit is an acceptable cost for it.
+_GOVERNANCE_CACHE_TTL_SECONDS = 15
+_governance_cache: tuple[dict[str, AlertRule], dict[str, SensorConfig]] = ({}, {})
+_governance_cache_at: datetime | None = None
+_governance_cache_lock = asyncio.Lock()
+
+
+async def _get_governance_snapshot() -> tuple[dict[str, AlertRule], dict[str, SensorConfig]]:
+    global _governance_cache, _governance_cache_at
+    now = datetime.now(timezone.utc)
+    if _governance_cache_at is not None and (now - _governance_cache_at).total_seconds() < _GOVERNANCE_CACHE_TTL_SECONDS:
+        return _governance_cache
+    async with _governance_cache_lock:
+        now = datetime.now(timezone.utc)
+        if _governance_cache_at is not None and (now - _governance_cache_at).total_seconds() < _GOVERNANCE_CACHE_TTL_SECONDS:
+            return _governance_cache
+        try:
+            async with AsyncSessionLocal() as db:
+                alert_rules = await governance_risk_service.load_alert_rules(db)
+                sensor_configs = await governance_risk_service.load_sensor_configs(db)
+            _governance_cache = (alert_rules, sensor_configs)
+            _governance_cache_at = now
+        except Exception:
+            logger.exception("Failed to refresh governance threshold cache; keeping the previous snapshot")
+    return _governance_cache
+
+
+async def _apply_governance(raw: dict) -> None:
+    """Mutates `raw`'s risk_score/risk_level in place if an admin-configured
+    threshold is breached and more severe than T2's own assessment. Runs
+    before both broadcast and persistence so the live 3D twin, the stored
+    reading, and any triggered incident all agree on the escalated level."""
+    alert_rules, sensor_configs = await _get_governance_snapshot()
+    governance_level = governance_risk_service.evaluate(raw, alert_rules, sensor_configs)
+    risk_score, risk_level = governance_risk_service.apply_escalation(
+        int(raw["risk_score"]), RiskLevel(raw["risk_level"]), governance_level
+    )
+    raw["risk_score"] = risk_score
+    raw["risk_level"] = risk_level.value
+
+
 async def _process_frame(db: AsyncSession, raw: dict) -> None:
+    """Persists a frame whose risk_score/risk_level have already been through
+    governance escalation (see `_apply_governance` in the ingestion loop below)
+    — by the time a frame reaches this queue, those fields are final."""
     sensor_id = raw["sensor_id"]
     sector_id = raw["sector_id"]
     telemetry = raw["telemetry"]
@@ -195,6 +247,7 @@ async def run_ingestion_loop(stop_event: asyncio.Event) -> None:
                         except Exception:
                             logger.exception("Failed to parse an upstream telemetry frame")
                             continue
+                        await _apply_governance(raw)
                         # Broadcast immediately (in-memory, effectively free) so
                         # live viewers aren't held up by a DB round-trip either;
                         # persistence/incident-triggering happens off-queue.
