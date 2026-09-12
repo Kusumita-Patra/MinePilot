@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useIncidents } from "@/hooks/useIncidents";
 import type { IncidentPatch } from "@/lib/offlineQueue";
@@ -8,6 +8,35 @@ import { useAuthStore } from "@/lib/authStore";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import RequireAuth from "@/components/RequireAuth";
 import type { Incident } from "../../../shared/types/telemetry";
+import type { EmergencyEvent } from "../../../shared/types/emergency";
+import { getEmergencyEvents } from "@/lib/emergencyApi";
+import EmergencyModeView from "./EmergencyModeView";
+
+const NON_TERMINAL = new Set(["DETECTED", "ACTIVE", "ACKNOWLEDGED", "ESCALATED", "EVACUATION_ACTIVE"]);
+
+function useActiveEmergency() {
+  const [event, setEvent] = useState<EmergencyEvent | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    function refresh() {
+      getEmergencyEvents()
+        .then((events) => {
+          if (cancelled) return;
+          setEvent(events.find((e) => NON_TERMINAL.has(e.status)) ?? null);
+        })
+        .catch(() => {});
+    }
+    refresh();
+    const interval = setInterval(refresh, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  return event;
+}
 
 function FieldWorkerView() {
   const { incidents, loading, isOffline, pendingCount, updateIncidentOffline } = useIncidents();
@@ -15,9 +44,14 @@ function FieldWorkerView() {
   const workerName = useAuthStore((s) => s.user?.full_name);
   const [remarksByTicket, setRemarksByTicket] = useState<Record<string, string>>({});
   const [busyTicket, setBusyTicket] = useState<string | null>(null);
+  const activeEmergency = useActiveEmergency();
 
   // Field staff only care about tickets that aren't closed out yet.
   const active = incidents.filter((i) => i.status !== "SIGNED_OFF");
+
+  if (activeEmergency) {
+    return <EmergencyModeView event={activeEmergency} />;
+  }
 
   async function act(ticket: Incident, patch: IncidentPatch) {
     setBusyTicket(ticket.ticket_id);

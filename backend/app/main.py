@@ -12,6 +12,7 @@ from app.routers import (
     auth,
     blueprints,
     corrective_actions,
+    emergency,
     environment,
     health,
     incidents,
@@ -23,6 +24,7 @@ from app.routers import (
     users,
     water,
 )
+from app.services.emergency_escalation_service import run_emergency_escalation_loop
 from app.services.telemetry_service import run_ingestion_loop
 
 settings = get_settings()
@@ -32,11 +34,20 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     stop_event = asyncio.Event()
     ingestion_task = asyncio.create_task(run_ingestion_loop(stop_event))
+    # Second background task, same stop_event/cancel shape as the telemetry
+    # ingestion loop above — the escalation timer needs a proactive tick to
+    # auto-escalate a live emergency without anyone refreshing a page.
+    escalation_task = asyncio.create_task(run_emergency_escalation_loop(stop_event))
     yield
     stop_event.set()
     ingestion_task.cancel()
+    escalation_task.cancel()
     try:
         await ingestion_task
+    except asyncio.CancelledError:
+        pass
+    try:
+        await escalation_task
     except asyncio.CancelledError:
         pass
 
@@ -68,3 +79,4 @@ app.include_router(environment.router)
 app.include_router(water.router)
 app.include_router(corrective_actions.router)
 app.include_router(sustainability.router)
+app.include_router(emergency.router)

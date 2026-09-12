@@ -13,6 +13,7 @@ import {
   ScrollText,
   Activity,
   Settings,
+  Siren,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -46,6 +47,10 @@ const NAV_GROUPS: {
   {
     heading: "Alert Configuration",
     items: [{ label: "Alert Rules", href: "/admin/alerts", icon: Bell }],
+  },
+  {
+    heading: "Emergency Safety",
+    items: [{ label: "Emergency Config", href: "/admin/safety/emergency", icon: Siren }],
   },
   { heading: null, items: [{ label: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText }] },
   { heading: null, items: [{ label: "System Health", href: "/admin/system-health", icon: Activity }] },

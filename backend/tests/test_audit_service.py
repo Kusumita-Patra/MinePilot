@@ -11,7 +11,7 @@ def test_record_signature_has_no_raw_passthrough():
     # below — never a raw request body / headers dict — so a password or JWT
     # can't end up in an audit row just because a caller passed one in.
     params = inspect.signature(audit_service.record).parameters
-    assert set(params) == {"db", "actor", "action", "resource_type", "description", "resource_id", "metadata"}
+    assert set(params) == {"db", "actor", "action", "resource_type", "description", "resource_id", "metadata", "commit"}
     assert not any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values())
 
 

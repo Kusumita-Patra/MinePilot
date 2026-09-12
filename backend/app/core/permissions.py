@@ -24,6 +24,11 @@ CAPABILITIES: list[tuple[str, str]] = [
     ("system_health.view", "View system health"),
     ("corrective_actions.manage", "Create / assign / prioritize corrective actions"),
     ("corrective_actions.verify", "Verify completed corrective actions"),
+    ("emergency.acknowledge", "Acknowledge an active emergency"),
+    ("emergency.escalate", "Manually escalate, activate evacuation, block/unblock evacuation routes"),
+    ("emergency.resolve", "Resolve or cancel an emergency"),
+    ("emergency.configure", "Configure emergency rules and evacuation exits"),
+    ("emergency.simulate", "Trigger simulated emergencies and worker-position advances (demo)"),
 ]
 
 CAPABILITY_KEYS = {key for key, _ in CAPABILITIES}

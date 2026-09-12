@@ -10,11 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import get_settings
 from app.db.database import AsyncSessionLocal
 from app.models.alert_rule import AlertRule
-from app.models.enums import RiskLevel
+from app.models.enums import HazardType, RiskLevel
 from app.models.sensor import Sensor
 from app.models.sensor_config import SensorConfig
 from app.models.telemetry_reading import TelemetryReading
-from app.services import governance_risk_service, incident_service
+from app.services import emergency_event_service, emergency_rule_service, governance_risk_service, incident_service
 
 logger = logging.getLogger("minepilot.backend.telemetry")
 settings = get_settings()
@@ -174,6 +174,16 @@ async def _process_frame(db: AsyncSession, raw: dict) -> None:
 
     if risk_level != RiskLevel.NORMAL:
         await incident_service.trigger_incident(db, sensor_id, sector_id, risk_score, risk_level)
+
+    # Emergency detection is keyed on the raw telemetry field for a hazard
+    # type (ch4_pct for METHANE), never on risk_level/risk_score — those are
+    # blended signals that don't identify a specific hazard, and this must
+    # never read or mutate T2's risk engine output. See
+    # emergency_event_service.detect_and_create.
+    rule = await emergency_rule_service.get_active_rule(db, HazardType.METHANE)
+    ch4 = telemetry.get("ch4_pct")
+    if rule is not None and ch4 is not None and rule.critical_threshold is not None and ch4 >= rule.critical_threshold:
+        await emergency_event_service.detect_and_create(db, HazardType.METHANE, sector_id, sensor_id, ch4, rule)
 
 
 # Every NullPool session pays a full fresh-connection round trip to Supabase

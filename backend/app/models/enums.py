@@ -172,6 +172,100 @@ class TargetPeriod(str, enum.Enum):
     YEARLY = "YEARLY"
 
 
+class HazardType(str, enum.Enum):
+    """Generic hazard vocabulary for the Emergency Safety module. Only
+    METHANE is reachable by any endpoint in this pass (it reuses the
+    ch4_pct channel already in every SensorFrame) — the others are defined
+    now so a future hazard type is a rule-table row + a detection-hook
+    branch, not a schema migration. Mirrors SensorType carrying far more
+    values than are ever exercised."""
+
+    METHANE = "METHANE"
+    CARBON_MONOXIDE = "CARBON_MONOXIDE"
+    FIRE = "FIRE"
+    FLOOD = "FLOOD"
+    ROCKFALL = "ROCKFALL"
+    EQUIPMENT_FAILURE = "EQUIPMENT_FAILURE"
+    OTHER = "OTHER"
+
+
+class EmergencyEventStatus(str, enum.Enum):
+    # DETECTED is momentary/system-internal only — detect_and_create()
+    # transitions straight to ACTIVE before returning, so a human PATCH
+    # request should never see or target DETECTED.
+    DETECTED = "DETECTED"
+    ACTIVE = "ACTIVE"
+    ACKNOWLEDGED = "ACKNOWLEDGED"
+    ESCALATED = "ESCALATED"
+    EVACUATION_ACTIVE = "EVACUATION_ACTIVE"
+    RESOLVED = "RESOLVED"
+    CANCELLED = "CANCELLED"
+
+
+class EvacuationNodeType(str, enum.Enum):
+    JUNCTION = "JUNCTION"
+    EXIT = "EXIT"
+    REFUGE_CHAMBER = "REFUGE_CHAMBER"
+    WORK_AREA = "WORK_AREA"
+
+
+class EvacuationRouteStatus(str, enum.Enum):
+    ACTIVE = "ACTIVE"
+    INVALIDATED = "INVALIDATED"
+    COMPLETED = "COMPLETED"
+
+
+class WorkerPositionSourceType(str, enum.Enum):
+    # SIMULATED is the only value any endpoint can produce today — no real
+    # underground personnel tracking hardware exists. REAL_TRACKER/MANUAL
+    # are defined now so a future integration doesn't need another
+    # migration, mirroring DataSourceType.REAL_SENSOR's precedent.
+    SIMULATED = "SIMULATED"
+    REAL_TRACKER = "REAL_TRACKER"
+    MANUAL = "MANUAL"
+
+
+class WorkerEvacuationStatus(str, enum.Enum):
+    NOT_AFFECTED = "NOT_AFFECTED"
+    EVACUATION_ASSIGNED = "EVACUATION_ASSIGNED"
+    MOVING = "MOVING"
+    # Reachable via worker_position_service.detect_delayed_workers (real
+    # staleness) or the manual "Worker Not Moving" demo toggle.
+    DELAYED = "DELAYED"
+    ROUTE_CHANGED = "ROUTE_CHANGED"
+    SAFE_AT_EXIT = "SAFE_AT_EXIT"
+    UNACCOUNTED = "UNACCOUNTED"
+    # Unreachable — no real tracker exists to lose signal from.
+    TRACKING_LOST = "TRACKING_LOST"
+
+
+class AlarmState(str, enum.Enum):
+    """The virtual/digital alarm system's 3 states — deliberately not a 1:1
+    mirror of RiskLevel: this is what a worker SEES (a sector-level signal),
+    RiskLevel is what a sensor/edge reports. SAFE also covers "no active
+    hazard" so a configured row always exists to answer "what does the
+    all-clear light look like"."""
+
+    SAFE = "SAFE"
+    CAUTION = "CAUTION"
+    DANGER = "DANGER"
+
+
+class AlarmLightPattern(str, enum.Enum):
+    SOLID = "SOLID"
+    PULSE = "PULSE"
+    STROBE = "STROBE"
+
+
+class AlarmSoundPattern(str, enum.Enum):
+    """Simulated only — see EmergencyRule/notification docstrings elsewhere.
+    No real siren or speaker is ever driven by this value."""
+
+    SILENT = "SILENT"
+    CHIME = "CHIME"
+    SIREN = "SIREN"
+
+
 # Single shared instances so Alembic/SQLAlchemy emit exactly one Postgres
 # ENUM type per name, even though the type is referenced from several tables.
 risk_level_enum = PgEnum(RiskLevel, name="risk_level")
@@ -192,3 +286,12 @@ corrective_action_priority_enum = PgEnum(CorrectiveActionPriority, name="correct
 corrective_action_status_enum = PgEnum(CorrectiveActionStatus, name="corrective_action_status")
 sustainability_category_enum = PgEnum(SustainabilityCategory, name="sustainability_category")
 target_period_enum = PgEnum(TargetPeriod, name="target_period")
+hazard_type_enum = PgEnum(HazardType, name="hazard_type")
+emergency_event_status_enum = PgEnum(EmergencyEventStatus, name="emergency_event_status")
+evacuation_node_type_enum = PgEnum(EvacuationNodeType, name="evacuation_node_type")
+evacuation_route_status_enum = PgEnum(EvacuationRouteStatus, name="evacuation_route_status")
+worker_position_source_type_enum = PgEnum(WorkerPositionSourceType, name="worker_position_source_type")
+worker_evacuation_status_enum = PgEnum(WorkerEvacuationStatus, name="worker_evacuation_status")
+alarm_state_enum = PgEnum(AlarmState, name="alarm_state")
+alarm_light_pattern_enum = PgEnum(AlarmLightPattern, name="alarm_light_pattern")
+alarm_sound_pattern_enum = PgEnum(AlarmSoundPattern, name="alarm_sound_pattern")
