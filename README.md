@@ -147,6 +147,17 @@ Then open **http://localhost:3000**.
 - **Why the forecast model matters operationally:** a 1-hour lead time gives
   field staff enough runway to evacuate a sector via the incident ticket
   lifecycle (`TRIGGERED → ASSIGNED → …`) before a WARNING becomes CRITICAL.
+- **Why the forecast's CRITICAL/WARNING label comes from a separate
+  classifier, not the regression score:** future CRITICAL readings are
+  <0.3% of samples, so a plain regressor minimizing MAE just learns to
+  predict the ~25 baseline and never really tries to fit the rare spikes.
+  `train_forecast_model.py` trains dedicated, class-weighted XGBoost
+  classifiers for "will this reach WARNING/CRITICAL within the horizon"
+  and calibrates each one's decision threshold on a held-out set for a
+  <=0.5% false-positive rate — this is what `/api/v1/predict-risk`'s
+  `forecast.predicted_risk_level` and `*_probability` fields are actually
+  driven by. The regression score is kept only for the continuous number
+  shown in the UI.
 - **Graceful degradation:** `risk_scoring.py` never crashes if a model file
   is missing — it falls back to rule-based scoring only.
 

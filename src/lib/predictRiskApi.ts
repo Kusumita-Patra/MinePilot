@@ -10,6 +10,13 @@ export interface PredictRiskForecast {
   horizon_minutes: number;
   predicted_risk_score: number;
   predicted_risk_level: "NORMAL" | "WARNING" | "CRITICAL";
+  // Calibrated probability from the dedicated alarm classifiers (not always
+  // present — only when the backend trained with xgboost; see
+  // train_forecast_model.py). Thresholded at a low false-positive rate, so
+  // a level of CRITICAL/WARNING here is meaningfully more trustworthy than
+  // a plain score cutoff would be.
+  critical_probability?: number;
+  warning_probability?: number;
 }
 
 export interface PredictRiskResponse {

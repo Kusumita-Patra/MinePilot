@@ -20,7 +20,7 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from risk_scoring import calculate_risk_index, FEATURE_ORDER
+from risk_scoring import calculate_risk_index, FEATURE_ORDER, THRESHOLDS
 from data_generator import SENSORS as SENSOR_CONFIG, SECTORS
 import incidents
 
@@ -73,19 +73,35 @@ class PredictRiskResponse(BaseModel):
 
 _forecast_model = None
 _forecast_meta = None
+_critical_clf = None
+_warning_clf = None
 _forecast_loaded = False
 
 
 def _load_forecast_model():
-    global _forecast_model, _forecast_meta, _forecast_loaded
+    """Loads the forecast regressor (continuous score, for display) plus,
+    if present, the dedicated CRITICAL/WARNING alarm classifiers and their
+    calibrated probability thresholds. The classifiers are what the alarm
+    decision below actually uses when available — trained and calibrated
+    specifically to keep the false-positive rate low (see
+    train_forecast_model.py's calibrate_probability_threshold) — with the
+    regressor's own score cutoffs kept only as a fallback for the
+    sklearn-backend path, which doesn't produce classifiers."""
+    global _forecast_model, _forecast_meta, _critical_clf, _warning_clf, _forecast_loaded
     if not _forecast_loaded:
         model_path = os.path.join(MODEL_DIR, "forecast_model.joblib")
         meta_path = os.path.join(MODEL_DIR, "forecast_model_meta.joblib")
         if os.path.exists(model_path) and os.path.exists(meta_path):
             _forecast_model = joblib.load(model_path)
             _forecast_meta = joblib.load(meta_path)
+            if _forecast_meta.get("has_alarm_classifiers"):
+                crit_path = os.path.join(MODEL_DIR, "forecast_critical_clf.joblib")
+                warn_path = os.path.join(MODEL_DIR, "forecast_warning_clf.joblib")
+                if os.path.exists(crit_path) and os.path.exists(warn_path):
+                    _critical_clf = joblib.load(crit_path)
+                    _warning_clf = joblib.load(warn_path)
         _forecast_loaded = True
-    return _forecast_model, _forecast_meta
+    return _forecast_model, _forecast_meta, _critical_clf, _warning_clf
 
 
 def _build_forecast_features(window: List[TelemetryReading], feature_cols: List[str]) -> Optional[np.ndarray]:
@@ -96,12 +112,16 @@ def _build_forecast_features(window: List[TelemetryReading], feature_cols: List[
         return None
 
     values = {k: np.array([getattr(r, k) for r in window]) for k in FEATURE_ORDER}
+    n = len(window)
+    trend_span = min(10, n - 1)  # mirrors training's ROLLING_WINDOW=10, shrunk for short live windows
     row = {}
     for k in FEATURE_ORDER:
         row[k] = values[k][-1]
         row[f"{k}_roll_mean"] = values[k].mean()
         row[f"{k}_roll_std"] = values[k].std()
         row[f"{k}_rate"] = values[k][-1] - values[k][-2]
+        row[f"{k}_ratio"] = values[k][-1] / THRESHOLDS[k]
+        row[f"{k}_trend"] = (values[k][-1] - values[k][-1 - trend_span]) / trend_span
 
     try:
         return np.array([[row[c] for c in feature_cols]])
@@ -160,17 +180,46 @@ def predict_risk(req: PredictRiskRequest):
         )
 
     forecast_out = None
-    model, meta = _load_forecast_model()
+    model, meta, critical_clf, warning_clf = _load_forecast_model()
     if model is not None and meta is not None:
         feats = _build_forecast_features(req.telemetry, meta["feature_cols"])
         if feats is not None:
             predicted_score = float(np.clip(model.predict(feats)[0], 0, 100))
-            level = "CRITICAL" if predicted_score >= 75 else ("WARNING" if predicted_score >= 40 else "NORMAL")
             forecast_out = {
                 "horizon_minutes": meta["horizon_steps"] * 30 / 60,
                 "predicted_risk_score": round(predicted_score, 1),
-                "predicted_risk_level": level,
             }
+
+            if critical_clf is not None and warning_clf is not None:
+                # Alarm-worthy CRITICAL/WARNING decisions come from the
+                # dedicated classifiers' calibrated probability thresholds,
+                # not the regressor's point estimate — see
+                # train_forecast_model.py for why (extreme class imbalance
+                # made the regressor's own cutoffs both unreliable and,
+                # uncalibrated, prone to false alarms).
+                critical_proba = float(critical_clf.predict_proba(feats)[0, 1])
+                warning_proba = float(warning_clf.predict_proba(feats)[0, 1])
+                if critical_proba >= meta["critical_probability_threshold"]:
+                    level = "CRITICAL"
+                elif warning_proba >= meta["warning_probability_threshold"]:
+                    level = "WARNING"
+                else:
+                    level = "NORMAL"
+                forecast_out["predicted_risk_level"] = level
+                forecast_out["critical_probability"] = round(critical_proba, 3)
+                forecast_out["warning_probability"] = round(warning_proba, 3)
+            else:
+                # sklearn fallback backend: no classifiers, fall back to the
+                # regressor's own calibrated score cutoffs from meta.
+                critical_threshold = meta.get("critical_threshold", 75)
+                warning_threshold = meta.get("warning_threshold", 40)
+                if predicted_score >= critical_threshold:
+                    level = "CRITICAL"
+                elif predicted_score >= warning_threshold:
+                    level = "WARNING"
+                else:
+                    level = "NORMAL"
+                forecast_out["predicted_risk_level"] = level
 
     return PredictRiskResponse(
         sensor_id=req.sensor_id,

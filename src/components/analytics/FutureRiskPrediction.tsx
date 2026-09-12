@@ -106,6 +106,18 @@ export default function FutureRiskPrediction({ sectorId }: { sectorId: string | 
             </p>
           </div>
 
+          {(forecast.critical_probability !== undefined || forecast.warning_probability !== undefined) && (
+            <p className="text-[11px] text-neutral-500">
+              Confidence:{" "}
+              {forecast.predicted_risk_level === "CRITICAL"
+                ? `${Math.round((forecast.critical_probability ?? 0) * 100)}% likelihood of reaching CRITICAL`
+                : forecast.predicted_risk_level === "WARNING"
+                ? `${Math.round((forecast.warning_probability ?? 0) * 100)}% likelihood of reaching WARNING`
+                : "below the calibrated alarm threshold"}{" "}
+              — calibrated for a low false-alarm rate
+            </p>
+          )}
+
           <div>
             <p className="text-[11px] font-semibold text-neutral-400 tracking-wide mb-2">POSSIBLE ACTIONS</p>
             {suggestions.length === 0 ? (

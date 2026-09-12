@@ -30,8 +30,12 @@ SENSORS = {
 
 SECTORS = ["sector_north_wall", "sector_south_face", "sector_shaft_b", "sector_conveyor_3"]
 SAMPLE_INTERVAL_SEC = 30          # one reading every 30s per sensor node
-DAYS_TO_SIMULATE = 10
+DAYS_TO_SIMULATE = 90
 SEED = 42
+# scenario count scales with simulated days so extending the run gives more
+# total dangerous examples (needed to calibrate a rare-event CRITICAL alarm
+# threshold) without changing how often anomalies happen per unit time
+_SCENARIO_DENSITY_SCALE = max(1, DAYS_TO_SIMULATE // 10)
 
 rng = np.random.default_rng(SEED)
 
@@ -92,7 +96,7 @@ def generate_for_sector(sector: str, n_samples: int, rng) -> pd.DataFrame:
     is_anomaly = np.zeros(n_samples, dtype=int)
     scenario = np.array(["normal"] * n_samples, dtype=object)
 
-    n_scenarios = rng.integers(3, 6)
+    n_scenarios = rng.integers(3, 6) * _SCENARIO_DENSITY_SCALE
     for _ in range(n_scenarios):
         kind = rng.choice(["methane_buildup", "strain_accel", "spon_combustion", "multigas_spike"])
         start = int(rng.integers(200, n_samples - 400))
