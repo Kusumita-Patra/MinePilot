@@ -9,10 +9,19 @@
 // via the SectorRegistry (see SectorRegistry.tsx) — never by re-deriving
 // positions from this file.
 //
-// Sector IDs are unchanged from the open-pit version (they're a stored
-// contract shared with the backend/mock data) — only their names,
-// descriptions and what they physically represent were updated for the
-// underground rebuild.
+// Sector ids MUST equal T2's real telemetry sector_id values
+// (data_generator.py SECTORS: sector_north_wall, sector_south_face,
+// sector_shaft_b, sector_conveyor_3) — this file previously used its own
+// separate taxonomy (sector_main_pit / sector_deep_shaft_b /
+// sector_surface_conveyor) for 3 of its 4 sectors, a pre-existing mismatch
+// that silently prevented real risk data from ever coloring those sectors
+// in the 3D view (useSectorRisk's `if (!(sectorId in result)) continue`
+// skipped every sensor whose real sector_id didn't match). Fixed to align
+// with the same mapping backend/alembic/versions/
+// b5c6d7e8f9a0_align_evacuation_graph_sectors_with_telemetry.py already
+// applied to the evacuation graph for the same underlying bug. Display
+// `name`/`description` are unaffected — only the `id` (and therefore the
+// object key) changed.
 // ============================================================================
 
 import type { CameraPreset, MineSectorConfig, MineSectorId } from "./types";
@@ -24,18 +33,18 @@ export const mineSectors: Record<MineSectorId, MineSectorConfig> = {
     name: "North Section",
     description: "Level -1 branch tunnels running north of the main shaft.",
   },
-  sector_deep_shaft_b: {
-    id: "sector_deep_shaft_b",
+  sector_shaft_b: {
+    id: "sector_shaft_b",
     name: "Deep Shaft B",
     description: "Main vertical access shaft, including its narrow lower run and sump.",
   },
-  sector_surface_conveyor: {
-    id: "sector_surface_conveyor",
+  sector_conveyor_3: {
+    id: "sector_conveyor_3",
     name: "Surface Conveyor",
     description: "Surface-level headframe and overland conveyor at the shaft collar.",
   },
-  sector_main_pit: {
-    id: "sector_main_pit",
+  sector_south_face: {
+    id: "sector_south_face",
     name: "Main Tunnel Network",
     description: "Level -2 cross network of tunnels — the main working area.",
   },

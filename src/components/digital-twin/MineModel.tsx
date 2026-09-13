@@ -9,7 +9,7 @@
 //
 // Sector identification for GLB content: the DCC-authored model is expected
 // to name its sector objects exactly like the ids in sectors.ts
-// (sector_north_wall, sector_deep_shaft_b, sector_surface_conveyor —
+// (sector_north_wall, sector_shaft_b, sector_conveyor_3, sector_south_face —
 // e.g. as Blender Empty/object names, which glTF export preserves as
 // `Object3D.name`). On load we walk the scene graph once and register any
 // object whose name matches a known sector id, stamping userData.sectorId

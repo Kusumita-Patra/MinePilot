@@ -23,9 +23,12 @@ export default function DashboardPage() {
   const [cameraPreset, setCameraPreset] = useState<CameraPresetId>(DEFAULT_CAMERA_PRESET);
 
   const sensorList = Object.values(sensors);
-  const avgRisk = sensorList.length
-    ? Math.round(sensorList.reduce((a, s) => a + s.risk_score, 0) / sensorList.length)
-    : 70;
+  // Worst-case, not an average — every other aggregation in this app
+  // (computeSectorStates, governance escalation) uses "worst sensor wins,
+  // never downgrade." Averaging a CRITICAL sector together with calm ones
+  // would dilute the headline into a falsely reassuring number, which is
+  // the wrong failure mode for a safety alarm.
+  const worstRisk = sensorList.length ? Math.max(...sensorList.map((s) => s.risk_score)) : 0;
 
   const blueprintSections = useMemo<BlueprintTunnelSection[]>(() => {
     if (!blueprint) return [];
@@ -75,7 +78,13 @@ export default function DashboardPage() {
           </MineDigitalTwinContainer>
         </div>
 
-        <AiRiskAnalysis riskScore={avgRisk} />
+        <AiRiskAnalysis
+          sensors={sensorList}
+          riskScore={worstRisk}
+          selected={selected}
+          onClearSelection={() => setSelected(null)}
+          onFocusSensor={setSelected}
+        />
       </div>
 
       <AnalyticsSection />

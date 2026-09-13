@@ -6,9 +6,9 @@ import { useAuthStore } from "./authStore";
  * for the same 4 values used by sensor.sector_id). */
 export type BlueprintSectorId =
   | "sector_north_wall"
-  | "sector_deep_shaft_b"
-  | "sector_surface_conveyor"
-  | "sector_main_pit";
+  | "sector_shaft_b"
+  | "sector_conveyor_3"
+  | "sector_south_face";
 
 export type BlueprintZoneType = "NORMAL" | "RESTRICTED" | "EMERGENCY" | "HIGH_RISK" | "WORK_ZONE";
 export type BlueprintSectionStatus = "ACTIVE" | "CLOSED" | "UNDER_MAINTENANCE";

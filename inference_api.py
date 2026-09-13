@@ -239,8 +239,30 @@ def predict_risk(req: PredictRiskRequest):
 # the digital twin frontend has something interesting to render.
 # ---------------------------------------------------------------------------
 
-ANOMALY_KINDS = ["methane_buildup", "strain_accel", "spon_combustion", "multigas_spike", None, None, None]
+ANOMALY_KINDS = ["methane_buildup", "strain_accel", "spon_combustion", "multigas_spike"]
 _SIM_STATE = {}
+
+# Anomaly scheduling is intentionally GLOBAL, not per-sector: each sector used
+# to roll its own independent 8%-per-tick chance with no coordination, so
+# multiple sectors would frequently go CRITICAL at once purely by chance —
+# which, combined with calculate_risk_index's correct-but-unconditional
+# statutory-breach clamp to 100, made the whole facility flash red
+# simultaneously during demos. Real mine incidents are rare and (mostly)
+# uncorrelated across sectors; simulating them that way trains false alarm
+# fatigue into anyone watching the dashboard. Capping to one concurrent
+# anomaly mine-wide, plus a cooldown after it ends, keeps CRITICAL alerts
+# rare, isolated, and attributable to a specific sector — closer to a real
+# rescue-team-paging alarm than a constant klaxon.
+#
+# The original per-sector roll was 8% chance, then a 4-in-7 chance the picked
+# "kind" was actually a real scenario (3 of 7 entries were None, i.e. a no-op)
+# — an effective ~4.6% start rate. Preserved here as an explicit rate instead
+# of encoding it via padding the list with None, now that the list is only
+# ever used to pick which scenario, never whether one happens at all.
+_ANOMALY_START_CHANCE = 0.08 * 4 / 7
+_ANOMALY_COOLDOWN_RANGE = (40, 100)  # global ticks (~1-2.5 min at the 1.5s send interval)
+_active_anomaly_sector: str | None = None
+_global_cooldown_ticks = 0
 
 
 def _init_sim_state():
@@ -262,14 +284,27 @@ _init_sim_state()
 
 
 def _step_sensor(sector: str) -> dict:
+    global _active_anomaly_sector, _global_cooldown_ticks
+
     state = _SIM_STATE[sector]
     vals = state["values"]
 
-    # occasionally start a new anomaly scenario for this sector
-    if state["anomaly_ticks_left"] == 0 and random.random() < 0.08:
-        kind = random.choice(ANOMALY_KINDS)
-        state["anomaly_kind"] = kind
-        state["anomaly_ticks_left"] = random.randint(20, 50) if kind else 0
+    if _global_cooldown_ticks > 0:
+        _global_cooldown_ticks -= 1
+
+    # Only start a new anomaly if this sector is idle, no other sector is
+    # currently mid-anomaly, and we're not in the post-anomaly cooldown —
+    # see the module-level comment above ANOMALY_KINDS for why this is
+    # gated globally instead of per-sector.
+    if (
+        state["anomaly_ticks_left"] == 0
+        and _active_anomaly_sector is None
+        and _global_cooldown_ticks == 0
+        and random.random() < _ANOMALY_START_CHANCE
+    ):
+        state["anomaly_kind"] = random.choice(ANOMALY_KINDS)
+        state["anomaly_ticks_left"] = random.randint(20, 50)
+        _active_anomaly_sector = sector
 
     # baseline mean-reverting random walk
     for k, cfg in SENSOR_CONFIG.items():
@@ -293,6 +328,10 @@ def _step_sensor(sector: str) -> dict:
             vals["co_ppm"] += vals["co_ppm"] * 0.3
             vals["dust_pm10"] += vals["dust_pm10"] * 0.3
         state["anomaly_ticks_left"] -= 1
+        if state["anomaly_ticks_left"] == 0:
+            state["anomaly_kind"] = None
+            _active_anomaly_sector = None
+            _global_cooldown_ticks = random.randint(*_ANOMALY_COOLDOWN_RANGE)
 
     # clip to physically sane bounds
     vals["ch4_pct"] = float(np.clip(vals["ch4_pct"], 0, 10))

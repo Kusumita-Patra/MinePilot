@@ -10,7 +10,7 @@
   },
   {
     "sensor_id": "SNS-SEC1-CO-02",
-    "sector_id": "sector_deep_shaft_b",
+    "sector_id": "sector_shaft_b",
     "coordinates": { "x": -6.1, "y": 2.3, "z": -14.5 },
     "telemetry": { "ch4_pct": 0.12, "co_ppm": 8.2, "displacement_mm": 0.4, "temp_c": 24.1, "dust_pm10": 1.2 },
     "risk_score": 18,
@@ -19,7 +19,7 @@
   },
   {
     "sensor_id": "SNS-SEC2-DISP-03",
-    "sector_id": "sector_surface_conveyor",
+    "sector_id": "sector_conveyor_3",
     "coordinates": { "x": 30.0, "y": 0.5, "z": 5.0 },
     "telemetry": { "ch4_pct": 0.05, "co_ppm": 4.0, "displacement_mm": 6.2, "temp_c": 38.4, "dust_pm10": 5.9 },
     "risk_score": 91,

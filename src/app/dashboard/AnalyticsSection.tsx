@@ -3,6 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { useRiskRanking } from "@/hooks/useRiskRanking";
 import { useInspectionsBreakdown } from "@/hooks/useInspectionsBreakdown";
+import { useTelemetry } from "@/lib/telemetryContext";
 import ComplianceOverview from "@/components/ComplianceOverview";
 import { formatSectorId } from "@/lib/format";
 
@@ -27,8 +28,22 @@ function riskTone(score: number) {
 export default function AnalyticsSection() {
   const { data: ranking, loading: rankingLoading } = useRiskRanking();
   const { data: inspections } = useInspectionsBreakdown();
+  const { sensors, selected, setSelected } = useTelemetry();
 
   const rankingRows = ranking.length > 0 ? ranking : rankingLoading ? [] : FALLBACK_RANKING;
+
+  // Same shared selection the 3D twin and the AI Risk Analysis panel read
+  // from (via useTelemetry()) — clicking a row here highlights that sector
+  // in the 3D view and focuses the AI panel on it, and vice versa, so the
+  // three widgets read as one linked view instead of three disjoint ones.
+  function selectSector(sectorId: string) {
+    if (selected?.sector_id === sectorId) {
+      setSelected(null);
+      return;
+    }
+    const sensor = Object.values(sensors).find((s) => s.sector_id === sectorId);
+    if (sensor) setSelected(sensor);
+  }
 
   const inspectionSegments = inspections
     ? [
@@ -50,19 +65,31 @@ export default function AnalyticsSection() {
           {rankingRows.length === 0 && (
             <p className="text-[11px] text-neutral-600 py-3">No sector telemetry yet.</p>
           )}
-          {rankingRows.map((r, i) => (
-            <div key={r.sector_id} className="flex items-center gap-3">
-              <span className="text-[11px] text-neutral-500 w-4">{i + 1}</span>
-              <span className="text-xs flex-1 truncate">{formatSectorId(r.sector_id)}</span>
-              <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full ${riskTone(r.avg_risk_score)}`}
-                  style={{ width: `${r.avg_risk_score}%` }}
-                />
-              </div>
-              <span className="text-xs font-medium w-8 text-right">{r.avg_risk_score}</span>
-            </div>
-          ))}
+          {rankingRows.map((r, i) => {
+            const isSelected = selected?.sector_id === r.sector_id;
+            return (
+              <button
+                key={r.sector_id}
+                onClick={() => selectSector(r.sector_id)}
+                className={`w-full flex items-center gap-3 -mx-1.5 px-1.5 py-1 rounded-md transition-colors text-left ${
+                  isSelected ? "bg-blue-500/10 ring-1 ring-blue-500/40" : "hover:bg-white/5"
+                }`}
+                title={`Focus ${formatSectorId(r.sector_id)} in the 3D view and AI analysis`}
+              >
+                <span className="text-[11px] text-neutral-500 w-4">{i + 1}</span>
+                <span className={`text-xs flex-1 truncate ${isSelected ? "text-blue-300 font-medium" : ""}`}>
+                  {formatSectorId(r.sector_id)}
+                </span>
+                <div className="w-16 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${riskTone(r.avg_risk_score)}`}
+                    style={{ width: `${r.avg_risk_score}%` }}
+                  />
+                </div>
+                <span className="text-xs font-medium w-8 text-right">{r.avg_risk_score}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
