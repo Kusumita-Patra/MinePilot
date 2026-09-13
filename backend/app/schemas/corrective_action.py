@@ -25,7 +25,7 @@ class CorrectiveActionResponse(BaseModel):
     verification_date: datetime | None
     remarks: str | None
     evidence_url: str | None
-    created_by: uuid.UUID
+    created_by: uuid.UUID | None
     updated_at: datetime
 
     # Computed at read time, not stored — see corrective_action_service._is_overdue.

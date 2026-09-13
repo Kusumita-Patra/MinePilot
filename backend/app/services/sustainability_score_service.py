@@ -8,10 +8,13 @@ from app.models.sustainability_score import SustainabilityScore
 from app.services import (
     analytics_service,
     corrective_action_service,
+    energy_metric_service,
     environmental_reading_service,
     environmental_requirement_service,
     kpi_service,
+    land_metric_service,
     sustainability_target_service,
+    waste_metric_service,
     water_metric_service,
 )
 
@@ -22,15 +25,34 @@ from app.services import (
 # of whether a new snapshot was written this call. See plan Deviation #3.
 _SNAPSHOT_MIN_INTERVAL = timedelta(minutes=5)
 
-# ENERGY/WASTE/LAND/LABOUR have no backing data model in this pass (deferred
-# per the flagship-slice scope) — only these 4 are actually computed, plus
-# OVERALL as their average. Deliberately not faked as 100/neutral.
+# LABOUR has no backing data model in this pass (out of P3 scope) — every
+# other category now has one. Deliberately not faked as 100/neutral.
 _COMPUTED_CATEGORIES = [
     SustainabilityCategory.WATER,
+    SustainabilityCategory.ENERGY,
+    SustainabilityCategory.WASTE,
+    SustainabilityCategory.LAND,
     SustainabilityCategory.ENVIRONMENTAL,
     SustainabilityCategory.SAFETY,
     SustainabilityCategory.COMPLIANCE,
 ]
+
+# Direction each P3 metric name scores in — "higher"/"lower" is better.
+# Shared by compute_energy_score/compute_waste_score/compute_land_score
+# below (metric names are unique across categories, so one flat dict is
+# simpler than three near-identical ones).
+_METRIC_DIRECTION: dict[str, str] = {
+    "energy_intensity_kwh_per_tonne": "lower",
+    "renewable_energy_pct": "higher",
+    "peak_demand_kw": "lower",
+    "waste_diversion_pct": "higher",
+    "waste_recycling_pct": "higher",
+    "waste_reuse_pct": "higher",
+    "waste_intensity_tonnes_per_tonne": "lower",
+    "land_reclamation_pct": "higher",
+    "land_revegetation_pct": "higher",
+    "erosion_incidents": "lower",
+}
 
 
 async def _latest_snapshots(
@@ -207,8 +229,130 @@ async def compute_compliance_score(db: AsyncSession) -> dict:
     }
 
 
+def _metric_score(actual: float, target_value: float, direction: str) -> float | None:
+    """Pure — unit-tested directly. `direction` is "higher" (actual/target)
+    or "lower" (target/actual), each clamped to 100. Returns None (not 0)
+    when the arithmetic isn't meaningful (e.g. a "lower is better" metric
+    with an actual of 0 or less), so the caller excludes it rather than
+    silently scoring 0 or blowing up on a division by zero."""
+    if direction == "higher":
+        if target_value <= 0:
+            return None
+        return min(100.0, round(actual / target_value * 100, 1))
+    if actual <= 0:
+        return None
+    return min(100.0, round(target_value / actual * 100, 1))
+
+
+async def _compute_target_based_score(db: AsyncSession, category: SustainabilityCategory, resolver) -> dict:
+    """Shared multi-metric averaging logic for ENERGY/WASTE/LAND (spec:
+    "calculate individual metric scores and average only those with valid
+    data"). `resolver(metric_name: str) -> float | None` fetches the actual
+    value for one specific metric from that category's latest aggregate
+    row — kept category-specific rather than generalized further, since each
+    category's underlying model/service differs."""
+    targets = await sustainability_target_service.list_targets(db, category=category, is_active=True)
+    contributing: dict[str, dict] = {}
+    scores: list[float] = []
+
+    for target in targets:
+        actual = await resolver(target.metric)
+        if actual is None:
+            continue
+        direction = _METRIC_DIRECTION.get(target.metric, "higher")
+        metric_score = _metric_score(actual, target.target_value, direction)
+        if metric_score is None:
+            continue
+        scores.append(metric_score)
+        contributing[target.metric] = {
+            "actual": actual,
+            "target": target.target_value,
+            "direction": direction,
+            "score_pct": metric_score,
+        }
+
+    if not scores:
+        return {
+            "score_pct": 50.0,
+            "contributing_metrics": contributing,
+            "methodology_notes": (
+                f"No active {category.value} SustainabilityTarget currently has a computable actual value — "
+                "neutral default. Configure a target and log at least one metric to see a real score."
+            ),
+        }
+
+    score = round(sum(scores) / len(scores), 1)
+    metric_names = ", ".join(sorted(contributing.keys()))
+    return {
+        "score_pct": score,
+        "contributing_metrics": contributing,
+        "methodology_notes": (
+            f"Average of per-metric scores ({metric_names}) against their configured targets — "
+            "higher-is-better metrics score min(100, actual/target*100), lower-is-better metrics score "
+            "min(100, target/actual*100). Metrics with no active target or no computable data are "
+            "excluded from the average, never treated as 0 or 100."
+        ),
+    }
+
+
+async def compute_energy_score(db: AsyncSession) -> dict:
+    latest = await energy_metric_service.get_latest(db, sector_id=None)
+
+    async def resolver(metric_name: str) -> float | None:
+        if latest is None:
+            return None
+        if metric_name == "energy_intensity_kwh_per_tonne":
+            return energy_metric_service.energy_intensity_kwh_per_tonne(latest)
+        if metric_name == "renewable_energy_pct":
+            return energy_metric_service.renewable_percentage(latest)
+        if metric_name == "peak_demand_kw":
+            return latest.peak_demand_kw
+        return None
+
+    return await _compute_target_based_score(db, SustainabilityCategory.ENERGY, resolver)
+
+
+async def compute_waste_score(db: AsyncSession) -> dict:
+    latest = await waste_metric_service.get_latest(db, sector_id=None)
+
+    async def resolver(metric_name: str) -> float | None:
+        if latest is None:
+            return None
+        if metric_name == "waste_diversion_pct":
+            return waste_metric_service.diversion_rate_pct(latest)
+        if metric_name == "waste_recycling_pct":
+            return waste_metric_service.recycling_rate_pct(latest)
+        if metric_name == "waste_reuse_pct":
+            return waste_metric_service.reuse_rate_pct(latest)
+        if metric_name == "waste_intensity_tonnes_per_tonne":
+            return waste_metric_service.waste_intensity_tonnes_per_tonne(latest)
+        return None
+
+    return await _compute_target_based_score(db, SustainabilityCategory.WASTE, resolver)
+
+
+async def compute_land_score(db: AsyncSession) -> dict:
+    latest = await land_metric_service.get_latest(db, sector_id=None)
+
+    async def resolver(metric_name: str) -> float | None:
+        if latest is None:
+            return None
+        if metric_name == "land_reclamation_pct":
+            return land_metric_service.reclamation_rate_pct(latest)
+        if metric_name == "land_revegetation_pct":
+            return land_metric_service.revegetation_rate_pct(latest)
+        if metric_name == "erosion_incidents":
+            return float(latest.erosion_incidents) if latest.erosion_incidents is not None else None
+        return None
+
+    return await _compute_target_based_score(db, SustainabilityCategory.LAND, resolver)
+
+
 _COMPUTE_FN = {
     SustainabilityCategory.WATER: compute_water_score,
+    SustainabilityCategory.ENERGY: compute_energy_score,
+    SustainabilityCategory.WASTE: compute_waste_score,
+    SustainabilityCategory.LAND: compute_land_score,
     SustainabilityCategory.ENVIRONMENTAL: compute_environmental_score,
     SustainabilityCategory.SAFETY: compute_safety_score,
     SustainabilityCategory.COMPLIANCE: compute_compliance_score,
@@ -222,9 +366,9 @@ def _compute_overall(computed: dict[SustainabilityCategory, dict]) -> dict:
         "score_pct": score,
         "contributing_metrics": {category.value: result["score_pct"] for category, result in computed.items()},
         "methodology_notes": (
-            "Unweighted average of the Water/Environmental/Safety/Compliance sub-scores — equal "
-            "weighting, pending product input on relative importance. Energy/Waste/Land/Labour are out "
-            "of scope for this pass and excluded from the average (not treated as 100)."
+            "Unweighted average of the Water/Energy/Waste/Land/Environmental/Safety/Compliance "
+            "sub-scores — equal weighting, pending product input on relative importance. Labour is "
+            "excluded because no Labour sustainability model exists yet — it is not treated as 100."
         ),
     }
 

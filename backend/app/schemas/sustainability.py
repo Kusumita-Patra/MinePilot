@@ -77,3 +77,28 @@ class SustainabilityDashboardResponse(BaseModel):
     water_summary: WaterSummaryResponse
     open_environmental_actions: list[CorrectiveActionResponse]
     insights: list[InsightItem]
+
+
+# Never persisted to the DB — pure runtime control state for the demo
+# simulator, so this is a Literal, not a Postgres-backed enum.
+SimulatorScenario = Literal[
+    "NORMAL_OPERATION",
+    "HIGH_ENERGY_CONSUMPTION",
+    "HIGH_WASTE_GENERATION",
+    "LOW_WASTE_DIVERSION",
+    "LAND_RECLAMATION_PROGRESS",
+    "LAND_DISTURBANCE_INCREASE",
+    "ENVIRONMENTAL_ANOMALY",
+]
+
+
+class SimulatorStatusResponse(BaseModel):
+    enabled: bool
+    running: bool
+    scenario: SimulatorScenario
+    interval_seconds: int
+    last_tick_at: datetime | None
+
+
+class SimulatorScenarioRequest(BaseModel):
+    scenario: SimulatorScenario

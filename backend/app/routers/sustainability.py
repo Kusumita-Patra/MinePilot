@@ -9,13 +9,21 @@ from app.models.enums import SustainabilityCategory
 from app.models.user import User
 from app.schemas.common import success_body
 from app.schemas.sustainability import (
+    SimulatorScenarioRequest,
+    SimulatorStatusResponse,
     SustainabilityDashboardResponse,
     SustainabilityScoreResponse,
     SustainabilityTargetCreate,
     SustainabilityTargetResponse,
     SustainabilityTargetUpdate,
 )
-from app.services import audit_service, sustainability_dashboard_service, sustainability_score_service, sustainability_target_service
+from app.services import (
+    audit_service,
+    sustainability_dashboard_service,
+    sustainability_score_service,
+    sustainability_simulator_service,
+    sustainability_target_service,
+)
 
 router = APIRouter(prefix="/api/sustainability", tags=["sustainability"])
 
@@ -92,3 +100,68 @@ async def get_dashboard(
 ) -> dict:
     dashboard = await sustainability_dashboard_service.get_dashboard(db)
     return success_body(SustainabilityDashboardResponse(**dashboard).model_dump(mode="json"))
+
+
+@router.get("/simulator/status")
+async def get_simulator_status(current_user: User = Depends(get_current_user)) -> dict:
+    # Open to any authenticated user — a harmless read, matches
+    # GET /api/emergency/graph's openness precedent.
+    return success_body(SimulatorStatusResponse(**sustainability_simulator_service.get_status()).model_dump(mode="json"))
+
+
+@router.post("/simulator/start")
+async def start_simulator(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permission("sustainability.simulate")),
+) -> dict:
+    sustainability_simulator_service.set_running(True)
+    await audit_service.record(
+        db,
+        actor=current_user,
+        action="sustainability_simulator.start",
+        resource_type="sustainability_simulator",
+        description="Started the sustainability data simulator (DEMO / SIMULATED)",
+    )
+    return success_body(
+        SimulatorStatusResponse(**sustainability_simulator_service.get_status()).model_dump(mode="json"),
+        message="Simulator started",
+    )
+
+
+@router.post("/simulator/pause")
+async def pause_simulator(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permission("sustainability.simulate")),
+) -> dict:
+    sustainability_simulator_service.set_running(False)
+    await audit_service.record(
+        db,
+        actor=current_user,
+        action="sustainability_simulator.pause",
+        resource_type="sustainability_simulator",
+        description="Paused the sustainability data simulator",
+    )
+    return success_body(
+        SimulatorStatusResponse(**sustainability_simulator_service.get_status()).model_dump(mode="json"),
+        message="Simulator paused",
+    )
+
+
+@router.post("/simulator/scenario")
+async def set_simulator_scenario(
+    payload: SimulatorScenarioRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permission("sustainability.simulate")),
+) -> dict:
+    sustainability_simulator_service.set_scenario(payload.scenario)
+    await audit_service.record(
+        db,
+        actor=current_user,
+        action="sustainability_simulator.scenario",
+        resource_type="sustainability_simulator",
+        description=f"Set sustainability simulator scenario to {payload.scenario} (DEMO / SIMULATED)",
+    )
+    return success_body(
+        SimulatorStatusResponse(**sustainability_simulator_service.get_status()).model_dump(mode="json"),
+        message="Scenario updated",
+    )

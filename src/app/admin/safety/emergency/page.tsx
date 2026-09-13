@@ -1,17 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Ban, ShieldAlert, Siren, Unlock } from "lucide-react";
+import { Ban, Plus, ShieldAlert, Siren, Unlock } from "lucide-react";
 import Tabs from "@/components/ui/Tabs";
+import Modal from "@/components/ui/Modal";
 import SkeletonLoader from "@/components/ui/SkeletonLoader";
 import {
   blockEvacuationEdge,
+  createEvacuationExit,
   getEmergencyRules,
   getEvacuationGraph,
   updateEmergencyRule,
   updateEvacuationExit,
 } from "@/lib/emergencyApi";
-import type { EmergencyRule, EvacuationEdge, EvacuationExit } from "../../../../../shared/types/emergency";
+import type {
+  EmergencyRule,
+  EvacuationEdge,
+  EvacuationExit,
+  EvacuationNode,
+} from "../../../../../shared/types/emergency";
 import { formatSectorId } from "@/lib/format";
 
 type TabId = "rules" | "exits" | "overrides";
@@ -21,8 +28,10 @@ export default function AdminEmergencySafetyPage() {
   const [rules, setRules] = useState<EmergencyRule[]>([]);
   const [exits, setExits] = useState<EvacuationExit[]>([]);
   const [edges, setEdges] = useState<EvacuationEdge[]>([]);
+  const [nodes, setNodes] = useState<EvacuationNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [addExitOpen, setAddExitOpen] = useState(false);
 
   const refresh = useCallback(async () => {
     try {
@@ -30,6 +39,7 @@ export default function AdminEmergencySafetyPage() {
       setRules(rulesData);
       setExits(graph.exits);
       setEdges(graph.edges);
+      setNodes(graph.nodes);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load emergency configuration");
     } finally {
@@ -56,6 +66,16 @@ export default function AdminEmergencySafetyPage() {
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to update exit");
+    }
+  }
+
+  async function handleCreateExit(input: { node_id: string; name: string; sector_id: string; capacity_note?: string }) {
+    try {
+      await createEvacuationExit(input);
+      setAddExitOpen(false);
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to create exit");
     }
   }
 
@@ -115,6 +135,15 @@ export default function AdminEmergencySafetyPage() {
 
       {tab === "exits" && (
         <div className="bg-gray-900 border border-white/10 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+            <p className="text-sm font-semibold">Evacuation Exits</p>
+            <button
+              onClick={() => setAddExitOpen(true)}
+              className="text-xs px-2.5 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 inline-flex items-center gap-1"
+            >
+              <Plus size={12} /> Add Exit
+            </button>
+          </div>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-neutral-500 text-xs border-b border-white/10">
@@ -153,11 +182,19 @@ export default function AdminEmergencySafetyPage() {
             </tbody>
           </table>
           <p className="px-4 py-2 text-[11px] text-neutral-600 border-t border-white/10">
-            Exits are seeded from the demo evacuation graph. Creating new exits requires tracing a graph node first —
-            not built in this pass; see the module's known limitations.
+            New exits are created from an existing evacuation graph node — tracing a brand-new node onto the
+            blueprint isn't built in this pass.
           </p>
         </div>
       )}
+
+      <AddExitModal
+        open={addExitOpen}
+        onClose={() => setAddExitOpen(false)}
+        nodes={nodes}
+        existingExitNodeIds={new Set(exits.map((e) => e.node_id))}
+        onCreate={handleCreateExit}
+      />
 
       {tab === "overrides" && (
         <div className="bg-gray-900 border border-white/10 rounded-xl overflow-hidden">
@@ -234,6 +271,108 @@ export default function AdminEmergencySafetyPage() {
         </div>
       )}
     </div>
+  );
+}
+
+function AddExitModal({
+  open,
+  onClose,
+  nodes,
+  existingExitNodeIds,
+  onCreate,
+}: {
+  open: boolean;
+  onClose: () => void;
+  nodes: EvacuationNode[];
+  existingExitNodeIds: Set<string>;
+  onCreate: (input: { node_id: string; name: string; sector_id: string; capacity_note?: string }) => void;
+}) {
+  const availableNodes = nodes.filter((n) => !existingExitNodeIds.has(n.id));
+  const [nodeId, setNodeId] = useState(availableNodes[0]?.id ?? "");
+  const [name, setName] = useState("");
+  const [capacityNote, setCapacityNote] = useState("");
+
+  useEffect(() => {
+    if (open) {
+      setNodeId(availableNodes[0]?.id ?? "");
+      setName("");
+      setCapacityNote("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  const selectedNode = nodes.find((n) => n.id === nodeId);
+
+  function handleSubmit() {
+    if (!selectedNode || !name.trim()) return;
+    onCreate({
+      node_id: selectedNode.id,
+      name: name.trim(),
+      sector_id: selectedNode.sector_id,
+      capacity_note: capacityNote.trim() || undefined,
+    });
+  }
+
+  return (
+    <Modal open={open} onClose={onClose} title="Add Evacuation Exit">
+      <div className="space-y-4">
+        {availableNodes.length === 0 ? (
+          <p className="text-sm text-neutral-400">
+            Every graph node is already an exit — there's nothing left to promote.
+          </p>
+        ) : (
+          <>
+            <div>
+              <label className="text-xs text-neutral-400 block mb-1">Graph node</label>
+              <select
+                value={nodeId}
+                onChange={(e) => setNodeId(e.target.value)}
+                className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-sm"
+              >
+                {availableNodes.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.label ?? n.node_type} — {formatSectorId(n.sector_id)}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-neutral-600 mt-1">
+                Sector is taken from the node automatically ({selectedNode ? formatSectorId(selectedNode.sector_id) : "—"}).
+              </p>
+            </div>
+            <div>
+              <label className="text-xs text-neutral-400 block mb-1">Exit name</label>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. East Ventilation Raise"
+                className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-neutral-400 block mb-1">Capacity note (optional)</label>
+              <input
+                value={capacityNote}
+                onChange={(e) => setCapacityNote(e.target.value)}
+                placeholder="e.g. Single-file only"
+                className="w-full bg-black/30 border border-white/10 rounded-md px-3 py-2 text-sm"
+              />
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <button onClick={onClose} className="px-3 py-2 text-sm text-neutral-400 hover:text-white">
+                Cancel
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={!name.trim()}
+                className="bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-md px-4 py-2 text-sm font-medium"
+              >
+                Create Exit
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </Modal>
   );
 }
 

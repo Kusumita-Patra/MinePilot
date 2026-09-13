@@ -2,7 +2,7 @@ import uuid
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.models.enums import SensorConfigStatus, SensorSourceType, SensorType
 from app.schemas.blueprint import SectorId
@@ -32,7 +32,7 @@ class SensorConfigResponse(BaseModel):
     model: str | None
     status: SensorConfigStatus
     source_type: SensorSourceType
-    blueprint_id: uuid.UUID
+    blueprint_id: uuid.UUID | None
     section_id: uuid.UUID | None
     sector_id: str
     level_label: str
@@ -44,7 +44,7 @@ class SensorConfigResponse(BaseModel):
     installation_date: date | None
     last_calibration_at: date | None
     next_calibration_at: date | None
-    created_by: uuid.UUID
+    created_by: uuid.UUID | None
     created_at: datetime
     updated_at: datetime
 
@@ -63,7 +63,11 @@ class SensorConfigCreate(BaseModel):
     manufacturer: str | None = Field(default=None, max_length=200)
     model: str | None = Field(default=None, max_length=200)
     source_type: SensorSourceType = SensorSourceType.REAL
-    blueprint_id: uuid.UUID
+    # Nullable: the sustainability simulator's auto-created environmental
+    # sensors have no blueprint-relative placement yet (see
+    # sustainability_simulator_service._ensure_environmental_sensors). An
+    # administrator-registered sensor should still always supply this.
+    blueprint_id: uuid.UUID | None = None
     section_id: uuid.UUID | None = None
     sector_id: SectorId
     level_label: str = Field(min_length=1, max_length=50)
@@ -75,6 +79,20 @@ class SensorConfigCreate(BaseModel):
     installation_date: date | None = None
     last_calibration_at: date | None = None
     next_calibration_at: date | None = None
+
+    @model_validator(mode="after")
+    def _require_blueprint_unless_simulated(self) -> "SensorConfigCreate":
+        # blueprint_id is nullable at the DB/model level only so the
+        # sustainability simulator's auto-created environmental sensors
+        # (source_type=SIMULATED, written via the service layer directly)
+        # can omit a placement they don't have yet. Every other sensor —
+        # in particular anything reaching this schema through the public
+        # POST /api/sensors endpoint, which an administrator always drives
+        # from the blueprint-placement canvas — must still supply one, or a
+        # real/manual sensor could silently end up with no placement at all.
+        if self.source_type != SensorSourceType.SIMULATED and self.blueprint_id is None:
+            raise ValueError("blueprint_id is required unless source_type is SIMULATED")
+        return self
 
 
 class SensorConfigUpdate(BaseModel):

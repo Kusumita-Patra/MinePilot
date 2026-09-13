@@ -25,31 +25,34 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def _execute_idempotent(sql: str) -> None:
-    """Catches "already exists" only, not a Python-level pre-check.
+    """Catches "already exists"/"does not exist yet" only, not a
+    Python-level pre-check — and COMMITS THE REAL OUTER TRANSACTION after
+    every statement, not just a SAVEPOINT.
 
-    Debugged live: a SELECT immediately before a CREATE TYPE, in the SAME
-    alembic migration transaction, showed the type NOT existing — and the
-    very next statement still raised DuplicateObjectError. Supabase's
-    Supavisor pooler in transaction-pooling mode does not appear to
-    guarantee statement-to-statement consistency for DDL the way a plain
-    Postgres connection would (each statement can apparently be routed to
-    a different backend even mid logical-transaction). A pre-check is
-    therefore unreliable here; catching the specific "already exists" error
-    per statement is the only reliable guard.
+    Debugged live, twice: (1) a SELECT immediately before a CREATE TYPE, in
+    the SAME uncommitted alembic migration transaction, showed the type NOT
+    existing — and the very next statement still raised
+    DuplicateObjectError. (2) after switching to SAVEPOINT-per-statement
+    (commits the sub-transaction but leaves the OUTER transaction
+    uncommitted), CREATE TABLE then failed with "type alarm_state does not
+    exist" even though it had just been created and savepoint-committed
+    moments earlier in the same outer transaction.
 
-    Runs inside its own SAVEPOINT (begin_nested): a caught error still
-    marks the OUTER transaction aborted in Postgres unless the failure is
-    isolated to a sub-transaction — without this, the first caught
-    "already exists" would silently poison every statement after it with
-    "current transaction is aborted" (also hit live while building this).
+    Both point to the same cause: Supabase's Supavisor pooler in
+    transaction-pooling mode does not guarantee one physical backend for
+    the life of a single *uncommitted* logical transaction — different
+    statements can land on different backends, and an uncommitted change
+    on backend A is invisible to backend B. A real COMMIT is the only thing
+    guaranteed to be visible everywhere (ordinary Postgres MVCC), so this
+    function commits after every single statement rather than relying on
+    savepoints or transactional atomicity across the whole migration.
     """
     bind = op.get_bind()
-    savepoint = bind.begin_nested()
     try:
         bind.execute(sa.text(sql))
-        savepoint.commit()
+        bind.commit()
     except ProgrammingError as exc:
-        savepoint.rollback()
+        bind.rollback()
         if "already exists" not in str(exc):
             raise
 
@@ -59,37 +62,22 @@ def upgrade() -> None:
     _execute_idempotent("CREATE TYPE alarm_light_pattern AS ENUM ('SOLID', 'PULSE', 'STROBE')")
     _execute_idempotent("CREATE TYPE alarm_sound_pattern AS ENUM ('SILENT', 'CHIME', 'SIREN')")
 
-    bind = op.get_bind()
-    savepoint = bind.begin_nested()
-    try:
-        op.create_table(
-            'alarm_configs',
-            sa.Column('id', sa.UUID(), nullable=False),
-            sa.Column(
-                'state', sa.Enum('SAFE', 'CAUTION', 'DANGER', name='alarm_state', create_type=False), nullable=False
-            ),
-            sa.Column(
-                'light_pattern',
-                sa.Enum('SOLID', 'PULSE', 'STROBE', name='alarm_light_pattern', create_type=False),
-                nullable=False,
-            ),
-            sa.Column(
-                'sound_pattern',
-                sa.Enum('SILENT', 'CHIME', 'SIREN', name='alarm_sound_pattern', create_type=False),
-                nullable=False,
-            ),
-            sa.Column('is_enabled', sa.Boolean(), server_default=sa.true(), nullable=False),
-            sa.Column('updated_by', sa.UUID(), nullable=True),
-            sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
-            sa.ForeignKeyConstraint(['updated_by'], ['users.id'], name=op.f('fk_alarm_configs_updated_by_users')),
-            sa.PrimaryKeyConstraint('id', name=op.f('pk_alarm_configs')),
-            sa.UniqueConstraint('state', name='uq_alarm_configs_state'),
+    _execute_idempotent(
+        """
+        CREATE TABLE alarm_configs (
+            id UUID NOT NULL,
+            state alarm_state NOT NULL,
+            light_pattern alarm_light_pattern NOT NULL,
+            sound_pattern alarm_sound_pattern NOT NULL,
+            is_enabled BOOLEAN DEFAULT true NOT NULL,
+            updated_by UUID,
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+            CONSTRAINT pk_alarm_configs PRIMARY KEY (id),
+            CONSTRAINT uq_alarm_configs_state UNIQUE (state),
+            CONSTRAINT fk_alarm_configs_updated_by_users FOREIGN KEY(updated_by) REFERENCES users (id)
         )
-        savepoint.commit()
-    except ProgrammingError as exc:
-        savepoint.rollback()
-        if "already exists" not in str(exc):
-            raise
+        """
+    )
 
     _execute_idempotent(
         f"""

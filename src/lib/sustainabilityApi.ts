@@ -22,7 +22,12 @@ export type SustainabilityCategory =
   | "LABOUR"
   | "OVERALL";
 export type TargetPeriod = "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
-export type CorrectiveActionSourceType = "INCIDENT" | "ENVIRONMENTAL_REQUIREMENT" | "INSPECTION" | "MANUAL";
+export type CorrectiveActionSourceType =
+  | "INCIDENT"
+  | "ENVIRONMENTAL_REQUIREMENT"
+  | "INSPECTION"
+  | "MANUAL"
+  | "SUSTAINABILITY_TARGET";
 export type CorrectiveActionPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 export type CorrectiveActionStatus = "OPEN" | "IN_PROGRESS" | "COMPLETED" | "VERIFIED" | "CANCELLED";
 
@@ -67,6 +72,31 @@ export async function createEnvironmentalRequirement(payload: {
     method: "POST",
     body: JSON.stringify(payload),
   });
+}
+
+export interface EnvironmentalReading {
+  id: number;
+  sensor_config_id: string;
+  parameter: string;
+  value: number;
+  unit: string;
+  data_source: DataSourceType;
+  recorded_at: string;
+  created_at: string;
+  sensor_display_name: string | null;
+}
+
+export async function getEnvironmentalReadings(params: {
+  sensor_config_id?: string;
+  parameter?: string;
+  limit?: number;
+}): Promise<EnvironmentalReading[]> {
+  const search = new URLSearchParams();
+  if (params.sensor_config_id) search.set("sensor_config_id", params.sensor_config_id);
+  if (params.parameter) search.set("parameter", params.parameter);
+  if (params.limit) search.set("limit", String(params.limit));
+  const qs = search.toString();
+  return apiFetch<EnvironmentalReading[]>(`/api/environment/readings${qs ? `?${qs}` : ""}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -255,4 +285,215 @@ export interface SustainabilityDashboard {
 
 export async function getSustainabilityDashboard(): Promise<SustainabilityDashboard> {
   return apiFetch<SustainabilityDashboard>("/api/sustainability/dashboard");
+}
+
+// ---------------------------------------------------------------------------
+// P3: Energy metrics
+// ---------------------------------------------------------------------------
+
+export interface EnergyMetric {
+  id: string;
+  sector_id: string | null;
+  recorded_date: string;
+  electricity_kwh: number;
+  fuel_litres: number | null;
+  renewable_energy_kwh: number | null;
+  peak_demand_kw: number | null;
+  production_tonnes: number | null;
+  data_source: DataSourceType;
+  created_at: string;
+  energy_intensity_kwh_per_tonne: number | null;
+  renewable_percentage: number | null;
+}
+
+export interface EnergySummary {
+  date: string;
+  sector_id: string | null;
+  electricity_kwh: number;
+  fuel_litres: number | null;
+  renewable_energy_kwh: number | null;
+  peak_demand_kw: number | null;
+  production_tonnes: number | null;
+  energy_intensity_kwh_per_tonne: number | null;
+  renewable_percentage: number | null;
+  data_source: DataSourceType | null;
+}
+
+export async function getEnergyHistory(sectorId?: string): Promise<EnergyMetric[]> {
+  const qs = sectorId ? `?sector_id=${encodeURIComponent(sectorId)}` : "";
+  return apiFetch<EnergyMetric[]>(`/api/energy/history${qs}`);
+}
+
+export async function getEnergySummary(sectorId?: string): Promise<EnergySummary> {
+  const qs = sectorId ? `?sector_id=${encodeURIComponent(sectorId)}` : "";
+  return apiFetch<EnergySummary>(`/api/energy/summary${qs}`);
+}
+
+export async function createEnergyMetric(payload: {
+  sector_id?: string;
+  recorded_date: string;
+  electricity_kwh: number;
+  fuel_litres?: number;
+  renewable_energy_kwh?: number;
+  peak_demand_kw?: number;
+  production_tonnes?: number;
+  data_source: "SIMULATED_SENSOR" | "MANUAL_ENTRY";
+}): Promise<EnergyMetric> {
+  return apiFetch<EnergyMetric>("/api/energy", { method: "POST", body: JSON.stringify(payload) });
+}
+
+// ---------------------------------------------------------------------------
+// P3: Waste metrics
+// ---------------------------------------------------------------------------
+
+export interface WasteMetric {
+  id: string;
+  sector_id: string | null;
+  recorded_date: string;
+  total_waste_tonnes: number;
+  recycled_waste_tonnes: number;
+  reused_waste_tonnes: number;
+  disposed_waste_tonnes: number;
+  hazardous_waste_tonnes: number | null;
+  production_tonnes: number | null;
+  data_source: DataSourceType;
+  created_at: string;
+  diversion_rate_pct: number | null;
+  recycling_rate_pct: number | null;
+  reuse_rate_pct: number | null;
+  waste_intensity_tonnes_per_tonne: number | null;
+}
+
+export interface WasteSummary {
+  date: string;
+  sector_id: string | null;
+  total_waste_tonnes: number;
+  recycled_waste_tonnes: number;
+  reused_waste_tonnes: number;
+  disposed_waste_tonnes: number;
+  hazardous_waste_tonnes: number | null;
+  diversion_rate_pct: number | null;
+  recycling_rate_pct: number | null;
+  reuse_rate_pct: number | null;
+  waste_intensity_tonnes_per_tonne: number | null;
+  data_source: DataSourceType | null;
+}
+
+export async function getWasteHistory(sectorId?: string): Promise<WasteMetric[]> {
+  const qs = sectorId ? `?sector_id=${encodeURIComponent(sectorId)}` : "";
+  return apiFetch<WasteMetric[]>(`/api/waste/history${qs}`);
+}
+
+export async function getWasteSummary(sectorId?: string): Promise<WasteSummary> {
+  const qs = sectorId ? `?sector_id=${encodeURIComponent(sectorId)}` : "";
+  return apiFetch<WasteSummary>(`/api/waste/summary${qs}`);
+}
+
+export async function createWasteMetric(payload: {
+  sector_id?: string;
+  recorded_date: string;
+  total_waste_tonnes: number;
+  recycled_waste_tonnes?: number;
+  reused_waste_tonnes?: number;
+  disposed_waste_tonnes?: number;
+  hazardous_waste_tonnes?: number;
+  production_tonnes?: number;
+  data_source: "SIMULATED_SENSOR" | "MANUAL_ENTRY";
+}): Promise<WasteMetric> {
+  return apiFetch<WasteMetric>("/api/waste", { method: "POST", body: JSON.stringify(payload) });
+}
+
+// ---------------------------------------------------------------------------
+// P3: Land metrics
+// ---------------------------------------------------------------------------
+
+export interface LandMetric {
+  id: string;
+  sector_id: string | null;
+  recorded_date: string;
+  total_disturbed_area_ha: number;
+  reclaimed_area_ha: number;
+  active_reclamation_area_ha: number | null;
+  revegetated_area_ha: number | null;
+  erosion_incidents: number | null;
+  data_source: DataSourceType;
+  created_at: string;
+  reclamation_rate_pct: number | null;
+  revegetation_rate_pct: number | null;
+}
+
+export interface LandSummary {
+  date: string;
+  sector_id: string | null;
+  total_disturbed_area_ha: number;
+  reclaimed_area_ha: number;
+  active_reclamation_area_ha: number | null;
+  revegetated_area_ha: number | null;
+  erosion_incidents: number | null;
+  reclamation_rate_pct: number | null;
+  revegetation_rate_pct: number | null;
+  data_source: DataSourceType | null;
+}
+
+export async function getLandHistory(sectorId?: string): Promise<LandMetric[]> {
+  const qs = sectorId ? `?sector_id=${encodeURIComponent(sectorId)}` : "";
+  return apiFetch<LandMetric[]>(`/api/land/history${qs}`);
+}
+
+export async function getLandSummary(sectorId?: string): Promise<LandSummary> {
+  const qs = sectorId ? `?sector_id=${encodeURIComponent(sectorId)}` : "";
+  return apiFetch<LandSummary>(`/api/land/summary${qs}`);
+}
+
+export async function createLandMetric(payload: {
+  sector_id?: string;
+  recorded_date: string;
+  total_disturbed_area_ha: number;
+  reclaimed_area_ha?: number;
+  active_reclamation_area_ha?: number;
+  revegetated_area_ha?: number;
+  erosion_incidents?: number;
+  data_source: "SIMULATED_SENSOR" | "MANUAL_ENTRY";
+}): Promise<LandMetric> {
+  return apiFetch<LandMetric>("/api/land", { method: "POST", body: JSON.stringify(payload) });
+}
+
+// ---------------------------------------------------------------------------
+// P3: Sustainability data simulator control
+// ---------------------------------------------------------------------------
+
+export type SimulatorScenario =
+  | "NORMAL_OPERATION"
+  | "HIGH_ENERGY_CONSUMPTION"
+  | "HIGH_WASTE_GENERATION"
+  | "LOW_WASTE_DIVERSION"
+  | "LAND_RECLAMATION_PROGRESS"
+  | "LAND_DISTURBANCE_INCREASE"
+  | "ENVIRONMENTAL_ANOMALY";
+
+export interface SimulatorStatus {
+  enabled: boolean;
+  running: boolean;
+  scenario: SimulatorScenario;
+  interval_seconds: number;
+  last_tick_at: string | null;
+}
+
+export async function getSimulatorStatus(): Promise<SimulatorStatus> {
+  return apiFetch<SimulatorStatus>("/api/sustainability/simulator/status");
+}
+
+export async function startSimulator(): Promise<SimulatorStatus> {
+  return apiFetch<SimulatorStatus>("/api/sustainability/simulator/start", { method: "POST" });
+}
+
+export async function pauseSimulator(): Promise<SimulatorStatus> {
+  return apiFetch<SimulatorStatus>("/api/sustainability/simulator/pause", { method: "POST" });
+}
+
+export async function setSimulatorScenario(scenario: SimulatorScenario): Promise<SimulatorStatus> {
+  return apiFetch<SimulatorStatus>("/api/sustainability/simulator/scenario", {
+    method: "POST",
+    body: JSON.stringify({ scenario }),
+  });
 }

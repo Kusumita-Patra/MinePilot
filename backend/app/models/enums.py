@@ -132,6 +132,10 @@ class CorrectiveActionSourceType(str, enum.Enum):
     ENVIRONMENTAL_REQUIREMENT = "ENVIRONMENTAL_REQUIREMENT"
     INSPECTION = "INSPECTION"
     MANUAL = "MANUAL"
+    # System-generated (no human actor) when a P3 Energy/Waste/Land
+    # SustainabilityTarget is repeatedly breached — see
+    # corrective_action_service.create_system_action.
+    SUSTAINABILITY_TARGET = "SUSTAINABILITY_TARGET"
 
 
 class CorrectiveActionPriority(str, enum.Enum):

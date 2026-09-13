@@ -11,7 +11,7 @@
 // has one from dashboard/layout.tsx, the admin page wraps its own.
 // ============================================================================
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import clsx from "clsx";
 import { useTelemetry } from "@/lib/telemetryContext";
 import { useActiveBlueprint } from "@/hooks/useBlueprint";
@@ -19,7 +19,8 @@ import { useSensorConfigs } from "@/hooks/useSensors";
 import { pixelToWorldXZ } from "@/lib/blueprintCoords";
 import MineDigitalTwinContainer from "./MineDigitalTwinContainer";
 import MineDigitalTwin from "./index";
-import type { SensorLocationMarker } from "./types";
+import { DEFAULT_CAMERA_PRESET } from "./sectors";
+import type { CameraPresetId, SensorLocationMarker } from "./types";
 import { formatSectorId } from "@/lib/format";
 
 const RISK_STYLES: Record<string, string> = {
@@ -33,6 +34,11 @@ export default function MineViewPanel() {
   const { blueprint } = useActiveBlueprint();
   const { sensors: sensorConfigs } = useSensorConfigs();
   const sensorList = Object.values(sensors).sort((a, b) => b.risk_score - a.risk_score);
+
+  // Controlled camera preset, shared between the container's left-side level
+  // selector and the 3D twin's own top-right preset buttons, so either one
+  // flying the camera keeps the other's highlighted state in sync.
+  const [cameraPreset, setCameraPreset] = useState<CameraPresetId>(DEFAULT_CAMERA_PRESET);
 
   const sensorLocations = useMemo<SensorLocationMarker[]>(() => {
     if (!blueprint) return [];
@@ -61,12 +67,14 @@ export default function MineViewPanel() {
         </span>
       </div>
 
-      <MineDigitalTwinContainer>
+      <MineDigitalTwinContainer activePreset={cameraPreset} onSelectPreset={setCameraPreset}>
         <MineDigitalTwin
           sensors={sensorList}
           sensorLocations={sensorLocations}
           selectedSensor={selected}
           onSelectSensor={setSelected}
+          cameraPreset={cameraPreset}
+          onCameraPresetChange={setCameraPreset}
         />
       </MineDigitalTwinContainer>
 

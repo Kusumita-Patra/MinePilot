@@ -14,6 +14,7 @@ import {
   Activity,
   Settings,
   Siren,
+  Leaf,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -51,6 +52,10 @@ const NAV_GROUPS: {
   {
     heading: "Emergency Safety",
     items: [{ label: "Emergency Config", href: "/admin/safety/emergency", icon: Siren }],
+  },
+  {
+    heading: "Sustainability",
+    items: [{ label: "Data Simulator", href: "/admin/sustainability/simulator", icon: Leaf }],
   },
   { heading: null, items: [{ label: "Audit Logs", href: "/admin/audit-logs", icon: ScrollText }] },
   { heading: null, items: [{ label: "System Health", href: "/admin/system-health", icon: Activity }] },

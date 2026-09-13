@@ -122,6 +122,7 @@ async def assign_routes_for_active_evacuation(db: AsyncSession, event: Emergency
             position.status = WorkerEvacuationStatus.UNACCOUNTED
             continue
 
+        already_at_exit = len(computation.node_path) <= 1
         route = EvacuationRoute(
             emergency_event_id=event.id,
             worker_id=worker.id,
@@ -133,11 +134,20 @@ async def assign_routes_for_active_evacuation(db: AsyncSession, event: Emergency
             safety_score=computation.safety_score,
             hazards_avoided=computation.hazards_avoided,
             reason=computation.reason,
+            status=EvacuationRouteStatus.COMPLETED if already_at_exit else EvacuationRouteStatus.ACTIVE,
         )
         db.add(route)
         await db.flush()
 
-        position.status = WorkerEvacuationStatus.EVACUATION_ASSIGNED
+        # A worker whose origin already IS the exit node gets a trivial
+        # 0-distance/1-node route — without this branch they'd sit at
+        # EVACUATION_ASSIGNED forever (advance_one_hop has nothing to
+        # advance for a 1-node path, so last_moved_at never updates), and
+        # detect_delayed_workers would eventually flag them DELAYED despite
+        # already being safe. Found live: every worker showed DELAYED with
+        # a 0m/0s route after resolving several prior evacuations left them
+        # standing at exits.
+        position.status = WorkerEvacuationStatus.SAFE_AT_EXIT if already_at_exit else WorkerEvacuationStatus.EVACUATION_ASSIGNED
         position.active_route_id = route.id
         position.manual_stall = False
         position.last_moved_at = datetime.now(timezone.utc)
@@ -197,6 +207,7 @@ async def invalidate_and_reroute_all(db: AsyncSession) -> None:
         old_route.status = EvacuationRouteStatus.INVALIDATED
         old_route.invalidated_at = now
 
+        already_at_exit = len(new_path) <= 1
         new_route = EvacuationRoute(
             emergency_event_id=old_route.emergency_event_id,
             worker_id=old_route.worker_id,
@@ -209,14 +220,18 @@ async def invalidate_and_reroute_all(db: AsyncSession) -> None:
             hazards_avoided=computation.hazards_avoided,
             reason=computation.reason,
             route_version=old_route.route_version + 1,
-            status=EvacuationRouteStatus.ACTIVE,
+            status=EvacuationRouteStatus.COMPLETED if already_at_exit else EvacuationRouteStatus.ACTIVE,
         )
         db.add(new_route)
         await db.flush()
         old_route.superseded_by_route_id = new_route.id
 
+        # Same "already at the exit" fix as assign_routes_for_active_evacuation
+        # — a rerouted worker whose current node already IS the exit must be
+        # marked SAFE_AT_EXIT immediately, not ROUTE_CHANGED, or they'd never
+        # advance again and would eventually be flagged DELAYED instead.
         if position is not None:
-            position.status = WorkerEvacuationStatus.ROUTE_CHANGED
+            position.status = WorkerEvacuationStatus.SAFE_AT_EXIT if already_at_exit else WorkerEvacuationStatus.ROUTE_CHANGED
             position.active_route_id = new_route.id
 
         new_routes.append(new_route)
@@ -239,36 +254,54 @@ async def clear_positions_for_event(db: AsyncSession, event: EmergencyEvent) -> 
     permanently showing stale evacuated workers as if still affected).
     Skips a worker if they have an ACTIVE route on some OTHER still-open
     event (a second, unrelated evacuation in progress) — only this event's
-    own affected workers are reset. One commit for the whole batch."""
+    own affected workers are reset. Also sweeps up UNACCOUNTED/
+    TRACKING_LOST workers who never got a route at all (the honest
+    "no safe route" case has no EvacuationRoute row to key off), but only
+    once no evacuation is active anywhere — found live: an UNACCOUNTED
+    worker with no route stayed stuck forever after their event resolved,
+    since the routes-based lookup below never touches them. One commit for
+    the whole batch."""
     result = await db.execute(
         select(EvacuationRoute).where(EvacuationRoute.emergency_event_id == event.id)
     )
     routes_for_event = list(result.scalars().all())
-    if not routes_for_event:
-        return
-
     worker_ids = {r.worker_id for r in routes_for_event}
-    other_active_result = await db.execute(
-        select(EvacuationRoute.worker_id).where(
-            EvacuationRoute.emergency_event_id != event.id,
-            EvacuationRoute.status == EvacuationRouteStatus.ACTIVE,
-            EvacuationRoute.worker_id.in_(worker_ids),
-        )
-    )
-    workers_still_evacuating_elsewhere = {row[0] for row in other_active_result.all()}
-
-    for route in routes_for_event:
-        if route.status == EvacuationRouteStatus.ACTIVE:
-            route.status = EvacuationRouteStatus.COMPLETED
-
-    positions_result = await db.execute(select(WorkerPosition).where(WorkerPosition.worker_id.in_(worker_ids)))
     reset_positions = []
-    for position in positions_result.scalars().all():
-        if position.worker_id in workers_still_evacuating_elsewhere:
-            continue
-        position.status = WorkerEvacuationStatus.NOT_AFFECTED
-        position.active_route_id = None
-        reset_positions.append(position)
+
+    if worker_ids:
+        other_active_result = await db.execute(
+            select(EvacuationRoute.worker_id).where(
+                EvacuationRoute.emergency_event_id != event.id,
+                EvacuationRoute.status == EvacuationRouteStatus.ACTIVE,
+                EvacuationRoute.worker_id.in_(worker_ids),
+            )
+        )
+        workers_still_evacuating_elsewhere = {row[0] for row in other_active_result.all()}
+
+        for route in routes_for_event:
+            if route.status == EvacuationRouteStatus.ACTIVE:
+                route.status = EvacuationRouteStatus.COMPLETED
+
+        positions_result = await db.execute(select(WorkerPosition).where(WorkerPosition.worker_id.in_(worker_ids)))
+        for position in positions_result.scalars().all():
+            if position.worker_id in workers_still_evacuating_elsewhere:
+                continue
+            position.status = WorkerEvacuationStatus.NOT_AFFECTED
+            position.active_route_id = None
+            reset_positions.append(position)
+
+    from app.services import emergency_event_service
+
+    if not await emergency_event_service.any_evacuation_active(db):
+        stranded_result = await db.execute(
+            select(WorkerPosition).where(
+                WorkerPosition.status.in_([WorkerEvacuationStatus.UNACCOUNTED, WorkerEvacuationStatus.TRACKING_LOST]),
+                WorkerPosition.active_route_id.is_(None),
+            )
+        )
+        for position in stranded_result.scalars().all():
+            position.status = WorkerEvacuationStatus.NOT_AFFECTED
+            reset_positions.append(position)
 
     await db.commit()
     for position in reset_positions:

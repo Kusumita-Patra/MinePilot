@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useTelemetry } from "@/lib/telemetryContext";
 import { useActiveBlueprint } from "@/hooks/useBlueprint";
 import { useSensorConfigs } from "@/hooks/useSensors";
@@ -13,12 +13,14 @@ import AnalyticsSection from "@/app/dashboard/AnalyticsSection";
 import QuickActions from "@/app/dashboard/QuickActions";
 import IncidentSignOff from "@/app/dashboard/IncidentSignOff";
 import MineDigitalTwin from "@/components/digital-twin";
-import type { BlueprintTunnelSection, SensorLocationMarker } from "@/components/digital-twin";
+import { DEFAULT_CAMERA_PRESET } from "@/components/digital-twin/sectors";
+import type { BlueprintTunnelSection, CameraPresetId, SensorLocationMarker } from "@/components/digital-twin";
 
 export default function DashboardPage() {
   const { sensors, selected, setSelected } = useTelemetry();
   const { blueprint } = useActiveBlueprint();
   const { sensors: sensorConfigs } = useSensorConfigs();
+  const [cameraPreset, setCameraPreset] = useState<CameraPresetId>(DEFAULT_CAMERA_PRESET);
 
   const sensorList = Object.values(sensors);
   const avgRisk = sensorList.length
@@ -60,13 +62,15 @@ export default function DashboardPage() {
 
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="flex-1">
-          <MineDigitalTwinContainer>
+          <MineDigitalTwinContainer activePreset={cameraPreset} onSelectPreset={setCameraPreset}>
             <MineDigitalTwin
               sensors={sensorList}
               blueprintSections={blueprintSections}
               sensorLocations={sensorLocations}
               selectedSensor={selected}
               onSelectSensor={setSelected}
+              cameraPreset={cameraPreset}
+              onCameraPresetChange={setCameraPreset}
             />
           </MineDigitalTwinContainer>
         </div>
