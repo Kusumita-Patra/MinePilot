@@ -41,14 +41,25 @@ async def get_kpis(db: AsyncSession) -> dict:
         )
     ).scalar_one()
 
-    total_sectors = (await db.execute(select(func.count(func.distinct(Sensor.sector_id))))).scalar_one()
-    critical_sectors = (
-        await db.execute(
-            select(func.count(func.distinct(Incident.sector_id)))
-            .where(Incident.status != IncidentStatus.SIGNED_OFF)
-            .where(Incident.severity == RiskLevel.CRITICAL)
-        )
-    ).scalar_one()
+    # Sourced from each sector's current live sensor reading, not incident
+    # ticket history: an incident-based measure ("has any critical incident
+    # in this sector ever gone un-signed-off") only ever ratchets toward 0%
+    # in a continuously-simulated environment where nobody is triaging the
+    # incident queue in real time - it stops reflecting whether the mine is
+    # actually safe right now. This mirrors PLAN.md's "Overall Compliance"
+    # gap (§ compliance_scores, flagged as unspecified) with the simplest
+    # honest definition available from data we already have: worst live
+    # risk level per sector.
+    sensor_rows = (await db.execute(select(Sensor.sector_id, Sensor.last_risk_level))).all()
+    sectors_seen: set[str] = set()
+    critical_sectors_set: set[str] = set()
+    for sector_id, risk_level in sensor_rows:
+        sectors_seen.add(sector_id)
+        if risk_level == RiskLevel.CRITICAL:
+            critical_sectors_set.add(sector_id)
+
+    total_sectors = len(sectors_seen)
+    critical_sectors = len(critical_sectors_set)
 
     overall_compliance = (
         100.0 if total_sectors == 0 else round((total_sectors - critical_sectors) / total_sectors * 100, 1)
