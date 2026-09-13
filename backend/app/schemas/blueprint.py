@@ -10,11 +10,20 @@ from app.models.enums import SectionStatus, ZoneType
 # plain Literal (not a Postgres enum) for the same reason Inspection.sector_id
 # is a plain string column: this is a display/aggregation grouping, not a
 # state machine.
+#
+# Values must equal T2's real telemetry sector_id (data_generator.py
+# SECTORS) — this previously used the 3D twin's own separate taxonomy for 3
+# of its 4 sectors, the same pre-existing mismatch
+# b5c6d7e8f9a0_align_evacuation_graph_sectors_with_telemetry.py fixed for
+# the evacuation graph. No migration needed here: blueprint_sections has no
+# seeded rows (schema-only), so there's no existing data to backfill —
+# but any sections already created via the UI under the old ids would
+# need a one-off UPDATE to match.
 SectorId = Literal[
     "sector_north_wall",
-    "sector_deep_shaft_b",
-    "sector_surface_conveyor",
-    "sector_main_pit",
+    "sector_shaft_b",
+    "sector_conveyor_3",
+    "sector_south_face",
 ]
 
 PathPoint = tuple[float, float]

@@ -36,9 +36,9 @@ export interface Vec3Tuple {
  * camera or registry code. */
 export type MineSectorId =
   | "sector_north_wall"
-  | "sector_deep_shaft_b"
-  | "sector_surface_conveyor"
-  | "sector_main_pit";
+  | "sector_shaft_b"
+  | "sector_conveyor_3"
+  | "sector_south_face";
 
 export interface MineSectorConfig {
   id: MineSectorId;

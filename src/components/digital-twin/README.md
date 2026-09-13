@@ -46,8 +46,9 @@ objects (e.g. Empties in Blender, or mesh names) exactly:
 
 ```
 sector_north_wall
-sector_deep_shaft_b
-sector_surface_conveyor
+sector_shaft_b
+sector_conveyor_3
+sector_south_face
 ```
 
 `MineModel.tsx` walks the loaded scene once and registers any object whose

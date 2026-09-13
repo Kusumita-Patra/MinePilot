@@ -462,15 +462,15 @@ export default function MineTerrain({
     return groups;
   }, [blueprintSections]);
 
-  const shaftColor = SECTOR_RISK_COLOR[sectorRisk.sector_deep_shaft_b];
+  const shaftColor = SECTOR_RISK_COLOR[sectorRisk.sector_shaft_b];
   const northColor = SECTOR_RISK_COLOR[sectorRisk.sector_north_wall];
-  const mainColor = SECTOR_RISK_COLOR[sectorRisk.sector_main_pit];
-  const conveyorColor = SECTOR_RISK_COLOR[sectorRisk.sector_surface_conveyor];
+  const mainColor = SECTOR_RISK_COLOR[sectorRisk.sector_south_face];
+  const conveyorColor = SECTOR_RISK_COLOR[sectorRisk.sector_conveyor_3];
 
-  const shaftPulse = sectorRisk.sector_deep_shaft_b === "CRITICAL";
+  const shaftPulse = sectorRisk.sector_shaft_b === "CRITICAL";
   const northPulse = sectorRisk.sector_north_wall === "CRITICAL";
-  const mainPulse = sectorRisk.sector_main_pit === "CRITICAL";
-  const conveyorPulse = sectorRisk.sector_surface_conveyor === "CRITICAL";
+  const mainPulse = sectorRisk.sector_south_face === "CRITICAL";
+  const conveyorPulse = sectorRisk.sector_conveyor_3 === "CRITICAL";
 
   // Sump floor is the one deliberately solid, unlit-black surface — it reads
   // as a physical cap at the bottom of the shaft rather than more wireframe.
@@ -519,7 +519,7 @@ export default function MineTerrain({
       {/* Main vertical access shaft: wide upper run, narrower lower run
           (this narrower continuation is "Deep Shaft B"), ending in a
           flared sump instead of an open-ended tube. */}
-      <SectorMesh sectorId="sector_deep_shaft_b" onClick={selectSector("sector_deep_shaft_b")}>
+      <SectorMesh sectorId="sector_shaft_b" onClick={selectSector("sector_shaft_b")}>
         <Holo
           position={[0, (LEVELS.surface + LEVELS.level2) / 2, 0]}
           geometryEl={
@@ -570,10 +570,10 @@ export default function MineTerrain({
             reaching it) render alongside the structural shaft geometry above
             — this sector always keeps its procedural structure regardless. */}
         <BlueprintTunnels
-          sections={blueprintBySector.sector_deep_shaft_b}
+          sections={blueprintBySector.sector_shaft_b}
           color={shaftColor}
           pulse={shaftPulse}
-          onSelect={selectTunnelIn("sector_deep_shaft_b")}
+          onSelect={selectTunnelIn("sector_shaft_b")}
         />
         {shaftPulse && <HazardLabel position={[SHAFT.collarRadius + 4, LEVELS.level2, 0]} />}
       </SectorMesh>
@@ -613,7 +613,7 @@ export default function MineTerrain({
 
       {/* Level -2: Main Tunnel Network — same "always procedural bulk, plus
           named blueprint branches layered on top" approach as North Section. */}
-      <SectorMesh sectorId="sector_main_pit" onClick={selectSector("sector_main_pit")}>
+      <SectorMesh sectorId="sector_south_face" onClick={selectSector("sector_south_face")}>
         <TunnelNetwork
           points={MAIN_NETWORK_POINTS}
           segments={MAIN_NETWORK_SEGMENTS}
@@ -621,13 +621,13 @@ export default function MineTerrain({
           y={LEVELS.level2}
           color={mainColor}
           pulse={mainPulse}
-          onSelect={selectTunnelIn("sector_main_pit")}
+          onSelect={selectTunnelIn("sector_south_face")}
         />
         <BlueprintTunnels
-          sections={blueprintBySector.sector_main_pit}
+          sections={blueprintBySector.sector_south_face}
           color={mainColor}
           pulse={mainPulse}
-          onSelect={selectTunnelIn("sector_main_pit")}
+          onSelect={selectTunnelIn("sector_south_face")}
         />
         <Holo
           position={[0, LEVELS.level2, 0]}
@@ -643,9 +643,9 @@ export default function MineTerrain({
 
       {/* Surface conveyor / headframe structure at the shaft collar */}
       <SectorMesh
-        sectorId="sector_surface_conveyor"
+        sectorId="sector_conveyor_3"
         position={SURFACE_CONVEYOR.position}
-        onClick={selectSector("sector_surface_conveyor")}
+        onClick={selectSector("sector_conveyor_3")}
       >
         {/* support base */}
         <Holo
@@ -697,10 +697,10 @@ export default function MineTerrain({
           position={[-SURFACE_CONVEYOR.position[0], -SURFACE_CONVEYOR.position[1], -SURFACE_CONVEYOR.position[2]]}
         >
           <BlueprintTunnels
-            sections={blueprintBySector.sector_surface_conveyor}
+            sections={blueprintBySector.sector_conveyor_3}
             color={conveyorColor}
             pulse={conveyorPulse}
-            onSelect={selectTunnelIn("sector_surface_conveyor")}
+            onSelect={selectTunnelIn("sector_conveyor_3")}
           />
         </group>
         {conveyorPulse && <HazardLabel position={[0, 10, 0]} />}

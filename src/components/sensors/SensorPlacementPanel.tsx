@@ -14,9 +14,9 @@ import type { BlueprintSectorId } from "@/lib/blueprintApi";
 
 const SECTOR_OPTIONS: { id: BlueprintSectorId; label: string; color: string }[] = [
   { id: "sector_north_wall", label: "North Section", color: "#38d6ff" },
-  { id: "sector_deep_shaft_b", label: "Deep Shaft B", color: "#a855f7" },
-  { id: "sector_surface_conveyor", label: "Surface Conveyor", color: "#f97316" },
-  { id: "sector_main_pit", label: "Main Tunnel Network", color: "#22c55e" },
+  { id: "sector_shaft_b", label: "Deep Shaft B", color: "#a855f7" },
+  { id: "sector_conveyor_3", label: "Surface Conveyor", color: "#f97316" },
+  { id: "sector_south_face", label: "Main Tunnel Network", color: "#22c55e" },
 ];
 
 const SENSOR_TYPES: SensorType[] = [

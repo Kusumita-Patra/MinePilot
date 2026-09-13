@@ -22,6 +22,18 @@ export function useTelemetryWebSocket(): UseTelemetryWebSocketReturn {
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mockInterval = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // authStore persists the token to localStorage and rehydrates it
+  // asynchronously (see authStore.ts's `isHydrated`). Reading
+  // `.getState().token` once on mount can race that rehydration and see
+  // `null` even for a genuinely logged-in user — and since this used to run
+  // in a `[seedMockData]`-only effect with no dependency on the token or
+  // hydration state, that one bad read permanently stranded the whole page
+  // session on mock data, even after the real token became available.
+  // Subscribing reactively and gating on `isHydrated` makes this wait for
+  // the real answer instead of guessing early, and re-run once it's known.
+  const token = useAuthStore((s) => s.token);
+  const isHydrated = useAuthStore((s) => s.isHydrated);
+
   const seedMockData = useCallback(() => {
     setUsingMockData(true);
     const seed: Record<string, SensorFrame> = {};
@@ -47,8 +59,11 @@ export function useTelemetryWebSocket(): UseTelemetryWebSocketReturn {
   }, []);
 
   useEffect(() => {
+    // Don't decide anything until hydration finishes — before that, `token`
+    // can read as null for a user who's actually logged in.
+    if (!isHydrated) return;
+
     function connect() {
-      const token = useAuthStore.getState().token;
       if (!token) {
         seedMockData();
         return;
@@ -96,7 +111,7 @@ export function useTelemetryWebSocket(): UseTelemetryWebSocketReturn {
       if (mockInterval.current) clearInterval(mockInterval.current);
       clearTimeout(fallbackTimer);
     };
-  }, [seedMockData]);
+  }, [isHydrated, token, seedMockData]);
 
   return { sensors, connected, usingMockData };
 }
