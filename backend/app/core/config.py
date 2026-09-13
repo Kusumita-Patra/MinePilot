@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     port: int = 8001
     sustainability_simulator_enabled: bool = True
     sustainability_simulator_interval_seconds: int = 60
+    worker_geotracking_enabled: bool = True
+    worker_geotracking_interval_seconds: int = 20
 
     @property
     def async_database_url(self) -> URL:

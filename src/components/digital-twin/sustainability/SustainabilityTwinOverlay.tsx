@@ -34,6 +34,11 @@ const SECTORS = ["sector_north_wall", "sector_deep_shaft_b", "sector_surface_con
 
 // Reuses the exact anchor point already used to frame each sector on camera
 // — see the module docstring above for why no separate coordinate exists.
+// Markers below only add a small (+1) Y offset on top of this anchor —
+// mineLayout.ts's tunnel cross-section radius is as tight as 3 in places
+// (SHAFT.lowerRadius), so a larger lift (an earlier version used +7/+12)
+// pushes a marker's center above/outside the tube entirely, which read as
+// the marker floating outside the tunnel rather than inside it.
 const SECTOR_ANCHOR: Record<(typeof SECTORS)[number], [number, number, number]> = {
   sector_north_wall: cameraPresets.northWall.target,
   sector_deep_shaft_b: cameraPresets.deepShaftB.target,
@@ -82,7 +87,7 @@ export const SustainabilityTwinOverlay = memo(function SustainabilityTwinOverlay
       setDataBySector(Object.fromEntries(results));
 
       const sensors = await getSensors().catch(() => [] as SensorConfig[]);
-      const envTypes = new Set(["PM10", "PM2_5", "SO2", "NOX"]);
+      const envTypes = new Set(["PM10", "PM2_5", "SO2", "NOX", "WATER_FLOW"]);
       const envOnly = sensors.filter((s) => envTypes.has(s.sensor_type));
       const withReadings = await Promise.all(
         envOnly.map(async (s) => {
@@ -114,7 +119,7 @@ export const SustainabilityTwinOverlay = memo(function SustainabilityTwinOverlay
             {data.energy && data.energy.data_source && (
               <SustainabilityMarker
                 id={`${sectorId}:energy`}
-                position={[anchor[0] - 4, anchor[1] + 12, anchor[2]]}
+                position={[anchor[0] - 4, anchor[1] + 1, anchor[2]]}
                 color={ENERGY_COLOR}
                 label="Energy"
                 detail={
@@ -127,7 +132,7 @@ export const SustainabilityTwinOverlay = memo(function SustainabilityTwinOverlay
             {data.waste && data.waste.data_source && (
               <SustainabilityMarker
                 id={`${sectorId}:waste`}
-                position={[anchor[0], anchor[1] + 12, anchor[2]]}
+                position={[anchor[0], anchor[1] + 1, anchor[2]]}
                 color={WASTE_COLOR}
                 label="Waste"
                 detail={
@@ -140,7 +145,7 @@ export const SustainabilityTwinOverlay = memo(function SustainabilityTwinOverlay
             {data.land && data.land.data_source && (
               <SustainabilityMarker
                 id={`${sectorId}:land`}
-                position={[anchor[0] + 4, anchor[1] + 12, anchor[2]]}
+                position={[anchor[0] + 4, anchor[1] + 1, anchor[2]]}
                 color={LAND_COLOR}
                 label="Land"
                 detail={
@@ -160,7 +165,7 @@ export const SustainabilityTwinOverlay = memo(function SustainabilityTwinOverlay
           <SustainabilityMarker
             key={sensor.id}
             id={`env:${sensor.sensor_id}`}
-            position={[anchor[0] + (i % 2 === 0 ? -7 : 7), anchor[1] + 7, anchor[2] + 3]}
+            position={[anchor[0] + (i % 2 === 0 ? -7 : 7), anchor[1] + 1, anchor[2] + 3]}
             color={ENV_SENSOR_COLOR}
             label={sensor.display_name}
             detail={sensor.latestValue !== null ? `${sensor.latestValue} ${sensor.latestUnit ?? ""}` : "No readings yet"}

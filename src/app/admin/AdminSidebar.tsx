@@ -15,6 +15,7 @@ import {
   Settings,
   Siren,
   Leaf,
+  MapPin,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,6 +40,7 @@ const NAV_GROUPS: {
     items: [
       { label: "Users", href: "/admin/users", icon: Users },
       { label: "Roles & Permissions", href: "/admin/roles", icon: KeySquare },
+      { label: "Worker Locations", href: "/admin/workers/locations", icon: MapPin },
     ],
   },
   {

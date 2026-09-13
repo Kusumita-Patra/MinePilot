@@ -12,6 +12,7 @@ from app.services.sustainability_simulator_service import (
     next_energy_values,
     next_land_values,
     next_waste_values,
+    next_water_flow_value,
 )
 
 _ITERATIONS = 200
@@ -207,3 +208,28 @@ def test_high_energy_consumption_scenario_biases_upward():
         high_values.append(prev_high["electricity_kwh"])
 
     assert sum(high_values) / len(high_values) > sum(normal_values) / len(normal_values)
+
+
+def test_water_flow_value_never_negative():
+    prev = None
+    for _ in range(_ITERATIONS):
+        prev = next_water_flow_value(prev)
+        assert prev >= 0
+
+
+def test_water_flow_value_first_call_has_no_prev():
+    value = next_water_flow_value(None)
+    assert value >= 0
+
+
+def test_water_flow_value_drifts_not_jumps():
+    """Continuity — the next value is always derived from the previous one
+    (bounded drift, with a small chance of a further 1.2-1.5x surge), never
+    an independent re-roll, so the sensor's history reads as a real flow
+    trend rather than noise. Bound accounts for the worst case: max drift
+    (+4) then a max surge (1.5x)."""
+    prev = 50.0
+    for _ in range(_ITERATIONS):
+        value = next_water_flow_value(prev)
+        assert value <= (prev + 4) * 1.5 + 1e-9
+        prev = value

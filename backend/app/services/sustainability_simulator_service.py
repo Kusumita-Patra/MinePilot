@@ -25,6 +25,8 @@ from datetime import date, datetime, timedelta, timezone
 
 from app.core.config import get_settings
 from app.db.database import AsyncSessionLocal
+from sqlalchemy.exc import IntegrityError
+
 from app.exceptions.custom_exceptions import DuplicateError
 from app.models.enums import CorrectiveActionPriority, CorrectiveActionSourceType
 from app.schemas.energy import EnergyMetricCreate
@@ -499,6 +501,88 @@ async def _maybe_write_environmental_anomaly(db) -> None:
         return  # one simulated anomaly per tick is enough
 
 
+_water_flow_state: dict = {"value": None}
+
+
+def next_water_flow_value(prev: float | None) -> float:
+    """Pure — unit-tested directly. A mine's dewatering/discharge flow rate
+    (m3/h) — continuously reported (unlike the pollutant sensors, which only
+    get a reading during ENVIRONMENTAL_ANOMALY), since flow is an
+    always-on operational measurement, not something that's normally silent
+    and occasionally spikes. Small bounded drift each tick, never negative."""
+    base = prev if prev is not None else random.uniform(30, 60)
+    value = max(0.0, base + random.uniform(-4, 4))
+    if random.random() < 0.05:  # occasional surge (e.g. a pump cycle)
+        value *= random.uniform(1.2, 1.5)
+    return round(value, 2)
+
+
+async def _ensure_water_flow_sensor(db) -> dict | None:
+    """Auto-creates one ACTIVE, SIMULATED WATER_FLOW SensorConfig if none
+    exists yet — same reasoning and shape as _ensure_environmental_sensors,
+    kept as its own function since water flow is reported every tick
+    unconditionally rather than only during a scenario, a different enough
+    lifecycle to not share that function's loop. Returns the (possibly
+    freshly-created) ACTIVE WATER_FLOW sensor, or None if creation failed."""
+    from app.models.enums import SensorConfigStatus, SensorSourceType, SensorType
+    from app.schemas.sensor import SensorConfigCreate
+    from app.services import sensor_config_service
+
+    existing = await sensor_config_service.list_sensors(
+        db, sensor_type=SensorType.WATER_FLOW, status=SensorConfigStatus.ACTIVE
+    )
+    if existing:
+        return existing[0]
+
+    payload = SensorConfigCreate(
+        sensor_id="sim-water-flow-01",
+        display_name="Simulated Water Flow Monitor",
+        sensor_type=SensorType.WATER_FLOW,
+        source_type=SensorSourceType.SIMULATED,
+        sector_id=SECTORS[0],
+        level_label="Simulated",
+        depth=0.0,
+        pixel_x=0.0,
+        pixel_y=0.0,
+    )
+    try:
+        await sensor_config_service.create_sensor(db, payload, created_by=None)
+        await db.commit()
+        logger.info("Auto-created missing simulated water flow sensor (no admin registration required)")
+    except DuplicateError:
+        pass  # another tick/process just created it — fine, re-fetch below
+
+    created = await sensor_config_service.list_sensors(
+        db, sensor_type=SensorType.WATER_FLOW, status=SensorConfigStatus.ACTIVE
+    )
+    return created[0] if created else None
+
+
+async def _write_water_flow_reading(db) -> None:
+    """Writes one WATER_FLOW reading every tick — unconditional, unlike the
+    pollutant sensors, since flow is a continuously-live measurement, not
+    an anomaly demo. Auto-creates the sensor first if an admin hasn't
+    registered one (see _ensure_water_flow_sensor)."""
+    from app.schemas.environment import EnvironmentalReadingCreate
+    from app.services import environmental_reading_service
+
+    sensor = await _ensure_water_flow_sensor(db)
+    if sensor is None:
+        return
+
+    value = next_water_flow_value(_water_flow_state["value"])
+    _water_flow_state["value"] = value
+
+    payload = EnvironmentalReadingCreate(
+        sensor_config_id=sensor["id"],
+        parameter="WATER_FLOW",
+        value=value,
+        unit="m3/h",
+        data_source="SIMULATED_SENSOR",
+    )
+    await environmental_reading_service.create_reading(db, payload)
+
+
 def _sum_values(all_values: list[dict], keys: list[str]) -> dict:
     """Mine-wide totals are sums of the per-sector totals for every metric
     here (electricity, waste tonnage, disturbed/reclaimed area, ...) —
@@ -542,7 +626,17 @@ async def _tick_once() -> None:
 
             # Upsert TODAY's row: delete-then-recreate is avoided (extra
             # round trips); instead update in place if it already exists.
-            await _upsert_today(db, sector_id, today, energy_values, waste_values, land_values)
+            # Wrapped in a SAVEPOINT (not just try/except) — the whole tick
+            # commits once at the end for NullPool reconnect-cost reasons,
+            # so without a savepoint a single sector's write failing (e.g. a
+            # constraint violation from a corner case _clamp_waste_accounting
+            # doesn't cover) would poison and roll back every other sector's
+            # already-staged updates for this tick too, not just this one's.
+            try:
+                async with db.begin_nested():
+                    await _upsert_today(db, sector_id, today, energy_values, waste_values, land_values)
+            except IntegrityError:
+                logger.exception("Sustainability upsert failed for %s — skipping this sector this tick", sector_id)
 
         # Mine-wide (sector_id=None) rollup — the score service and
         # dashboard insights both look up get_latest(db, sector_id=None),
@@ -568,10 +662,19 @@ async def _tick_once() -> None:
             ["total_disturbed_area_ha", "reclaimed_area_ha", "active_reclamation_area_ha", "revegetated_area_ha"],
         )
         mine_wide_land["erosion_incidents"] = sum(v.get("erosion_incidents") or 0 for v in all_land)
-        await _upsert_today(db, None, today, mine_wide_energy, mine_wide_waste, mine_wide_land)
+        try:
+            async with db.begin_nested():
+                await _upsert_today(db, None, today, mine_wide_energy, mine_wide_waste, mine_wide_land)
+        except IntegrityError:
+            logger.exception("Sustainability mine-wide upsert failed — skipping the rollup this tick")
 
         await db.commit()
         await _check_critical_breaches(db, scenario)
+
+        try:
+            await _write_water_flow_reading(db)
+        except Exception:
+            logger.exception("Water flow sensor reading failed")
 
         if scenario == "ENVIRONMENTAL_ANOMALY":
             try:
@@ -631,7 +734,16 @@ async def run_sustainability_simulator_loop(stop_event: asyncio.Event) -> None:
     while not stop_event.is_set():
         if _state["running"]:
             try:
-                await _tick_once()
+                # A hard timeout, not just a try/except — a single tick that
+                # hangs on a slow/stuck DB call (observed live: a dev-reload
+                # cycle left a tick stuck mid-transaction, which then also
+                # blocked the lifespan's graceful-shutdown await on this same
+                # task indefinitely, leaving the whole backend unresponsive
+                # to unrelated requests like GET /docs) must never be able to
+                # wedge this loop or the app's shutdown forever.
+                await asyncio.wait_for(_tick_once(), timeout=30)
+            except asyncio.TimeoutError:
+                logger.error("Sustainability simulator tick timed out after 30s — skipping this tick")
             except Exception:
                 logger.exception("Sustainability simulator tick failed")
 

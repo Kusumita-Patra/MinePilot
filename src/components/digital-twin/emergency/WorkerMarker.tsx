@@ -54,7 +54,13 @@ export const WorkerMarker = memo(function WorkerMarker({
   });
 
   return (
-    <group position={[position[0], position[1] + 4, position[2]]} name={`worker:${workerId}`}>
+    // No vertical offset (was +4): the evacuation graph's tunnel
+    // cross-section radius is as tight as 3 in places (SHAFT.lowerRadius,
+    // see mineLayout.ts) and this marker's own pulsing halo already
+    // reaches out to ~3 at its peak scale — a +4 lift put the marker's
+    // center entirely above/outside the tube. Sitting at the node's own
+    // coordinate keeps the whole marker safely inside the tunnel.
+    <group position={position} name={`worker:${workerId}`}>
       {pulsing && (
         <mesh ref={haloRef}>
           <sphereGeometry args={[2.2, 12, 12]} />

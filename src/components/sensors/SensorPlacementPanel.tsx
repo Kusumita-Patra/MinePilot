@@ -30,6 +30,17 @@ const SENSOR_TYPES: SensorType[] = [
   "DUST",
   "ELECTRICAL",
   "NOISE",
+  "PM10",
+  "PM2_5",
+  "SO2",
+  "NOX",
+  "WATER_PH",
+  "TURBIDITY",
+  "TDS",
+  "WATER_FLOW",
+  "WATER_LEVEL",
+  "ENERGY_METER",
+  "RAINFALL",
 ];
 
 const STATUS_DOT: Record<string, string> = {

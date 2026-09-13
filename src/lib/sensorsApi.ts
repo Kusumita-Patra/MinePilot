@@ -11,7 +11,20 @@ export type SensorType =
   | "VIBRATION"
   | "DUST"
   | "ELECTRICAL"
-  | "NOISE";
+  | "NOISE"
+  // Environmental sensor types (Sustainability module) — CARBON_MONOXIDE/
+  // TEMPERATURE/HUMIDITY/DUST/NOISE above are reused as-is, no duplication.
+  | "PM10"
+  | "PM2_5"
+  | "SO2"
+  | "NOX"
+  | "WATER_PH"
+  | "TURBIDITY"
+  | "TDS"
+  | "WATER_FLOW"
+  | "WATER_LEVEL"
+  | "ENERGY_METER"
+  | "RAINFALL";
 
 export type SensorConfigStatus = "ACTIVE" | "INACTIVE" | "MAINTENANCE" | "RETIRED";
 export type CalibrationStatus = "VALID" | "DUE_SOON" | "OVERDUE";

@@ -19,6 +19,7 @@ import {
   ScrollText,
   Activity,
   Leaf,
+  MapPin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -44,6 +45,7 @@ const NAV_ITEMS = [
   { label: "Contractors", href: "/dashboard/contractors", icon: Users, badge: "contractors" as const },
   { label: "Sustainability", href: "/dashboard/sustainability", icon: Leaf },
   { label: "Workforce", href: "/dashboard/workforce", icon: UserCog },
+  { label: "Worker Locations", href: "/dashboard/worker-locations", icon: MapPin },
 ];
 
 // Only appear in the sidebar at all when an administrator has granted the

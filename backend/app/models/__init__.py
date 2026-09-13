@@ -23,6 +23,7 @@ from app.models.waste_metric import WasteMetric
 from app.models.telemetry_reading import TelemetryReading
 from app.models.user import User
 from app.models.water_metric import WaterMetric
+from app.models.worker_location import WorkerLocation
 from app.models.worker_position import WorkerPosition
 
 __all__ = [
@@ -52,6 +53,7 @@ __all__ = [
     "EvacuationExit",
     "EvacuationRoute",
     "WorkerPosition",
+    "WorkerLocation",
     "AlarmConfig",
     "EnergyMetric",
     "WasteMetric",
