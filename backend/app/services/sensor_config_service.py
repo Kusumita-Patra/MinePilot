@@ -135,7 +135,7 @@ async def get_sensor(db: AsyncSession, sensor_id: str) -> dict:
     return enriched[0]
 
 
-async def create_sensor(db: AsyncSession, payload: SensorConfigCreate, created_by: uuid.UUID) -> SensorConfig:
+async def create_sensor(db: AsyncSession, payload: SensorConfigCreate, created_by: uuid.UUID | None) -> SensorConfig:
     existing = await db.execute(select(SensorConfig).where(SensorConfig.sensor_id == payload.sensor_id))
     if existing.scalar_one_or_none() is not None:
         raise DuplicateError(f"A sensor with id {payload.sensor_id!r} is already registered")

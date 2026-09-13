@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions.custom_exceptions import AppException, ForbiddenError, InvalidTransitionError, NotFoundError
 from app.models.corrective_action import CorrectiveAction
-from app.models.enums import CorrectiveActionSourceType, CorrectiveActionStatus, UserRole
+from app.models.enums import CorrectiveActionPriority, CorrectiveActionSourceType, CorrectiveActionStatus, UserRole
 from app.models.user import User
 from app.schemas.corrective_action import CorrectiveActionCreate, CorrectiveActionUpdate, CorrectiveActionVerify
 from app.services import permission_service
@@ -163,6 +163,43 @@ async def verify_action(
     return action
 
 
+async def create_system_action(
+    db: AsyncSession,
+    *,
+    source_type: CorrectiveActionSourceType,
+    source_id: str,
+    title: str,
+    priority: CorrectiveActionPriority,
+) -> CorrectiveAction | None:
+    """System-actor creation (no `User`, `created_by=None`) — used by the
+    sustainability simulator when a target is repeatedly breached. Dedupes
+    against an existing OPEN/IN_PROGRESS action with the same
+    (source_type, source_id) so a periodic tick never creates duplicates;
+    returns None (no-op) when one already exists, mirroring the emergency
+    module's detect_and_create's dedup-and-reuse precedent."""
+    existing = await db.execute(
+        select(CorrectiveAction).where(
+            CorrectiveAction.source_type == source_type,
+            CorrectiveAction.source_id == source_id,
+            CorrectiveAction.status.notin_(list(_TERMINAL_STATUSES)),
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        return None
+
+    action = CorrectiveAction(
+        source_type=source_type,
+        source_id=source_id,
+        title=title,
+        priority=priority,
+        created_by=None,
+    )
+    db.add(action)
+    await db.commit()
+    await db.refresh(action)
+    return action
+
+
 async def list_open(db: AsyncSession) -> list[CorrectiveAction]:
     """Every non-terminal corrective action, regardless of source — used by
     sustainability_score_service's overdue-ratio calculation."""
@@ -177,11 +214,14 @@ async def list_open(db: AsyncSession) -> list[CorrectiveAction]:
 
 async def list_open_environmental(db: AsyncSession) -> list[CorrectiveAction]:
     """Open (non-terminal) corrective actions sourced from an environmental
-    requirement breach — feeds the sustainability dashboard."""
+    requirement breach OR a sustainability target breach (P3: Energy/Waste/
+    Land) — feeds the sustainability dashboard's "open actions" list."""
     query = (
         select(CorrectiveAction)
         .where(
-            CorrectiveAction.source_type == CorrectiveActionSourceType.ENVIRONMENTAL_REQUIREMENT,
+            CorrectiveAction.source_type.in_(
+                [CorrectiveActionSourceType.ENVIRONMENTAL_REQUIREMENT, CorrectiveActionSourceType.SUSTAINABILITY_TARGET]
+            ),
             CorrectiveAction.status.notin_(list(_TERMINAL_STATUSES)),
         )
         .order_by(CorrectiveAction.created_at.desc())

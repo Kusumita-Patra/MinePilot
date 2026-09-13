@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     ml_service_rest_url: str = "http://localhost:8000"
     frontend_origin: str = "http://localhost:3000"
     port: int = 8001
+    sustainability_simulator_enabled: bool = True
+    sustainability_simulator_interval_seconds: int = 60
 
     @property
     def async_database_url(self) -> URL:

@@ -1,13 +1,29 @@
 "use client";
 
-import { useState } from "react";
 import { RefreshCw, Crosshair, Layers, X } from "lucide-react";
 import clsx from "clsx";
 import { useTelemetry } from "@/lib/telemetryContext";
 import { formatSectorId } from "@/lib/format";
+import type { CameraPresetId } from "./types";
 
-const LEVELS = ["Surface", "Level -1", "Level -2", "Level -3", "Level -4"];
+// Each level maps to the camera preset that actually frames that depth —
+// there is no independent per-level filtering of the 3D scene, so "showing
+// a level" means flying the camera to look at it. Matches the real depths
+// in mineLayout.ts's LEVELS constant (surface=0, level1=north section,
+// level2=main network, level3=shaft sump) — there is no "Level -4" in the
+// mine model, so it was dropped rather than wired to a preset that doesn't
+// represent anything real.
+const LEVELS: { label: string; preset: CameraPresetId }[] = [
+  { label: "Surface", preset: "surfaceConveyor" },
+  { label: "Level -1", preset: "northWall" },
+  { label: "Level -2", preset: "mainPit" },
+  { label: "Level -3", preset: "deepShaftB" },
+];
 
+// bg-sky-400 for Normal matches riskColors.ts's RISK_COLOR.NORMAL (#2f7dff,
+// blue) — the single source of truth for the 3-color risk language used by
+// the tunnel tinting and sensor markers, so the legend agrees with what's
+// actually drawn in the 3D view.
 const LEGEND = [
   { label: "Normal", color: "bg-sky-400" },
   { label: "Warning", color: "bg-amber-400" },
@@ -15,8 +31,19 @@ const LEGEND = [
   { label: "Restricted", color: "bg-neutral-500" },
 ];
 
-export default function MineDigitalTwinContainer({ children }: { children: React.ReactNode }) {
-  const [level, setLevel] = useState("Level -3");
+export default function MineDigitalTwinContainer({
+  children,
+  activePreset,
+  onSelectPreset,
+}: {
+  children: React.ReactNode;
+  /** Currently active camera preset, so the matching level button highlights
+   * even when the preset was reached via the 3D view's own top-right buttons. */
+  activePreset?: CameraPresetId;
+  /** Fired when a level button is clicked — the caller is expected to feed
+   * this straight into <MineDigitalTwin cameraPreset={...}>. */
+  onSelectPreset: (preset: CameraPresetId) => void;
+}) {
   const { selected, setSelected, connected, usingMockData } = useTelemetry();
 
   return (
@@ -69,20 +96,21 @@ export default function MineDigitalTwinContainer({ children }: { children: React
       </div>
 
       <div className="flex flex-1 min-h-[460px]">
-        {/* Level selector */}
+        {/* Level selector — each button flies the camera to the preset that
+            actually frames that depth (see LEVELS above). */}
         <div className="w-24 border-r border-white/10 flex flex-col p-2 gap-1 shrink-0">
-          {LEVELS.map((l) => (
+          {LEVELS.map(({ label, preset }) => (
             <button
-              key={l}
-              onClick={() => setLevel(l)}
+              key={label}
+              onClick={() => onSelectPreset(preset)}
               className={clsx(
                 "text-[11px] px-2 py-1.5 rounded-md text-left transition-colors",
-                level === l
+                activePreset === preset
                   ? "bg-blue-600 text-white"
                   : "text-neutral-400 hover:bg-white/5 hover:text-white"
               )}
             >
-              {l}
+              {label}
             </button>
           ))}
         </div>

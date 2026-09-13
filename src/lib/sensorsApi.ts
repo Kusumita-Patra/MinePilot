@@ -49,7 +49,9 @@ export interface SensorConfig {
   manufacturer: string | null;
   model: string | null;
   status: SensorConfigStatus;
-  blueprint_id: string;
+  // null for simulator-auto-created environmental sensors with no
+  // blueprint-relative placement yet (source_type "SIMULATED").
+  blueprint_id: string | null;
   section_id: string | null;
   sector_id: BlueprintSectorId;
   level_label: string;
@@ -61,7 +63,7 @@ export interface SensorConfig {
   installation_date: string | null;
   last_calibration_at: string | null;
   next_calibration_at: string | null;
-  created_by: string;
+  created_by: string | null;
   created_at: string;
   updated_at: string;
   // Enrichment — computed by the backend, not stored columns.

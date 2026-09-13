@@ -29,6 +29,7 @@ CAPABILITIES: list[tuple[str, str]] = [
     ("emergency.resolve", "Resolve or cancel an emergency"),
     ("emergency.configure", "Configure emergency rules and evacuation exits"),
     ("emergency.simulate", "Trigger simulated emergencies and worker-position advances (demo)"),
+    ("sustainability.simulate", "Control the sustainability data simulator (start/pause/scenario) (demo)"),
 ]
 
 CAPABILITY_KEYS = {key for key, _ in CAPABILITIES}

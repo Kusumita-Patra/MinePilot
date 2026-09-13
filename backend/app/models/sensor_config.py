@@ -57,7 +57,14 @@ class SensorConfig(Base):
         sensor_source_type_enum, nullable=False, server_default=SensorSourceType.REAL.value
     )
 
-    blueprint_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("mine_blueprints.id"), nullable=False)
+    # Nullable: the sustainability simulator auto-creates environmental
+    # sensors (PM10/PM2.5/SO2/NOx) with no blueprint-relative placement yet
+    # when none exists in a fresh demo DB — see sustainability_simulator_
+    # service._ensure_environmental_sensors. source_type=SIMULATED makes
+    # this visually obvious in the registry; it's a fully real row otherwise.
+    blueprint_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("mine_blueprints.id"), nullable=True
+    )
     section_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("blueprint_sections.id"), nullable=True
     )
@@ -76,7 +83,9 @@ class SensorConfig(Base):
     last_calibration_at: Mapped[date | None] = mapped_column(Date, nullable=True)
     next_calibration_at: Mapped[date | None] = mapped_column(Date, nullable=True)
 
-    created_by: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=False)
+    # Nullable: the simulator's auto-created environmental sensors have no
+    # human actor, matching corrective_actions.created_by's precedent.
+    created_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()

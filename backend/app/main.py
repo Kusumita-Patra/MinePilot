@@ -13,18 +13,22 @@ from app.routers import (
     blueprints,
     corrective_actions,
     emergency,
+    energy,
     environment,
     health,
     incidents,
     inspections,
     kpis,
+    land,
     sensors,
     sustainability,
     telemetry,
     users,
+    waste,
     water,
 )
 from app.services.emergency_escalation_service import run_emergency_escalation_loop
+from app.services.sustainability_simulator_service import run_sustainability_simulator_loop
 from app.services.telemetry_service import run_ingestion_loop
 
 settings = get_settings()
@@ -38,10 +42,18 @@ async def lifespan(app: FastAPI):
     # ingestion loop above — the escalation timer needs a proactive tick to
     # auto-escalate a live emergency without anyone refreshing a page.
     escalation_task = asyncio.create_task(run_emergency_escalation_loop(stop_event))
+    # Third background task, same shape again — the P3 Sustainability
+    # simulator. Only created when enabled, so disabling it (e.g. for a
+    # local dev session that shouldn't churn demo data) is a pure .env
+    # toggle with no code path even running. The test suite never boots this
+    # lifespan at all, so it never runs during pytest regardless.
+    simulator_task = asyncio.create_task(run_sustainability_simulator_loop(stop_event)) if settings.sustainability_simulator_enabled else None
     yield
     stop_event.set()
     ingestion_task.cancel()
     escalation_task.cancel()
+    if simulator_task is not None:
+        simulator_task.cancel()
     try:
         await ingestion_task
     except asyncio.CancelledError:
@@ -50,6 +62,11 @@ async def lifespan(app: FastAPI):
         await escalation_task
     except asyncio.CancelledError:
         pass
+    if simulator_task is not None:
+        try:
+            await simulator_task
+        except asyncio.CancelledError:
+            pass
 
 
 app = FastAPI(title="MinePilot Backend", lifespan=lifespan)
@@ -80,3 +97,6 @@ app.include_router(water.router)
 app.include_router(corrective_actions.router)
 app.include_router(sustainability.router)
 app.include_router(emergency.router)
+app.include_router(energy.router)
+app.include_router(waste.router)
+app.include_router(land.router)
