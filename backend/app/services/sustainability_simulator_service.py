@@ -48,9 +48,9 @@ logger = logging.getLogger("minepilot.backend.sustainability_simulator")
 # list rather than inventing a second one, per spec §6.
 SECTORS: list[str] = [
     "sector_north_wall",
-    "sector_deep_shaft_b",
-    "sector_surface_conveyor",
-    "sector_main_pit",
+    "sector_shaft_b",
+    "sector_conveyor_3",
+    "sector_south_face",
 ]
 
 _BACKFILL_DAYS = 14

@@ -30,7 +30,7 @@ import {
 } from "@/lib/sustainabilityApi";
 import { getSensors, type SensorConfig } from "@/lib/sensorsApi";
 
-const SECTORS = ["sector_north_wall", "sector_deep_shaft_b", "sector_surface_conveyor", "sector_main_pit"] as const;
+const SECTORS = ["sector_north_wall", "sector_shaft_b", "sector_conveyor_3", "sector_south_face"] as const;
 
 // Reuses the exact anchor point already used to frame each sector on camera
 // — see the module docstring above for why no separate coordinate exists.
@@ -41,9 +41,9 @@ const SECTORS = ["sector_north_wall", "sector_deep_shaft_b", "sector_surface_con
 // the marker floating outside the tunnel rather than inside it.
 const SECTOR_ANCHOR: Record<(typeof SECTORS)[number], [number, number, number]> = {
   sector_north_wall: cameraPresets.northWall.target,
-  sector_deep_shaft_b: cameraPresets.deepShaftB.target,
-  sector_surface_conveyor: cameraPresets.surfaceConveyor.target,
-  sector_main_pit: cameraPresets.mainPit.target,
+  sector_shaft_b: cameraPresets.deepShaftB.target,
+  sector_conveyor_3: cameraPresets.surfaceConveyor.target,
+  sector_south_face: cameraPresets.mainPit.target,
 };
 
 // Spec §39-40 color language: energy blue/cyan, waste orange/yellow, land
